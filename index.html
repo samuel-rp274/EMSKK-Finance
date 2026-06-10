@@ -534,6 +534,12 @@ if(!invoiceType.value){
     return;
 }
 
+
+if(!document.getElementById("tanggalInvoice").value){
+    status.innerHTML = "⚠️ Pilih Tanggal Invoice";
+    return;
+}
+
     const jenis =
     document.getElementById("invoiceType").value;
 
