@@ -254,9 +254,27 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         if(!yakin) return;
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
         status.innerHTML = "✅ Invoice berhasil disimpan";
-        document.getElementById("invoiceForm").reset();
-        tomSelectNama.clear();
-        jabatan.value = "";
+		
+		// reset hanya field invoice, bukan identitas EMS
+		document.getElementById("tanggalInvoice").value = "";
+		document.getElementById("bukti").value = "";
+
+		// optional: reset section-specific input
+		document.getElementById("harga").value = "";
+		document.getElementById("qty").value = "1";
+
+		document.getElementById("jenisOperasi").value = "";
+		document.getElementById("hargaOperasi").value = "";
+		document.getElementById("qtyOperasi").value = "1";
+
+		document.getElementById("jenisSurat").value = "";
+		document.getElementById("hargaSurat").value = "";
+		document.getElementById("qtySurat").value = "1";
+
+		document.getElementById("deskripsiLain").value = "";
+		document.getElementById("hargaLain").value = "";
+		document.getElementById("qtyLain").value = "1";
+		
         document.getElementById("total").innerText="$KK 0";
         normalSection.classList.remove("hidden");
         operasiSection.classList.add("hidden");
