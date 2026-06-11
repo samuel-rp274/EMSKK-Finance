@@ -340,13 +340,25 @@ const SCRIPT_URL =
 "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 
 const emsData = {};
-fetch("https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec") //
+
+fetch(SCRIPT_URL + "?action=getEMS")
   .then(res => res.json())
   .then(data => {
+
     data.forEach(item => {
-      nama.innerHTML += `<option value="${item.nama}">${item.nama}</option>`;
+
       emsData[item.nama] = item.jabatan;
+
+      nama.innerHTML += `
+        <option value="${item.nama}">
+          ${item.nama}
+        </option>
+      `;
+
     });
+
+    new TomSelect("#nama");
+
   });
 
 const nama = document.getElementById("nama");
@@ -467,6 +479,13 @@ if(!document.getElementById("tanggalInvoice").value){
     return;
 }
 
+const bukti = document.getElementById("bukti").value;
+
+if(!bukti.includes("discord.com") && !bukti.includes("cdn.discordapp.com")){
+    status.innerHTML = "⚠️ Bukti harus link Discord";
+    return;
+}
+
     const jenis =
     document.getElementById("invoiceType").value;
 
@@ -539,6 +558,20 @@ if(!document.getElementById("tanggalInvoice").value){
     "⏳ Mengirim...";
 
     try{
+
+const yakin = confirm(
+`
+Nama: ${nama.value}
+Invoice: ${invoiceType.options[invoiceType.selectedIndex].text}
+Total: ${formatKK(hargaFinal * qtyFinal)}
+
+Lanjut simpan?
+`
+);
+
+if(!yakin){
+    return;
+}
 
         await fetch(
             SCRIPT_URL,
