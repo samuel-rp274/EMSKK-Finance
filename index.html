@@ -341,21 +341,33 @@ const SCRIPT_URL =
 
 const emsData = {};
 
+const nama = document.getElementById("nama");
+const jabatan = document.getElementById("jabatan");
+
+nama.innerHTML =
+'<option value="">Cari Nama EMS...</option>';
+
 fetch(SCRIPT_URL + "?action=getEMS")
-  .then(res => res.json())
-  .then(data => {
+.then(res => res.json())
+.then(data => {
 
     data.forEach(item => {
 
-      emsData[item.nama] = item.jabatan;
+        emsData[item.nama] = item.jabatan;
 
-      nama.innerHTML += `
-        <option value="${item.nama}">
-          ${item.nama}
-        </option>
-      `;
-
+        nama.innerHTML +=
+        `<option value="${item.nama}">
+            ${item.nama}
+        </option>`;
     });
+
+    window.tomSelectNama =
+      new TomSelect("#nama");
+
+})
+.catch(err => {
+    console.error(err);
+});
 
     new TomSelect("#nama");
 
@@ -374,12 +386,6 @@ const lainSection = document.getElementById("lainSection");
 
 nama.innerHTML =
 '<option value="">Cari Nama EMS...</option>';
-
-Object.keys(emsData).forEach(item=>{
-    nama.innerHTML += `<option value="${item}">${item}</option>`;
-});
-
-const tomSelectNama = new TomSelect("#nama");
 
 nama.addEventListener("change",()=>{
     document.getElementById("jabatan").value =
