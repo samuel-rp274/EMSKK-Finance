@@ -47,7 +47,9 @@ button:hover{opacity:.9;}
 <form id="invoiceForm">
 <div class="form-group">
 <label>Nama EMS</label>
-<select id="nama"></select>
+<select id="nama">
+    <option value=""></option>
+</select>
 </div>
 
 <div class="form-group">
@@ -126,27 +128,48 @@ const nama = document.getElementById("nama");
 const jabatan = document.getElementById("jabatan");
 
 // Fetch data EMS
+
 fetch(SCRIPT_URL + "?action=getEMS")
 .then(res => res.json())
 .then(data => {
+
+    // placeholder kosong
+    const kosong = document.createElement("option");
+    kosong.value = "";
+    kosong.text = "";
+    nama.appendChild(kosong);
+
     data.forEach(item => {
+
         if(item.nama && item.jabatan){
+
             emsData[item.nama] = item.jabatan;
+
             const option = document.createElement("option");
             option.value = item.nama;
-            option.text = item.nama;
+            option.textContent = item.nama;
+
             nama.appendChild(option);
+        }
+
+    });
+
+    window.tomSelectNama = new TomSelect("#nama", {
+        placeholder: "Cari Nama EMS...",
+        create: false,
+        maxOptions: 500,
+        sortField: {
+            field: "text",
+            direction: "asc"
         }
     });
 
-    // Initialize TomSelect after all options are added
-    window.tomSelectNama = new TomSelect("#nama", {
-        allowEmptyOption: true,
-        create: false,
-        sortField: { field: "text", direction: "asc" }
-    });
+    tomSelectNama.clear();
+
 })
-.catch(err => console.error("Gagal load EMS:", err));
+.catch(err => {
+    console.error("Gagal load EMS:", err);
+});
 
 // Update jabatan saat nama dipilih
 nama.addEventListener("change", () => {
