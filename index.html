@@ -47,9 +47,7 @@ button:hover{opacity:.9;}
 <form id="invoiceForm">
 <div class="form-group">
 <label>Nama EMS</label>
-<select id="nama">
-    <option value=""></option>
-</select>
+<select id="nama"></select>
 </div>
 
 <div class="form-group">
@@ -128,48 +126,27 @@ const nama = document.getElementById("nama");
 const jabatan = document.getElementById("jabatan");
 
 // Fetch data EMS
-
 fetch(SCRIPT_URL + "?action=getEMS")
 .then(res => res.json())
 .then(data => {
-
-    // placeholder kosong
-    const kosong = document.createElement("option");
-    kosong.value = "";
-    kosong.text = "";
-    nama.appendChild(kosong);
-
     data.forEach(item => {
-
         if(item.nama && item.jabatan){
-
             emsData[item.nama] = item.jabatan;
-
             const option = document.createElement("option");
             option.value = item.nama;
             option.textContent = item.nama;
-
             nama.appendChild(option);
         }
-
     });
 
+    // Initialize TomSelect AFTER all options added
     window.tomSelectNama = new TomSelect("#nama", {
         placeholder: "Cari Nama EMS...",
         create: false,
-        maxOptions: 500,
-        sortField: {
-            field: "text",
-            direction: "asc"
-        }
+        sortField: { field: "text", direction: "asc" }
     });
-
-    tomSelectNama.clear();
-
 })
-.catch(err => {
-    console.error("Gagal load EMS:", err);
-});
+.catch(err => console.error("Gagal load EMS:", err));
 
 // Update jabatan saat nama dipilih
 nama.addEventListener("change", () => {
@@ -254,37 +231,38 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         if(!yakin) return;
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
         status.innerHTML = "✅ Invoice berhasil disimpan";
-		
-		// reset hanya field invoice, bukan identitas EMS
-		document.getElementById("tanggalInvoice").value = "";
-		document.getElementById("bukti").value = "";
 
-		// optional: reset section-specific input
-		document.getElementById("harga").value = "";
-		document.getElementById("qty").value = "1";
+        document.getElementById("invoiceForm").reset();
 
-		document.getElementById("jenisOperasi").value = "";
-		document.getElementById("hargaOperasi").value = "";
-		document.getElementById("qtyOperasi").value = "1";
+        // reset section input
+        document.getElementById("harga").value = "";
+        document.getElementById("qty").value = "1";
+        document.getElementById("jenisOperasi").value = "";
+        document.getElementById("hargaOperasi").value = "";
+        document.getElementById("qtyOperasi").value = "1";
+        document.getElementById("jenisSurat").value = "";
+        document.getElementById("hargaSurat").value = "";
+        document.getElementById("qtySurat").value = "1";
+        document.getElementById("deskripsiLain").value = "";
+        document.getElementById("hargaLain").value = "";
+        document.getElementById("qtyLain").value = "1";
 
-		document.getElementById("jenisSurat").value = "";
-		document.getElementById("hargaSurat").value = "";
-		document.getElementById("qtySurat").value = "1";
-
-		document.getElementById("deskripsiLain").value = "";
-		document.getElementById("hargaLain").value = "";
-		document.getElementById("qtyLain").value = "1";
-		
         document.getElementById("total").innerText="$KK 0";
         normalSection.classList.remove("hidden");
         operasiSection.classList.add("hidden");
         suratSection.classList.add("hidden");
         lainSection.classList.add("hidden");
+
+        // reset tomSelect
+        tomSelectNama.clear();
+        jabatan.value = "";
+
     } catch(err){
         console.error(err);
         status.innerHTML = "❌ Gagal mengirim invoice";
     }
 });
 </script>
+
 </body>
 </html>
