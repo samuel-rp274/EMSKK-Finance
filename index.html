@@ -47,7 +47,9 @@ button:hover{opacity:.9;}
 <form id="invoiceForm">
 <div class="form-group">
 <label>Nama EMS</label>
-<select id="nama"></select>
+<select id="nama">
+    <option value=""></option>
+</select>
 </div>
 
 <div class="form-group">
@@ -81,8 +83,8 @@ button:hover{opacity:.9;}
 
 <!-- NORMAL -->
 <div id="normalSection">
-  <div class="form-group"><label>Harga</label><input type="number" id="harga" readonly min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qty" value="1" min="0"></div>
+  <div class="form-group"><label>Harga</label><input type="number" id="harga" readonly></div>
+  <div class="form-group"><label>Kuantitas</label><input type="number" id="qty" value="1" min="1"></div>
 </div>
 
 <!-- OPERASI -->
@@ -90,22 +92,22 @@ button:hover{opacity:.9;}
   <div class="form-group"><label>Jenis Operasi</label><input type="text" id="jenisOperasi"></div>
   <div class="form-group"><label>Rawat Inap</label><select id="rawatInap"><option>Reguler</option><option>VIP</option><option>VVIP</option></select></div>
   <div class="form-group"><label>Pembayaran</label><select id="pembayaran"><option>BPJS</option><option>Non BPJS</option></select></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaOperasi" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyOperasi" value="1" min="0"></div>
+  <div class="form-group"><label>Harga</label><input type="number" id="hargaOperasi"></div>
+  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyOperasi" value="1"></div>
 </div>
 
 <!-- SURAT -->
 <div id="suratSection" class="hidden">
   <div class="form-group"><label>Jenis Surat</label><input type="text" id="jenisSurat"></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaSurat" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtySurat" value="1" min="0"></div>
+  <div class="form-group"><label>Harga</label><input type="number" id="hargaSurat"></div>
+  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtySurat" value="1"></div>
 </div>
 
 <!-- LAIN -->
 <div id="lainSection" class="hidden">
   <div class="form-group"><label>Deskripsi</label><input type="text" id="deskripsiLain"></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaLain" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyLain" value="1" min="0"></div>
+  <div class="form-group"><label>Harga</label><input type="number" id="hargaLain"></div>
+  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyLain" value="1"></div>
 </div>
 
 <div class="form-group"><label>Link Bukti Invoice</label><input type="url" id="bukti"></div>
@@ -126,27 +128,48 @@ const nama = document.getElementById("nama");
 const jabatan = document.getElementById("jabatan");
 
 // Fetch data EMS
+
 fetch(SCRIPT_URL + "?action=getEMS")
 .then(res => res.json())
 .then(data => {
+
+    // placeholder kosong
+    const kosong = document.createElement("option");
+    kosong.value = "";
+    kosong.text = "";
+    nama.appendChild(kosong);
+
     data.forEach(item => {
+
         if(item.nama && item.jabatan){
+
             emsData[item.nama] = item.jabatan;
+
             const option = document.createElement("option");
             option.value = item.nama;
             option.textContent = item.nama;
+
             nama.appendChild(option);
         }
+
     });
 
-    // Initialize TomSelect AFTER all options added
     window.tomSelectNama = new TomSelect("#nama", {
         placeholder: "Cari Nama EMS...",
         create: false,
-        sortField: { field: "text", direction: "asc" }
+        maxOptions: 500,
+        sortField: {
+            field: "text",
+            direction: "asc"
+        }
     });
+
+    tomSelectNama.clear();
+
 })
-.catch(err => console.error("Gagal load EMS:", err));
+.catch(err => {
+    console.error("Gagal load EMS:", err);
+});
 
 // Update jabatan saat nama dipilih
 nama.addEventListener("change", () => {
@@ -231,38 +254,19 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         if(!yakin) return;
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
         status.innerHTML = "✅ Invoice berhasil disimpan";
-
         document.getElementById("invoiceForm").reset();
-
-        // reset section input
-        document.getElementById("harga").value = "";
-        document.getElementById("qty").value = "1";
-        document.getElementById("jenisOperasi").value = "";
-        document.getElementById("hargaOperasi").value = "";
-        document.getElementById("qtyOperasi").value = "1";
-        document.getElementById("jenisSurat").value = "";
-        document.getElementById("hargaSurat").value = "";
-        document.getElementById("qtySurat").value = "1";
-        document.getElementById("deskripsiLain").value = "";
-        document.getElementById("hargaLain").value = "";
-        document.getElementById("qtyLain").value = "1";
-
+        tomSelectNama.clear();
+        jabatan.value = "";
         document.getElementById("total").innerText="$KK 0";
         normalSection.classList.remove("hidden");
         operasiSection.classList.add("hidden");
         suratSection.classList.add("hidden");
         lainSection.classList.add("hidden");
-
-        // reset tomSelect
-        tomSelectNama.clear();
-        jabatan.value = "";
-
     } catch(err){
         console.error(err);
         status.innerHTML = "❌ Gagal mengirim invoice";
     }
 });
 </script>
-
 </body>
 </html>
