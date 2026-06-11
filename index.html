@@ -245,14 +245,25 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         if(!yakin) return;
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
         status.innerHTML = "✅ Invoice berhasil disimpan";
-        document.getElementById("invoiceForm").reset();
-        tomSelectNama.clear();
-        jabatan.value = "";
-        document.getElementById("total").innerText="$KK 0";
-        normalSection.classList.remove("hidden");
-        operasiSection.classList.add("hidden");
-        suratSection.classList.add("hidden");
-        lainSection.classList.add("hidden");
+        
+		// Simpan nilai Nama & Jabatan sebelum reset
+		const namaTerpilih = nama.value;
+		const jabatanTerpilih = jabatan.value;
+
+		// Reset form tapi tetap pertahankan Nama & Jabatan
+		document.getElementById("invoiceForm").reset();
+
+		// Restore Nama & Jabatan
+		tomSelectNama.setValue(namaTerpilih);
+		jabatan.value = jabatanTerpilih;
+
+		// Reset total dan sections
+		document.getElementById("total").innerText="$KK 0";
+		normalSection.classList.remove("hidden");
+		operasiSection.classList.add("hidden");
+		suratSection.classList.add("hidden");
+		lainSection.classList.add("hidden");
+		
     } catch(err){
         console.error(err);
         status.innerHTML = "❌ Gagal mengirim invoice";
