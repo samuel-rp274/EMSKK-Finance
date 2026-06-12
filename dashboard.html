@@ -38,6 +38,7 @@ a{color:#60a5fa;}
 
 /* TomSelect styling */
 .ts-control { background: var(--input) !important; color: white !important; border-radius:12px !important; padding:12px !important; }
+.ts-control input { color:white !important; } /* warna font saat ketik */
 .ts-dropdown { background: var(--card) !important; color: white !important; border: none !important; }
 .ts-dropdown .option { color: white !important; }
 .ts-dropdown .active { background: var(--primary) !important; }
@@ -91,24 +92,23 @@ a{color:#60a5fa;}
 </div>
 
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec"; // ganti dengan URL Apps Script
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 
 let allInvoices = [];
 let filteredInvoices = [];
+let tomSelectInstance = null;
 
-// Load nama EMS dan inisialisasi TomSelect
 async function loadEMS(){
     const res = await fetch(SCRIPT_URL+"?action=getEMS");
     const data = await res.json();
     const select = document.getElementById("searchEMS");
 
-    // Option kosong default
+    // option kosong default
     const defaultOption = document.createElement("option");
     defaultOption.value = "";
     defaultOption.textContent = "";
     select.appendChild(defaultOption);
 
-    // Tambah nama EMS
     data.forEach(item=>{
         const option = document.createElement("option");
         option.value = item.nama;
@@ -116,17 +116,19 @@ async function loadEMS(){
         select.appendChild(option);
     });
 
-    // Inisialisasi TomSelect
-    new TomSelect("#searchEMS",{
+    // Inisialisasi TomSelect dan event change
+    tomSelectInstance = new TomSelect("#searchEMS",{
         create:false,
         sortField:{field:"text",direction:"asc"},
-        placeholder:"Cari nama EMS..."
+        placeholder:"Cari nama EMS...",
+        onChange: function(value){
+            renderTable();
+        }
     });
 
     loadData();
 }
 
-// Load semua invoice
 async function loadData(){
     try{
         const res = await fetch(SCRIPT_URL+"?action=getInvoices");
@@ -137,7 +139,6 @@ async function loadData(){
     }
 }
 
-// Hitung minggu (Minggu-Sabtu)
 function getWeekRange(date){
     const d = new Date(date);
     const day = d.getDay();
@@ -148,11 +149,8 @@ function getWeekRange(date){
     return {start,end};
 }
 
-// Render tabel dan statistik
 function renderTable(){
-    const select = document.getElementById("searchEMS");
-    const nameInput = select.value.trim().toLowerCase();
-
+    const nameInput = tomSelectInstance ? tomSelectInstance.getValue().trim().toLowerCase() : "";
     if(!nameInput){
         document.getElementById("tbody").innerHTML = `<tr><td colspan="5" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
         document.getElementById("jumlahInvoice").innerText = 0;
@@ -161,7 +159,6 @@ function renderTable(){
         return;
     }
 
-    // Filter nama EMS
     filteredInvoices = allInvoices.filter(i => i["Nama"].toLowerCase() === nameInput);
 
     if(filteredInvoices.length===0){
@@ -184,7 +181,6 @@ function renderTable(){
     document.getElementById("jumlahInvoice").innerText = weekInvoices.length;
     document.getElementById("totalGaji").innerText = "$KK "+total.toLocaleString("id-ID");
 
-    // Upload terakhir
     const last = filteredInvoices.reduce((prev,i)=>{
         const d = new Date(i["Tanggal Invoice"]);
         return (!prev || d>prev.date)?{date:d,inv:i}:prev;
@@ -192,9 +188,8 @@ function renderTable(){
 
     document.getElementById("uploadTerakhir").innerText = last?`${last.date.toLocaleDateString('id-ID')} - ${last.inv["Jenis Invoice"]}`:"-";
 
-    // Render tabel
     const tbody = document.getElementById("tbody");
-    tbody.innerHTML = weekInvoices.map(i=>`
+    tbody.innerHTML = weekInvoices.length > 0 ? weekInvoices.map(i=>`
         <tr>
             <td>${i["Tanggal Invoice"] || "-"}</td>
             <td>${i["Jenis Invoice"] || "-"}</td>
@@ -202,7 +197,7 @@ function renderTable(){
             <td>$KK ${(Number(i["Total"])||0).toLocaleString("id-ID")}</td>
             <td><a href="${i["Bukti"]}" target="_blank">Lihat</a></td>
         </tr>
-    `).join("");
+    `).join("") : `<tr><td colspan="5" class="empty">Belum ada invoice minggu ini</td></tr>`;
 }
 
 document.addEventListener("DOMContentLoaded",()=>{ loadEMS(); });
