@@ -44,22 +44,22 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 </style>
 </head>
 <body>
-
 <div class="container">
 
 <!-- NAVBAR ADMIN -->
 <div style="display:flex;justify-content:center;margin-bottom:20px;">
     <div style="display:flex;gap:6px;background:#1e293b;padding:6px 12px;border-radius:12px;box-shadow:0 6px 18px rgba(0,0,0,.3);">
-        <a href="index.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:white;background:#334155;font-weight:600;transition:.2s;" onmouseover="this.style.background='#475569'" onmouseout="this.style.background='#334155'">Input</a>
-        <a href="dashboard.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:white;background:#334155;font-weight:600;transition:.2s;" onmouseover="this.style.background='#475569'" onmouseout="this.style.background='#334155'">Dashboard</a>
-        <a href="admin.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:#0f172a;background:#f8fafc;font-weight:700;transition:.2s;" onmouseover="this.style.opacity='0.85'" onmouseout="this.style.opacity='1'">Admin</a>
+        <a href="index.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:white;background:#334155;font-weight:600;">Input</a>
+        <a href="dashboard.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:white;background:#334155;font-weight:600;">Dashboard</a>
+        <a href="admin.html" style="padding:8px 14px;border-radius:12px;text-decoration:none;color:#0f172a;background:#f8fafc;font-weight:700;">Admin</a>
     </div>
 </div>
 
 <!-- Login Card -->
 <div class="card" id="loginCard">
     <h1>Admin Dashboard</h1>
-    <div class="subtitle">Halaman ini hanya dapat diakses oleh administrator EMS.</div>
+    <div class="subtitle">Masukkan password admin untuk akses</div>
+    <input type="password" id="adminPassword" placeholder="Password Admin">
     <button onclick="checkLogin()">Masuk</button>
     <div id="loginStatus"></div>
 </div>
@@ -68,7 +68,6 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 <div class="card hidden" id="adminPanel">
     <h1>Admin Dashboard EMS</h1>
     <div class="subtitle">Filter dan lihat invoice mingguan</div>
-
     <div class="form-group">
         <label>Pilih Minggu</label>
         <select id="weekSelect"></select>
@@ -112,37 +111,31 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-
 const POTONGAN = {
-  "PETINGGI": 0.25,
-  "PENGURUS": 0.25,
-  "SPESIALIS": 0.30,
-  "UMUM": 0.40,
-  "LAB": 0.35,
-  "OBGYN": 0.35,
-  "OPLAS": 0.35
+  "PETINGGI":0.25,"PENGURUS":0.25,"SPESIALIS":0.30,"UMUM":0.40,"LAB":0.35,"OBGYN":0.35,"OPLAS":0.35
 };
+let allInvoices = [], weekRanges = [];
 
-let allInvoices = [];
-let weekRanges = [];
-
-// Login via Google Apps Script
-function checkLogin(){
-    document.getElementById("loginStatus").innerText = "⏳ Memeriksa akses...";
-    google.script.run
-      .withSuccessHandler(isAdmin=>{
-          if(isAdmin){
-              document.getElementById("loginCard").classList.add("hidden");
-              document.getElementById("adminPanel").classList.remove("hidden");
-              loadData();
-          } else {
-              document.getElementById("loginStatus").innerText = "❌ Anda tidak memiliki akses admin";
-          }
-      })
-      .isAdmin();
+// Login Admin
+async function checkLogin(){
+    const pw = document.getElementById("adminPassword").value.trim();
+    document.getElementById("loginStatus").innerText = "⏳ Memeriksa password...";
+    try{
+        const res = await fetch(SCRIPT_URL + "?action=verifyAdmin&password=" + encodeURIComponent(pw));
+        const data = await res.json();
+        if(data.success){
+            document.getElementById("loginCard").classList.add("hidden");
+            document.getElementById("adminPanel").classList.remove("hidden");
+            loadData();
+        } else {
+            document.getElementById("loginStatus").innerText = "❌ Password salah";
+        }
+    }catch(e){
+        document.getElementById("loginStatus").innerText = "❌ Gagal memeriksa password";
+    }
 }
 
-// Load invoice data
+// Load invoice
 async function loadData(){
     const res = await fetch(SCRIPT_URL+"?action=getInvoices");
     allInvoices = await res.json();
@@ -150,85 +143,66 @@ async function loadData(){
     renderTable();
 }
 
-// Populate minggu dropdown (Minggu → Sabtu)
+// Populate minggu (Minggu → Sabtu)
 function populateWeeks(){
     const select = document.getElementById("weekSelect");
     const dates = allInvoices.map(i=>new Date(i["Tanggal Invoice"]));
     const weeks = {};
-
     dates.forEach(d=>{
-        const start = new Date(d); start.setDate(d.getDate()-d.getDay()); start.setHours(0,0,0,0); // Minggu
-        const end = new Date(start); end.setDate(start.getDate()+6); end.setHours(23,59,59,999); // Sabtu
+        const start = new Date(d); start.setDate(d.getDate()-d.getDay()); start.setHours(0,0,0,0);
+        const end = new Date(start); end.setDate(start.getDate()+6); end.setHours(23,59,59,999);
         const key = start.toISOString().split("T")[0]+"|"+end.toISOString().split("T")[0];
-        if(!weeks[key]) weeks[key] = {start,end};
+        if(!weeks[key]) weeks[key]={start,end};
     });
-
     weekRanges = Object.values(weeks);
     Object.keys(weeks).forEach(key=>{
-        const opt = document.createElement("option");
-        opt.value = key;
-        const [s,e] = key.split("|");
-        opt.textContent = s+" s/d "+e;
+        const opt=document.createElement("option");
+        opt.value=key;
+        const [s,e]=key.split("|");
+        opt.textContent=s+" s/d "+e;
         select.appendChild(opt);
     });
-
     select.addEventListener("change", renderTable);
 }
 
-// Render tabel, stats, Top 3, dan Detail
+// Render tabel, stats, top 3 dan detail
 function renderTable(){
-    const select = document.getElementById("weekSelect");
-    const key = select.value;
+    const select=document.getElementById("weekSelect");
+    const key=select.value;
     if(!key) return;
-
-    const [startStr,endStr] = key.split("|");
-    const start = new Date(startStr);
-    const end = new Date(endStr);
-
-    const weekInvoices = allInvoices.filter(i=>{
-        const t = new Date(i["Tanggal Invoice"]);
+    const [startStr,endStr]=key.split("|");
+    const start=new Date(startStr);
+    const end=new Date(endStr);
+    const weekInvoices=allInvoices.filter(i=>{
+        const t=new Date(i["Tanggal Invoice"]);
         return t>=start && t<=end;
     });
-
-    // Group by nama
-    const payroll = {};
+    const payroll={};
     weekInvoices.forEach(i=>{
-        const nama = i["Nama"];
-        const divisi = i["Divisi"];
-        const total = Number(i["Total"])||0;
-        if(!payroll[nama]){
-            payroll[nama]={divisi,total:0,invoices:[]};
-        }
-        payroll[nama].total += total;
+        const nama=i["Nama"];
+        const divisi=i["Divisi"];
+        const total=Number(i["Total"])||0;
+        if(!payroll[nama]) payroll[nama]={divisi,total:0,invoices:[]};
+        payroll[nama].total+=total;
         payroll[nama].invoices.push(i);
     });
-
-    // Hitung gaji bersih
     Object.keys(payroll).forEach(n=>{
-        const divisi = payroll[n].divisi;
-        const potongan = POTONGAN[divisi]||0;
-        payroll[n].potongan = potongan;
-        payroll[n].gaji = payroll[n].total*(1-potongan);
+        const divisi=payroll[n].divisi;
+        const potongan=POTONGAN[divisi]||0;
+        payroll[n].potongan=potongan;
+        payroll[n].gaji=payroll[n].total*(1-potongan);
     });
 
-    // Update stats
-    const totals = Object.values(payroll).reduce((a,b)=>a+b.gaji,0);
-    const jumlahInv = weekInvoices.length;
-    document.getElementById("jumlahInvoice").innerText = jumlahInv;
-    document.getElementById("totalGaji").innerText = "$KK "+totals.toLocaleString("id-ID");
+    const totals=Object.values(payroll).reduce((a,b)=>a+b.gaji,0);
+    document.getElementById("jumlahInvoice").innerText=weekInvoices.length;
+    document.getElementById("totalGaji").innerText="$KK "+totals.toLocaleString("id-ID");
 
-    // Top 3 berdasarkan gaji bersih
-    const top3 = Object.entries(payroll).sort((a,b)=>b[1].gaji-a[1].gaji).slice(0,3);
-    document.getElementById("topGaji").innerHTML = top3.map((t,i)=>`${["🥇","🥈","🥉"][i]} ${t[0]} ($KK ${t[1].gaji.toLocaleString("id-ID")})`).join("<br>");
+    const top3=Object.entries(payroll).sort((a,b)=>b[1].gaji-a[1].gaji).slice(0,3);
+    document.getElementById("topGaji").innerHTML=top3.map((t,i)=>`${["🥇","🥈","🥉"][i]} ${t[0]} ($KK ${t[1].gaji.toLocaleString("id-ID")})`).join("<br>");
 
-    // Render tabel
-    const tbody = document.getElementById("tbody");
-    if(Object.keys(payroll).length===0){
-        tbody.innerHTML='<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>';
-        return;
-    }
-
-    tbody.innerHTML = Object.entries(payroll).map(([n,v])=>`
+    const tbody=document.getElementById("tbody");
+    if(Object.keys(payroll).length===0){tbody.innerHTML='<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>';return;}
+    tbody.innerHTML=Object.entries(payroll).map(([n,v])=>`
         <tr>
             <td>${n}</td>
             <td>${v.divisi}</td>
@@ -258,8 +232,8 @@ function renderTable(){
 }
 
 function toggleDetail(n){
-    const id = "detail-"+n.replace(/\s+/g,'');
-    const row = document.getElementById(id);
+    const id="detail-"+n.replace(/\s+/g,'');
+    const row=document.getElementById(id);
     if(row) row.classList.toggle("hidden");
 }
 </script>
