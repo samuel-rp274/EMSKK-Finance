@@ -187,6 +187,36 @@ const operasiSection = document.getElementById("operasiSection");
 const suratSection = document.getElementById("suratSection");
 const lainSection = document.getElementById("lainSection");
 
+const tanggalInvoice = document.getElementById("tanggalInvoice");
+
+// =========================
+// BATASI TANGGAL MINGGU AKTIF
+// =========================
+(function(){
+
+    const now = new Date();
+
+    // Minggu = awal minggu
+    const start = new Date(now);
+    start.setHours(0,0,0,0);
+    start.setDate(now.getDate() - now.getDay());
+
+    // Sabtu = akhir minggu
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+
+    const formatDate = (d)=>{
+        const y = d.getFullYear();
+        const m = String(d.getMonth()+1).padStart(2,"0");
+        const day = String(d.getDate()).padStart(2,"0");
+        return `${y}-${m}-${day}`;
+    };
+
+    tanggalInvoice.min = formatDate(start);
+    tanggalInvoice.max = formatDate(end);
+
+})();
+
 // Fetch data EMS
 fetch(SCRIPT_URL + "?action=getEMS")
 .then(res => res.json())
