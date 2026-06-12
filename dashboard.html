@@ -1,241 +1,9 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard EMS</title>
-
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
-<style>
-:root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --input:#334155;
-    --primary:#dc2626;
-    --text:#f8fafc;
-    --muted:#94a3b8;
-}
-
-*{
-    box-sizing:border-box;
-    margin:0;
-    padding:0;
-    font-family:Inter,Arial,sans-serif;
-}
-
-body{
-    background:var(--bg);
-    color:var(--text);
-    padding:30px;
-}
-
-.container{
-    max-width:1200px;
-    margin:auto;
-}
-
-.card{
-    background:var(--card);
-    border-radius:20px;
-    padding:24px;
-    margin-bottom:20px;
-}
-
-h1{margin-bottom:8px;}
-.subtitle{color:var(--muted);margin-bottom:20px;}
-
-select,input{
-    width:100%;
-    padding:12px;
-    border:none;
-    border-radius:12px;
-    background:var(--input);
-    color:white;
-    font-size:14px;
-    margin-bottom:15px;
-}
-
-.stats{
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-    gap:15px;
-    margin-top:20px;
-}
-
-.stat{
-    background:#111827;
-    border-radius:15px;
-    padding:20px;
-}
-
-.stat-title{color:var(--muted);font-size:13px;}
-.stat-value{font-size:24px;font-weight:bold;margin-top:8px;}
-
-table{
-    width:100%;
-    border-collapse:collapse;
-    margin-top:20px;
-}
-
-th{
-    background:#111827;
-    padding:12px;
-    text-align:left;
-}
-
-td{
-    padding:12px;
-    border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-tr:hover{background:rgba(255,255,255,.03);}
-a{color:#60a5fa;}
-.empty{text-align:center;color:var(--muted);padding:30px;}
-
-/* TomSelect */
-.ts-control{background:var(--input)!important;color:white!important;border-radius:12px!important;padding:12px!important;}
-.ts-control input{color:white!important;}
-.ts-dropdown{background:var(--card)!important;color:white!important;border:none!important;}
-.ts-dropdown .option{color:white!important;}
-.ts-dropdown .active{background:var(--primary)!important;}
-</style>
-</head>
-
-<body>
-
-<!-- NAVBAR CENTERED -->
-<div style="display:flex;justify-content:center;margin-bottom:20px;">
-    <div style="
-        display:flex;
-        gap:6px;
-        background:#1e293b;
-        padding:6px 12px;
-        border-radius:12px;
-        box-shadow:0 6px 18px rgba(0,0,0,.3);
-    ">
-
-        <!-- INPUT (NON AKTIF) -->
-        <a href="index.html" style="
-            padding:8px 14px;
-            border-radius:12px;
-            text-decoration:none;
-            color:white;
-            background:#334155;
-            font-weight:600;
-        "
-        onmouseover="this.style.background='#475569'"
-        onmouseout="this.style.background='#334155'">
-            Input
-        </a>
-
-        <!-- DASHBOARD (AKTIF) -->
-        <a href="dashboard.html" style="
-            padding:8px 14px;
-            border-radius:12px;
-            text-decoration:none;
-            color:#0f172a;
-            background:#f8fafc;
-            font-weight:700;
-        "
-        onmouseover="this.style.opacity='0.85'"
-        onmouseout="this.style.opacity='1'">
-            Dashboard
-        </a>
-
-    </div>
-</div>
-
-<div class="container">
-
-<div class="card">
-<h1>Dashboard EMS</h1>
-<div class="subtitle">Cek invoice yang sudah diupload</div>
-
-<select id="searchEMS" placeholder="Cari nama EMS..."></select>
-
-<div class="stats">
-<div class="stat">
-<div class="stat-title">Jumlah Invoice Minggu Ini</div>
-<div class="stat-value" id="jumlahInvoice">0</div>
-</div>
-<div class="stat">
-<div class="stat-title">Total Invoice Minggu Ini</div>
-<div class="stat-value" id="totalGaji">$KK 0</div>
-</div>
-<div class="stat">
-<div class="stat-title">Upload Terakhir</div>
-<div class="stat-value" id="uploadTerakhir">-</div>
-</div>
-</div>
-</div>
-
-<div class="card">
-<table>
-<thead>
-<tr>
-<th>Tanggal</th>
-<th>Invoice</th>
-<th>Qty</th>
-<th>Total</th>
-<th>Bukti</th>
-</tr>
-</thead>
-<tbody id="tbody">
-<tr>
-<td colspan="5" class="empty">Pilih EMS terlebih dahulu</td>
-</tr>
-</tbody>
-</table>
-</div>
-
-</div>
-
 <script>
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-
-let allInvoices = [];
-let tomSelectInstance = null;
-
-async function loadEMS(){
-    const res = await fetch(SCRIPT_URL+"?action=getEMS");
-    const data = await res.json();
-    const select = document.getElementById("searchEMS");
-
-    data.forEach(item=>{
-        const opt = document.createElement("option");
-        opt.value = item.nama;
-        opt.textContent = item.nama;
-        select.appendChild(opt);
-    });
-
-    tomSelectInstance = new TomSelect("#searchEMS",{
-        create:false,
-        sortField:{field:"text",direction:"asc"},
-        placeholder:"Cari nama EMS...",
-        onChange: renderTable
-    });
-    tomSelectInstance.clear(true);
-    tomSelectInstance.setValue('');
-
-    loadData();
-}
-
-async function loadData(){
-    const res = await fetch(SCRIPT_URL+"?action=getInvoices");
-    allInvoices = await res.json();
-    renderTable();
-}
-
-function getWeekRange(date){
-    const d = new Date(date);
-    const day = d.getDay();
-    const start = new Date(d);
-    start.setDate(d.getDate()-day);
-    const end = new Date(start);
-    end.setDate(start.getDate()+6);
-    return {start,end};
+// Fungsi konversi ke WIB (UTC+7), output YYYY-MM-DD
+function formatTanggalWIB(dateStr){
+    const d = new Date(dateStr);
+    d.setHours(d.getHours() + 7); // +7 jam ke WIB
+    return d.toISOString().split('T')[0];
 }
 
 function renderTable(){
@@ -270,14 +38,13 @@ function renderTable(){
         new Date(b["Tanggal Invoice"])-new Date(a["Tanggal Invoice"])
     )[0];
 
-    // Format Upload Terakhir hanya YYYY-MM-DD
+    // Upload Terakhir pakai WIB
     document.getElementById("uploadTerakhir").innerText =
-        last ? new Date(last["Tanggal Invoice"]).toISOString().split('T')[0]
-               + " - " + last["Jenis Invoice"] : "-";
+        last ? formatTanggalWIB(last["Tanggal Invoice"]) + " - " + last["Jenis Invoice"] : "-";
 
     document.getElementById("tbody").innerHTML = week.map(i=>`
         <tr>
-            <td>${new Date(i["Tanggal Invoice"]).toISOString().split('T')[0]}</td>
+            <td>${formatTanggalWIB(i["Tanggal Invoice"])}</td>
             <td>${i["Jenis Invoice"]}</td>
             <td>${i["Qty"]}</td>
             <td>$KK ${Number(i["Total"]).toLocaleString("id-ID")}</td>
@@ -285,9 +52,4 @@ function renderTable(){
         </tr>
     `).join("");
 }
-
-document.addEventListener("DOMContentLoaded",loadEMS);
 </script>
-
-</body>
-</html>
