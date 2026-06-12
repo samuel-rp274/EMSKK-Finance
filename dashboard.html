@@ -259,21 +259,26 @@ function renderTable(){
         `<tr><td colspan="5" class="empty">Belum ada invoice</td></tr>`;
         return;
     }
-
-    const {start,end}=getWeekRange(new Date());
 	
-	const week = filtered.filter(i => {
+	const {start,end}=getWeekRange(new Date());
+
+// Invoice minggu aktif
+const weekInvoices = filtered.filter(i => {
 
     const t = new Date(i["Tanggal Invoice"]);
 
     return t >= start && t <= end;
 
 });
-	
-    document.getElementById("jumlahInvoice").innerText = week.length;
-    document.getElementById("totalGaji").innerText =
-    "$KK "+week.reduce((a,b)=>a+(Number(b["Total"])||0),0).toLocaleString("id-ID");
 
+document.getElementById("jumlahInvoice").innerText =
+weekInvoices.length;
+
+document.getElementById("totalGaji").innerText =
+"$KK " + weekInvoices
+    .reduce((a,b)=>a+(Number(b["Total"])||0),0)
+    .toLocaleString("id-ID");
+	
     const last = filtered.sort((a,b)=>
         new Date(b["Tanggal Invoice"])-new Date(a["Tanggal Invoice"])
     )[0];
@@ -281,14 +286,13 @@ function renderTable(){
     // Format Upload Terakhir hanya YYYY-MM-DD
 	document.getElementById("uploadTerakhir").innerText =
 	last
-	? new Date(last["Tanggal Invoice"]).toLocaleDateString("id-ID")
-	+ " - " + last["Jenis Invoice"]
-	: "-";	
+	? last["Tanggal Invoice"] + " - " + last["Jenis Invoice"]
+	: "-";
 	
-    document.getElementById("tbody").innerHTML = week.map(i=>`
+	document.getElementById("tbody").innerHTML = filtered.map(i=>`
         <tr>
-			<td>${new Date(i["Tanggal Invoice"]).toLocaleDateString("id-ID")}</td>
-            <td>${i["Jenis Invoice"]}</td>
+			<td>${i["Tanggal Invoice"]}</td>
+			<td>${i["Jenis Invoice"]}</td>
             <td>${i["Qty"]}</td>
             <td>$KK ${Number(i["Total"]).toLocaleString("id-ID")}</td>
             <td><a href="${i["Bukti"]}" target="_blank">Lihat</a></td>
