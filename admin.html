@@ -185,22 +185,25 @@ function populateWeeks(){
 
   allInvoices.forEach(i => {
     const date = parseDateSafe(i["Tanggal Invoice"]);
-
+	date.setHours(0,0,0,0);
+	
     const day = date.getDay();
-
-    const start = new Date(date);
-    start.setDate(date.getDate() - day);
-    start.setHours(0,0,0,0);
+	
+	const start = new Date(date);
+	start.setHours(0,0,0,0);
+	start.setDate(start.getDate() - date.getDay());
 
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     end.setHours(23,59,59,999);
 
-    const key =
-      start.toISOString().split("T")[0] +
-      "|" +
-      end.toISOString().split("T")[0];
-
+    const formatDate = (d) =>
+	 d.getFullYear() + "-" +
+	 String(d.getMonth()+1).padStart(2,"0") + "-" +
+	 String(d.getDate()).padStart(2,"0");
+	
+	const key = formatDate(start) + "|" + formatDate(end);
+	
     if(!weeks[key]) weeks[key] = { start, end };
   });
 
