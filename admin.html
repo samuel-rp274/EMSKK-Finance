@@ -68,29 +68,39 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 <div class="card hidden" id="adminPanel">
   <h1>Admin Dashboard EMS</h1>
 
-  <!-- 4 Stat Card -->
-  <div class="stats">
-    <div class="stat">
-	  <div class="stat-title">⏳ Invoice Pending Minggu Ini</div>
-	  <div class="stat-value" id="pendingInvoice">0</div>
-	</div>
-	<div class="stat">
-      <div class="stat-title">📄 Total Invoice Minggu Ini (Valid)</div>
-      <div class="stat-value" id="jumlahInvoice">0</div>
-    </div>
-    <div class="stat">
-      <div class="stat-title">💰 Total Invoice Bruto</div>
-      <div class="stat-value" id="totalInvoiceBruto">0</div>
-    </div>
-    <div class="stat">
-      <div class="stat-title">🏦 Total Gaji Minggu Ini</div>
-      <div class="stat-value" id="totalGaji">0</div>
-    </div>
-    <div class="stat">
-      <div class="stat-title">🏆 Top 3 Gaji Mingguan</div>
-      <div class="stat-value" id="topGaji">-</div>
+<div class="stats">
+  <!-- Card 1: Pending + Valid -->
+  <div class="stat">
+    <div class="stat-title">📊 Status Invoice Minggu Ini</div>
+    <div class="stat-value">
+      <div style="font-size:18px;margin-bottom:6px">
+        ⏳ Pending: <span id="pendingInvoice">0</span>
+      </div>
+      <div style="font-size:18px">
+        📄 Valid: <span id="jumlahInvoice">0</span>
+      </div>
     </div>
   </div>
+
+  <!-- Card 2: Bruto + Gaji -->
+  <div class="stat">
+    <div class="stat-title">💰 Keuangan Minggu Ini</div>
+    <div class="stat-value">
+      <div style="font-size:18px;margin-bottom:6px">
+        Bruto: <span id="totalInvoiceBruto">0</span>
+      </div>
+      <div style="font-size:18px">
+        Gaji: <span id="totalGaji">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Card 3: Top 3 -->
+  <div class="stat">
+    <div class="stat-title">🏆 Top 3 Gaji Mingguan</div>
+    <div class="stat-value" id="topGaji">-</div>
+  </div>
+</div>
 
   <!-- Filter minggu -->
   <div class="form-group">
