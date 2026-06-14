@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMS Invoice System</title>
+<title>EMSKK Invoice System</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
 <style>
 :root{
@@ -16,8 +16,10 @@
 }
 *{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Arial,sans-serif;}
 body{background:var(--bg);color:var(--text);padding:30px;}
-.container{max-width:800px;margin:auto;}
-.card{background:var(--card);padding:24px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.3);}
+.container{width:100%;max-width:800px;margin:80px auto 0;}
+.card{background:var(--card);padding:24px;border-radius:20px;box-shadow:0 10px 30px rgba(0,0,0,.3);
+position:relative;
+z-index:2;}
 h1{margin-bottom:5px;}
 .subtitle{color:var(--muted);margin-bottom:25px;}
 .form-group{margin-bottom:18px;}
@@ -35,62 +37,85 @@ button:hover{opacity:.9;}
 .ts-dropdown .option{color: white !important;}
 .ts-dropdown .active{background: var(--primary) !important;}
 .ts-wrapper.focus .ts-control{box-shadow: 0 0 0 2px rgba(220,38,38,.4) !important;}
+
+.topnav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:10px 16px;
+
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+
+  background:rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:999;
+}
+
+.topnav a{
+  color:#cbd5e1;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+}
+
+.topnav a:hover{
+  color:#38bdf8;
+}
+
+.topnav .title{
+  font-size:13px;
+  font-weight:700;
+  color:#94a3b8;
+  letter-spacing:1px;
+}
+
+.blob{
+    position:fixed;
+    width:420px;
+    height:420px;
+    border-radius:50%;
+    filter: blur(90px);
+    opacity:0.35;
+    z-index:0;
+    animation: float 10s ease-in-out infinite;
+}
+
+.blob.one{
+    background:#38bdf8;
+    top:-120px;
+    left:-120px;
+}
+
+.blob.two{
+    background:#22c55e;
+    bottom:-140px;
+    right:-140px;
+    animation-delay:2s;
+}
+
+@keyframes float{
+    0%,100%{transform:translateY(0)}
+    50%{transform:translateY(40px)}
+}
+
 </style>
 </head>
 <body>
+<div class="blob one"></div>
+<div class="blob two"></div>
 
-<!-- Navbar -->
-<!-- Navbar Centered -->
-<div style="
-    display:flex;
-    justify-content:center;
-    margin-bottom:20px;
-">
-    <div style="
-        display:flex;
-        gap:6px;
-        background:#1e293b;
-        padding:6px 12px;
-        border-radius:12px;
-        box-shadow:0 6px 18px rgba(0,0,0,.3);
-    ">
-
-        <!-- INPUT (AKTIF) -->
-        <a href="index.html" style="
-            padding:8px 14px;
-            border-radius:12px;
-            text-decoration:none;
-            color:#0f172a;
-            background:#f8fafc;
-            font-weight:700;
-            transition:.2s;
-        "
-        onmouseover="this.style.opacity='0.85'"
-        onmouseout="this.style.opacity='1'">
-            Input
-        </a>
-
-        <!-- DASHBOARD  (NON AKTIF) -->
-        <a href="dashboard.html" style="
-            padding:8px 14px;
-            border-radius:12px;
-            text-decoration:none;
-            color:white;
-            background:#334155;
-            font-weight:600;
-            transition:.2s;
-        "
-        onmouseover="this.style.background='#475569'"
-        onmouseout="this.style.background='#334155'">
-            Dashboard
-        </a>
-
-    </div>
+<div class="topnav">
+  <a href="index.html">← Home</a>
+  <div class="title">EMSKK SYSTEM</div>
 </div>
 
 <div class="container">
 <div class="card">
-<h1>EMS Invoice System</h1>
+<h1>EMSKK Invoice System</h1>
 <div class="subtitle">Create & manage financial records</div>
 
 <form id="invoiceForm">
