@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMS Attendance</title>
 
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+
 <style>
 :root{
   --bg:#0f172a;
@@ -41,12 +44,11 @@ body{
   border:1px solid #1f2a44;
   border-radius:18px;
   padding:24px;
-  box-shadow:0 10px 30px rgba(0,0,0,.4);
 }
 
 h1{
   text-align:center;
-  margin-bottom:5px;
+  margin-bottom:6px;
 }
 
 .subtitle{
@@ -55,39 +57,52 @@ h1{
   margin-bottom:18px;
 }
 
-/* CLOCK UPGRADE */
+/* CLOCK */
 .clock-box{
   text-align:center;
   margin-bottom:18px;
-  padding:18px;
+  padding:16px;
   background:#0b1220;
   border-radius:14px;
   border:1px solid #1f2a44;
 }
 
 .clock-time{
-  font-size:40px;
+  font-size:38px;
   font-weight:800;
   color:var(--blue);
-  letter-spacing:2px;
 }
 
 .clock-date{
   font-size:13px;
-  margin-top:6px;
   color:var(--muted);
+  margin-top:5px;
+}
+
+/* FORM STYLE */
+.form-group{
+  margin-bottom:14px;
+}
+
+label{
+  display:block;
+  margin-bottom:6px;
+  font-size:13px;
+  color:#cbd5e1;
+  font-weight:600;
 }
 
 select,input{
   width:100%;
   padding:12px;
-  margin-top:10px;
-  border:none;
   border-radius:12px;
+  border:none;
   background:var(--input);
   color:white;
+  outline:none;
 }
 
+/* BUTTON */
 button{
   width:100%;
   padding:12px;
@@ -96,26 +111,52 @@ button{
   border-radius:12px;
   font-weight:700;
   cursor:pointer;
-  transition:.2s;
 }
 
-button:hover{
-  opacity:.85;
-}
-
-.start{
-  background:var(--green);
-}
-
-.finish{
-  background:var(--red);
-}
+.start{ background:var(--green); color:white; }
+.finish{ background:var(--red); color:white; }
 
 .status{
   text-align:center;
   margin-top:14px;
-  font-weight:600;
   color:var(--muted);
+  font-weight:600;
+}
+
+.ts-wrapper.single .ts-control{
+  background: #334155 !important;
+  color: #f8fafc !important;
+  border-radius: 12px !important;
+  border: none !important;
+  padding: 12px !important;
+}
+
+.ts-wrapper.single .ts-control input{
+  color: #f8fafc !important;
+}
+
+.ts-dropdown{
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f8fafc !important;
+}
+
+.ts-dropdown .option{
+  background: transparent !important;
+  color: #f8fafc !important;
+}
+
+.ts-dropdown .option.active{
+  background: #334155 !important;
+  color: #ffffff !important;
+}
+
+.ts-dropdown .option:hover{
+  background: #475569 !important;
+}
+
+.ts-wrapper.focus .ts-control{
+  box-shadow: 0 0 0 2px #38bdf8 !important;
 }
 </style>
 </head>
@@ -126,7 +167,7 @@ button:hover{
   <div class="card">
 
     <h1>EMS ABSENSI</h1>
-    <div class="subtitle">On Duty Tracking System</div>
+    <div class="subtitle">On Duty System</div>
 
     <!-- CLOCK -->
     <div class="clock-box">
@@ -134,12 +175,23 @@ button:hover{
       <div class="clock-date" id="clock-date">loading...</div>
     </div>
 
-    <select id="nama">
-      <option value="">Pilih Nama EMS</option>
-    </select>
+    <!-- FORM -->
+    <div class="form-group">
+      <label>Nama EMS</label>
+      <select id="nama">
+        <option value="">Cari Nama EMS...</option>
+      </select>
+    </div>
 
-    <input id="jabatan" placeholder="Jabatan" readonly>
-    <input id="divisi" placeholder="Divisi" readonly>
+    <div class="form-group">
+      <label>Jabatan</label>
+      <input id="jabatan" type="text" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>Divisi</label>
+      <input id="divisi" type="text" readonly>
+    </div>
 
     <button class="start" onclick="startDuty()">START DUTY</button>
     <button class="finish" onclick="finishDuty()">FINISH DUTY</button>
@@ -150,62 +202,150 @@ button:hover{
 </div>
 
 <script>
-const API = "https://script.google.com/macros/s/YOUR_SCRIPT/exec";
+const API = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 
 let emsData = {};
-const nama = document.getElementById("nama");
-const jabatan = document.getElementById("jabatan");
-const divisi = document.getElementById("divisi");
-const status = document.getElementById("status");
+let ts;
 
+let currentSession = null;
+let timerInterval = null;
 
 // ================= CLOCK =================
 function updateClock(){
   const now = new Date();
 
-  const time = now.toLocaleTimeString("id-ID", {
-    timeZone:"Asia/Jakarta",
-    hour12:false
-  });
+  document.getElementById("clock-time").innerText =
+    now.toLocaleTimeString("id-ID", {hour12:false, timeZone:"Asia/Jakarta"});
 
-  const date = now.toLocaleDateString("id-ID", {
-    weekday:"long",
-    year:"numeric",
-    month:"long",
-    day:"numeric"
-  });
-
-  document.getElementById("clock-time").innerText = time;
-  document.getElementById("clock-date").innerText = date;
+  document.getElementById("clock-date").innerText =
+    now.toLocaleDateString("id-ID", {
+      weekday:"long",
+      year:"numeric",
+      month:"long",
+      day:"numeric"
+    });
 }
-
 setInterval(updateClock,1000);
 updateClock();
-
 
 // ================= LOAD EMS =================
 async function loadEMS(){
   const res = await fetch(API + "?action=getEMS");
   const data = await res.json();
 
-  data.forEach(item=>{
-    emsData[item.nama] = {
-      jabatan:item.jabatan,
-      divisi:item.divisi
+  data.forEach(u=>{
+    emsData[u.nama] = {
+      jabatan: u.jabatan,
+      divisi: u.divisi
     };
 
     const opt = document.createElement("option");
-    opt.value = item.nama;
-    opt.textContent = item.nama;
+    opt.value = u.nama;
+    opt.textContent = u.nama;
     nama.appendChild(opt);
   });
+
+  // INIT TOMSELECT (WAJIB SETELAH DATA READY)
+  ts = new TomSelect("#nama",{
+    placeholder:"Cari Nama EMS...",
+    create:false,
+    maxOptions:50,
+    highlight:true
+  });
+
+  // EVENT HARUS DI SINI (ANTI BUG)
+  ts.on("change", function(value){
+  
+  localStorage.setItem("ems_name", value);
+
+  if(!value){
+    jabatan.value = "";
+    divisi.value = "";
+    status.innerText = "Status: -";
+
+    document.querySelector(".start").disabled = false;
+    document.querySelector(".finish").disabled = true;
+
+    return;
+  }
+
+  jabatan.value = emsData[value]?.jabatan || "";
+  divisi.value = emsData[value]?.divisi || "";
+
+  checkSession(value);
+});
 }
 
-nama.addEventListener("change",()=>{
-  jabatan.value = emsData[nama.value]?.jabatan || "";
-  divisi.value = emsData[nama.value]?.divisi || "";
-});
+async function checkSession(nama){
+  const res = await fetch(API + "?action=getActiveSession&nama=" + nama);
+  const data = await res.json();
 
+  if(data.active){
+    currentSession = data.startTime;
+
+    status.innerText = "🟢 ON DUTY ACTIVE";
+
+    document.querySelector(".start").disabled = true;
+    document.querySelector(".finish").disabled = false;
+
+    startLiveTimer(new Date(data.startTime));
+  } else {
+    currentSession = null;
+
+    document.querySelector(".start").disabled = false;
+    document.querySelector(".finish").disabled = true;
+
+    status.innerText = "⚪ OFF DUTY";
+
+    stopLiveTimer();
+  }
+}
+
+async function restoreSession(){
+  const savedName = localStorage.getItem("ems_name");
+
+  if(!savedName) return;
+
+  // set dropdown ke nama terakhir
+  ts.setValue(savedName, true);
+
+  jabatan.value = emsData[savedName]?.jabatan || "";
+  divisi.value = emsData[savedName]?.divisi || "";
+
+  await checkSession(savedName);
+}
+
+function startLiveTimer(startTime){
+  stopLiveTimer();
+
+  timerInterval = setInterval(() => {
+    const now = new Date();
+    const start = new Date(startTime);
+
+    const diff = now - start;
+
+    const minutes = diff / 60000;
+
+    const hours = diff / 3600000;
+
+    let display = "";
+
+    if(hours >= 1){
+      display = `${hours.toFixed(2)} jam`;
+    } else {
+      display = `${minutes.toFixed(1)} menit`;
+    }
+
+    status.innerText = `🟢 ON DUTY | ${display} berjalan`;
+  }, 1000);
+}
+
+function stopLiveTimer(){
+  if(timerInterval){
+    clearInterval(timerInterval);
+    timerInterval = null;
+  }
+}
 
 // ================= START =================
 async function startDuty(){
@@ -218,8 +358,12 @@ async function startDuty(){
   const data = await res.json();
 
   status.innerText = data.message;
-}
+  
+  document.querySelector(".start").disabled = true;
+  document.querySelector(".finish").disabled = false;
 
+  checkSession(nama.value);
+}
 
 // ================= FINISH =================
 async function finishDuty(){
@@ -231,16 +375,23 @@ async function finishDuty(){
   const res = await fetch(API + "?action=finishDuty&nama=" + nama.value);
   const data = await res.json();
 
-  if(data.success){
-    status.innerText = `${data.message} | Durasi: ${data.duration.toFixed(1)} menit`;
-  }else{
-    status.innerText = data.message;
-  }
+  status.innerText =
+    data.success
+    ? `${data.message} | ${data.duration.toFixed(1)} menit`
+    : data.message;
+	
+  stopLiveTimer();
+
+  document.querySelector(".start").disabled = false;
+  document.querySelector(".finish").disabled = true;
 }
 
-
 // ================= INIT =================
-loadEMS();
+loadEMS().then(() => {
+  setTimeout(() => {
+    restoreSession();
+  }, 500);
+});
 </script>
 
 </body>
