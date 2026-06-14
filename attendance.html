@@ -186,7 +186,7 @@ let currentUser=null;
 // CLOCK
 setInterval(()=>{
   const now = new Date(
-   new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })
+   new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
   );
   document.getElementById("clock-time").innerText=
     now.toLocaleTimeString("id-ID",{hour12:false});
@@ -263,7 +263,7 @@ function startTimer(start){
 
   timer=setInterval(()=>{
     const now = new Date(
-	 new Date().toLocaleString("id-ID", { timeZone: "Asia/Jakarta" })
+	 new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
 	);
 	const diff = new Date(now).getTime() - new Date(start).getTime();
 
