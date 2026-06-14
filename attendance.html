@@ -22,14 +22,7 @@
 body{
   background:#0b1220;
   color:#fff;
-
-  display:flex;
-  justify-content:center;
-  align-items:center;
-
   min-height:100vh;
-  padding-top:0;
-
   overflow-x:hidden;
 }
 
@@ -68,9 +61,9 @@ body{
 
 /* CONTAINER */
 .container{
-  width:100%;
   max-width:800px;
   margin:0 auto;
+  padding:100px 16px 40px;
 }
 
 /* GLASS CARD (MATCH INDEX) */
@@ -208,16 +201,9 @@ button:hover{
   position:fixed;
   top:0;
   left:0;
+  right:0;
   width:100%;
-  padding:10px 16px;
-
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-
-  background:rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(255,255,255,0.08);
+  box-sizing:border-box;
   z-index:999;
 }
 
@@ -240,14 +226,9 @@ button:hover{
 }
 
 @media (max-width:768px){
-  body{
-    align-items:center;
-    padding:20px;
-  }
-
   .container{
-    margin:0;
     width:100%;
+    padding:90px 12px 30px;
   }
 }
 
