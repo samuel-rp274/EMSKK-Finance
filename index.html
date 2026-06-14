@@ -118,9 +118,10 @@ p{
   background:#38bdf8;
 }
 
-.card.attendance::before{background:#22c55e;}
-.card.invoice::before{background:#facc15;}
-.card.dashboard::before{background:#38bdf8;}
+.card.attendance::before { background:#ff4d6d; }
+.card.attendancelog::before { background:#facc15; }
+.card.invoice::before { background:#22c55e; }
+.card.invoicelog::before { background:#00d4ff; }
 
 /* ICON */
 .icon{
@@ -162,21 +163,27 @@ p{
 
     <div class="card attendance" onclick="go('attendance.html')">
       <div class="icon">🕒</div>
-      <div class="title">Absensi</div>
+      <div class="title">Attendance</div>
       <div class="desc">Realtime on-duty tracking system</div>
     </div>
 
+	<div class="card attendancelog" onclick="go('attendancelog.html')">
+	 <div class="icon">⏱</div>
+	 <div class="title">Duty Dashboard</div>
+	 <div class="desc">Working hours & attendance log</div>
+	</div>
+
     <div class="card invoice" onclick="go('invoice.html')">
       <div class="icon">💳</div>
-      <div class="title">Invoice</div>
-      <div class="desc">Create & manage financial records</div>
+      <div class="title">Invoice Input</div>
+      <div class="desc">Create financial records</div>
     </div>
-
-    <div class="card dashboard" onclick="go('dashboard.html')">
-      <div class="icon">📊</div>
-      <div class="title">Dashboard</div>
-      <div class="desc">Analytics & performance overview</div>
-    </div>
+	
+	<div class="card invoicelog" onclick="go('invoicelog.html')">
+	 <div class="icon">📊</div>
+	 <div class="title">Invoice Dashboard</div>
+	 <div class="desc">Weekly financial analytics</div>
+	</div>
 
   </div>
 
