@@ -237,7 +237,6 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 
 let allInvoices = [];
 let tomSelectInstance = null;
-let currentName = "";
 let allAttendance = [];
 
 async function loadEMS(){
@@ -256,11 +255,11 @@ async function loadEMS(){
         create:false,
         sortField:{field:"text",direction:"asc"},
         placeholder:"Cari nama EMS...",
-        onChange: (val) => {
-			currentName = val;
+		onChange: (val) => {
+			tomSelectInstance.setValue(val);
 			renderTable();
-		}		
-	});
+		}
+    });
     tomSelectInstance.clear(true);
     tomSelectInstance.setValue('');
 
@@ -362,11 +361,13 @@ document.getElementById("totalGaji").innerText =
 
 function renderAttendance(){
 
+    const name = (tomSelectInstance?.getValue() || "").toLowerCase().trim();
+    if(!name) return;
+
     const { start, end } = getWeekRange(new Date());
-	if(!currentName) return;
 
     const data = allAttendance.filter(a =>
-        (a.nama || "").toLowerCase().trim() === currentName
+        (a.nama || "").toLowerCase().trim() === name
     );
 	
 	const week = data.filter(a => {
