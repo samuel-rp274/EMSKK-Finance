@@ -311,21 +311,30 @@ function setStatus(type,text){
 
 // LOAD EMS
 async function loadEMS(){
+  if (ts) {
+	ts.destroy();
+  }
+  
   const res=await fetch(API+"?action=getEMS");
   const data=await res.json();
+  
+  nama.innerHTML = `<option value="">Cari Nama EMS...</option>`;
 
-  data.forEach(u=>{
+  data
+  .sort((a,b)=>a.nama.localeCompare(b.nama))
+  .forEach(u=>{
     emsData[u.nama]=u;
+	
     let opt=document.createElement("option");
     opt.value=u.nama;
     opt.textContent=u.nama;
     nama.appendChild(opt);
   });
 
-  ts=new TomSelect("#nama",{create:false,highlight:true});
+ts=new TomSelect("#nama",{create:false,highlight:true});
 
-  ts.on("change",(v)=>{
-    currentUser=v;
+ts.on("change",(v)=>{
+  currentUser=v;
 
     if(!v){
       jabatan.value="";
