@@ -232,8 +232,9 @@ function getWeekRange(date){
 
     const d = new Date(date);
 
+    const day = d.getDay();
     const start = new Date(d);
-    start.setDate(d.getDate() - d.getDay());
+    start.setDate(d.getDate() - day);
     start.setHours(0,0,0,0);
 
     const end = new Date(start);
