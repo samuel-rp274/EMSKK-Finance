@@ -14,7 +14,7 @@
     --card:#1e293b;
     --input:#334155;
     --primary:#dc2626;
-    --text:#f8fafc;
+    --text:#f8fafc;```
     --muted:#94a3b8;
 }
 
@@ -190,6 +190,46 @@ a{color:#60a5fa;}
 </table>
 </div>
 
+<div class="card">
+<h2>Attendance Minggu Ini</h2>
+
+<div class="stats">
+<div class="stat">
+<div class="stat-title">Total Jam Duty</div>
+<div class="stat-value" id="totalHours">0h</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Session</div>
+<div class="stat-value" id="totalSession">0</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Rata-rata</div>
+<div class="stat-value" id="avgDuty">0h</div>
+</div>
+</div>
+</div>
+
+<div class="card">
+<h2>Riwayat Duty Minggu Ini</h2>
+
+<table>
+<thead>
+<tr>
+<th>Start</th>
+<th>Finish</th>
+<th>Durasi</th>
+</tr>
+</thead>
+
+<tbody id="attendanceTable">
+<tr><td colspan="3" class="empty">Pilih EMS</td></tr>
+</tbody>
+
+</table>
+</div>
+
 </div>
 
 <script>
@@ -197,6 +237,8 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 
 let allInvoices = [];
 let tomSelectInstance = null;
+let currentName = "";
+let allAttendance = [];
 
 async function loadEMS(){
     const res = await fetch(SCRIPT_URL+"?action=getEMS");
@@ -214,8 +256,11 @@ async function loadEMS(){
         create:false,
         sortField:{field:"text",direction:"asc"},
         placeholder:"Cari nama EMS...",
-        onChange: renderTable
-    });
+        onChange: (val) => {
+			currentName = val;
+			renderTable();
+		}		
+	});
     tomSelectInstance.clear(true);
     tomSelectInstance.setValue('');
 
@@ -225,7 +270,9 @@ async function loadEMS(){
 async function loadData(){
     const res = await fetch(SCRIPT_URL+"?action=getInvoices");
     allInvoices = await res.json();
-    renderTable();
+	const res2 = await fetch(SCRIPT_URL+"?action=getAttendance");
+	allAttendance = await res2.json();
+	renderTable();
 }
 
 function getWeekRange(date){
@@ -310,6 +357,45 @@ document.getElementById("totalGaji").innerText =
             <td><a href="${i["Bukti"]}" target="_blank">Lihat</a></td>
         </tr>
     `).join("");
+	renderAttendance();
+}
+
+function renderAttendance(){
+
+    const { start, end } = getWeekRange(new Date());
+	if(!currentName) return;
+
+    const data = allAttendance.filter(a =>
+        (a.nama || "").toLowerCase().trim() === currentName
+    );
+	
+	const week = data.filter(a => {
+		const t = new Date(String(a.start).replace(" ", "T"));
+		return t >= start && t <= end;
+	});
+	
+    let totalMinutes = week.reduce((a,b)=>
+        a + (Number(b.durasi) || 0), 0
+    );
+
+    document.getElementById("totalHours").innerText =
+        (totalMinutes / 60).toFixed(2) + "h";
+
+    document.getElementById("totalSession").innerText =
+        week.length;
+
+    document.getElementById("avgDuty").innerText =
+        week.length ? ((totalMinutes / week.length)/60).toFixed(2) + "h" : "0h";
+
+    document.getElementById("attendanceTable").innerHTML =
+        week.map(a=>`
+            <tr>
+                <td>${new Date(String(a.start).replace(" ", "T")).toLocaleString("id-ID")}</td>
+				<td>${a.finish ? new Date(a.finish).toLocaleString("id-ID") : "-"}</td>
+                <td>${a.durasi || 0} min</td>
+            </tr>
+        `).join("") ||
+        `<tr><td colspan="3">No data</td></tr>`;
 }
 
 document.addEventListener("DOMContentLoaded",loadEMS);
