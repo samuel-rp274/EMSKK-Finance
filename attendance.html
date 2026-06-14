@@ -300,7 +300,10 @@ async function finishDuty(){
 
   const res=await fetch(API+"?action=finishDuty&nama="+currentUser);
   const data=await res.json();
-
+  
+  clearInterval(timer);
+  timer = null;
+  
   setStatus("off",data.message);
 
   document.querySelector(".start").disabled=false;
