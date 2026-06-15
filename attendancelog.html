@@ -211,13 +211,14 @@ async function loadEMS(){
 }
 
 async function loadData(){
-    const res = await fetch(SCRIPT_URL+"?action=getAttendance");
+    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
     allData = await res.json();
     render();
 }
 
 function safeDate(v){
-    return new Date(String(v||"").split(" ")[0]);
+    const parts = String(v || "").split(" ")[0].split("-");
+    return new Date(parts[0], parts[1]-1, parts[2]);
 }
 
 function getWeekRange(){
@@ -266,6 +267,27 @@ function render(selectedName){
     });
 
     document.getElementById("weekHours").innerText = total + "h";
+	
+	const now = new Date();
+	const month = filtered.filter(i=>{
+		const t = safeDate(i["Start"]);
+		return t.getMonth() === now.getMonth() &&
+			   t.getFullYear() === now.getFullYear();
+	});
+	
+	let monthTotal = 0;
+	month.forEach(i=>{
+		monthTotal += Number(i["Durasi"]||0);
+	});
+
+	document.getElementById("monthHours").innerText = monthTotal + "h";
+	
+	const top = week.length
+		? [...week].sort((a,b)=>Number(b["Durasi"]) - Number(a["Durasi"]))[0]
+		: null;
+		
+	document.getElementById("topDuty").innerText =
+	top ? top["Nama"] : "-";
 
     // table
     document.getElementById("tbody").innerHTML = week.map(i=>`
