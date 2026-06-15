@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Duty Dashboard</title>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+/* ===== COPY STYLE DARI INVOICE ===== */
+:root{
+    --bg:#0f172a;
+    --card:#1e293b;
+    --input:#334155;
+    --primary:#22c55e;
+    --text:#f8fafc;
+    --muted:#94a3b8;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Inter,sans-serif;
+}
+
+body{
+  background:#0b1220;
+  color:#fff;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+.container{
+  width:100%;
+  max-width:1100px;
+  margin:80px auto 0;
+  padding:40px 16px;
+}
+
+.card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  border-radius:18px;
+  padding:24px;
+  margin-bottom:20px;
+}
+
+h1{margin-bottom:8px;}
+.subtitle{color:var(--muted);margin-bottom:20px;}
+
+select{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    background:var(--input);
+    color:white;
+    margin-bottom:15px;
+}
+
+/* stats */
+.stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+    gap:15px;
+}
+
+.stat{
+    background:#111827;
+    border-radius:15px;
+    padding:20px;
+}
+
+.stat-title{color:var(--muted);font-size:13px;}
+.stat-value{font-size:22px;font-weight:bold;margin-top:8px;}
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+th{
+    background:#111827;
+    padding:12px;
+    text-align:left;
+}
+
+td{
+    padding:12px;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.empty{text-align:center;color:var(--muted);padding:30px;}
+
+.topnav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:999;
+}
+
+.topnav a{
+  color:#cbd5e1;
+  text-decoration:none;
+}
+
+.topnav .title{
+  font-size:13px;
+  font-weight:700;
+  color:#94a3b8;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topnav">
+  <a href="index.html">← Home</a>
+  <div class="title">DUTY LOG SYSTEM</div>
+</div>
+
+<div class="container">
+
+<!-- HEADER -->
+<div class="card">
+<h1>EMSKK DUTY DASHBOARD</h1>
+<div class="subtitle">Working hours analytics</div>
+
+<select id="searchEMS"></select>
+
+<div class="stats">
+<div class="stat">
+<div class="stat-title">Total Jam Minggu Ini</div>
+<div class="stat-value" id="weekHours">0h</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Total Jam Bulan Ini</div>
+<div class="stat-value" id="monthHours">0h</div>
+</div>
+
+<div class="stat">
+<div class="stat-title">Top Duty Minggu Ini</div>
+<div class="stat-value" id="topDuty">-</div>
+</div>
+</div>
+
+</div>
+
+<!-- TABLE -->
+<div class="card">
+<table>
+<thead>
+<tr>
+<th>Nama</th>
+<th>Start</th>
+<th>Finish</th>
+<th>Durasi</th>
+</tr>
+</thead>
+
+<tbody id="tbody">
+<tr>
+<td colspan="4" class="empty">Pilih EMS terlebih dahulu</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
+
+let allData = [];
+let ts;
+
+async function loadEMS(){
+    const res = await fetch(SCRIPT_URL+"?action=getEMS");
+    const data = await res.json();
+
+    const select = document.getElementById("searchEMS");
+
+    data.forEach(d=>{
+        let opt = document.createElement("option");
+        opt.value = d.nama;
+        opt.textContent = d.nama;
+        select.appendChild(opt);
+    });
+
+    ts = new TomSelect("#searchEMS",{
+        onChange:render
+    });
+
+    loadData();
+}
+
+async function loadData(){
+    const res = await fetch(SCRIPT_URL+"?action=getAttendance");
+    allData = await res.json();
+    render();
+}
+
+function safeDate(v){
+    return new Date(String(v||"").split(" ")[0]);
+}
+
+function getWeekRange(){
+    const d = new Date();
+    const day = d.getDay();
+    const start = new Date(d);
+    start.setDate(d.getDate()-day);
+    start.setHours(0,0,0,0);
+
+    const end = new Date(start);
+    end.setDate(start.getDate()+6);
+    end.setHours(23,59,59,999);
+
+    return {start,end};
+}
+
+function render(){
+
+    const name = (ts?.getValue() || "").toLowerCase().trim();
+
+    if(!name) return;
+
+    const filtered = allData.filter(i =>
+        (i["Nama"]||"").toLowerCase().trim() === name
+    );
+
+    const {start,end} = getWeekRange();
+
+    const week = filtered.filter(i=>{
+        const t = safeDate(i["Start"]);
+        return t>=start && t<=end;
+    });
+
+    // total week hours
+    let total = 0;
+    week.forEach(i=>{
+        total += Number(i["Durasi"]||0);
+    });
+
+    document.getElementById("weekHours").innerText = total + "h";
+
+    // table
+    document.getElementById("tbody").innerHTML = week.map(i=>`
+        <tr>
+            <td>${i["Nama"]}</td>
+            <td>${i["Start"]}</td>
+            <td>${i["Finish"]}</td>
+            <td>${i["Durasi"]}h</td>
+        </tr>
+    `).join("");
+}
+
+document.addEventListener("DOMContentLoaded",loadEMS);
+</script>
+
+</body>
+</html>
