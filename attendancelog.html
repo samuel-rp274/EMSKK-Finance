@@ -31,6 +31,7 @@ body{
   color:#fff;
   min-height:100vh;
   overflow-x:hidden;
+  overflow-y:auto;
 }
 
 .container{
@@ -49,6 +50,7 @@ body{
   margin-bottom:20px;
   position: relative;
   z-index: 1;
+  overflow: visible !important;
 }
 
 h1{margin-bottom:8px;}
@@ -128,7 +130,7 @@ td{
 
 .ts-wrapper {
     background: #1e293b !important;
-    border-radius: 12px;
+    border-radius: 999px !important;
     position: relative;
     z-index: 9999;
 }
@@ -137,6 +139,8 @@ td{
     background: #1e293b !important;
     color: #f8fafc !important;
     border: 1px solid rgba(255,255,255,0.08) !important;
+    border-radius: 999px !important;
+    padding: 10px 14px !important;
 }
 
 .ts-control input {
@@ -152,6 +156,7 @@ td{
     background: #111827 !important;
     color: #f8fafc !important;
     border: fixed !important;
+	position: absolute !important;
     z-index: 999999 !important;
 }
 
@@ -161,6 +166,10 @@ td{
 
 .ts-dropdown .active {
     background: #334155 !important;
+}
+
+.search-wrap{
+    margin-bottom: 24px;
 }
 
 </style>
@@ -180,7 +189,9 @@ td{
 <h1>EMSKK DUTY DASHBOARD</h1>
 <div class="subtitle">Working hours analytics</div>
 
-<select id="searchEMS"></select>
+<div class="search-wrap">
+    <select id="searchEMS"></select>
+</div>
 
 <div class="stats">
 <div class="stat">
