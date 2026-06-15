@@ -219,7 +219,15 @@ async function loadData(){
 function parseDuration(str){
     if(!str) return 0;
 
-    str = String(str).toLowerCase();
+    str = String(str).trim().toLowerCase();
+
+    // FORMAT HH:MM:SS
+    if(str.includes(":")){
+        const p = str.split(":");
+        if(p.length === 3){
+            return (+p[0]*3600) + (+p[1]*60) + (+p[2]);
+        }
+    }
 
     let h = 0, m = 0, s = 0;
 
@@ -227,9 +235,9 @@ function parseDuration(str){
     const mMatch = str.match(/(\d+)\s*m/);
     const sMatch = str.match(/(\d+)\s*s/);
 
-    if(hMatch) h = parseInt(hMatch[1]);
-    if(mMatch) m = parseInt(mMatch[1]);
-    if(sMatch) s = parseInt(sMatch[1]);
+    if(hMatch) h = +hMatch[1];
+    if(mMatch) m = +mMatch[1];
+    if(sMatch) s = +sMatch[1];
 
     return (h * 3600) + (m * 60) + s;
 }
@@ -301,9 +309,12 @@ function render(selectedName){
         total += parseDuration(i["Durasi"]);
     });
 
-    document.getElementById("weekHours").innerText =
-	Math.floor(total / 3600) + "h";
-	
+    const hours = Math.floor(total / 3600);
+	const minutes = Math.floor((total % 3600) / 60);
+
+	document.getElementById("weekHours").innerText =
+	`${hours}h ${minutes}m`;
+		
 	const now = new Date();
 	const month = filtered.filter(i=>{
 		const t = safeDate(i["Start"]);
@@ -316,8 +327,11 @@ function render(selectedName){
 		monthTotal += parseDuration(i["Durasi"]);
 	});
 
+	const mHours = Math.floor(monthTotal / 3600);
+	const mMinutes = Math.floor((monthTotal % 3600) / 60);
+
 	document.getElementById("monthHours").innerText =
-	Math.floor(monthTotal / 3600) + "h";
+	`${mHours}h ${mMinutes}m`;
 	
 	const top = week.length
 		? [...week].sort((a,b)=>
