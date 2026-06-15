@@ -226,8 +226,13 @@ function parseDuration(str){
 }
 
 function safeDate(v){
-    const parts = String(v || "").split(" ")[0].split("-");
-    return new Date(parts[0], parts[1]-1, parts[2]);
+    if(!v) return new Date(0);
+
+    // kalau sudah Date object
+    if(v instanceof Date) return v;
+
+    // kalau string datetime dari GAS
+    return new Date(v);
 }
 
 function getWeekRange(){
@@ -246,7 +251,7 @@ function getWeekRange(){
 
 function render(selectedName){
 	
-	const name = (selectedName ?? ts?.getValue() ?? "").toString().trim();
+	const name = (selectedName || ts?.getValue() || "").toString().trim();
 	
 	console.log("SELECTED:", ts.getValue());
 	console.log("NAME:", name);
@@ -274,6 +279,10 @@ function render(selectedName){
 
     const week = filtered.filter(i=>{
         const t = safeDate(i["Start"]);
+		
+		console.log("START RAW:", i["Start"]);
+		console.log("PARSED:", t);
+		
         return t>=start && t<=end;
     });
 
@@ -306,17 +315,20 @@ function render(selectedName){
 		: null;
 		
 	document.getElementById("topDuty").innerText =
-	top ? top["Nama"] : "-";
+	top ? top.Nama : "-"
 
     // table
-    document.getElementById("tbody").innerHTML = week.map(i=>`
-        <tr>
+    document.getElementById("tbody").innerHTML =
+	week.length ? week.map(i=>`	
+	    <tr>
             <td>${i["Nama"]}</td>
             <td>${i["Start"]}</td>
             <td>${i["Finish"]}</td>
             <td>${i["Durasi"]}</td>
         </tr>
-    `).join("");
+    
+	`).join("") : `
+	<tr><td colspan="4" class="empty">Tidak ada data minggu ini</td></tr>`;
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
