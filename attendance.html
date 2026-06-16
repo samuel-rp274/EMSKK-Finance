@@ -392,7 +392,17 @@ async function startDuty(){
 
   setStatus("loading","STARTING...");
 
-  await fetch(API+"?action=startDuty&nama="+currentUser);
+  const data = emsData[currentUser];
+
+  if(!data) return;
+
+  await fetch(
+    API +
+    "?action=startDuty" +
+    "&nama=" + encodeURIComponent(currentUser) +
+    "&jabatan=" + encodeURIComponent(data.jabatan || "") +
+    "&divisi=" + encodeURIComponent(data.divisi || "")
+  );
 
   document.querySelector(".start").disabled=true;
   document.querySelector(".finish").disabled=false;
