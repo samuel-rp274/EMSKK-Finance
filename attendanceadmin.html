@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attendance Dashboard EMS</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<style>
+#navbar{
+  display: none;
+}
+
+:root{
+  --bg:#0f172a; --card:#1e293b; --input:#334155; --primary:#dc2626;
+  --text:#f8fafc; --muted:#94a3b8;
+}
+*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,Arial,sans-serif;}
+body{background:var(--bg);color:var(--text);padding:30px;}
+.container{max-width:1200px;margin:auto;}
+.card{background:var(--card);border-radius:20px;padding:24px;margin-bottom:20px;}
+h1{margin-bottom:8px;}
+.subtitle{color:var(--muted);margin-bottom:20px;}
+select,input{width:100%;padding:12px;border:none;border-radius:12px;background:var(--input);color:white;font-size:14px;margin-bottom:15px;}
+button{width:100%;padding:14px;border:none;border-radius:12px;background:var(--primary);color:white;font-weight:700;cursor:pointer;margin-bottom:10px;}
+button:hover{opacity:.9;}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin:20px 0;}
+.stat{background:#111827;border-radius:18px;padding:22px;border:1px solid rgba(255,255,255,.08);transition:.2s;}
+.stat:hover{transform:translateY(-2px);}
+.stat-title{color:var(--muted);font-size:13px;margin-bottom:8px;}
+.stat-value{font-size:28px;font-weight:700;line-height:1.3;}
+#topDuty{font-size:14px;line-height:1.5;}
+#topDuty .top-name{font-size:14px;font-weight:600;}
+#topDuty .top-salary{font-size:12px;color:#94a3b8;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th{background:#111827;padding:12px;text-align:left;}
+td{padding:12px;border-bottom:1px solid rgba(255,255,255,.08);}
+tr:hover{background:rgba(255,255,255,.03);}
+a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
+.empty{text-align:center;color:var(--muted);padding:30px;}
+.ts-control{background:var(--input)!important;color:white!important;border-radius:12px!important;padding:12px!important;}
+.ts-control input{color:white!important;}
+.ts-dropdown{background:var(--card)!important;color:white!important;border:none!important;}
+.ts-dropdown .option{color:white!important;}
+.ts-dropdown .active{background:var(--primary)!important;}
+.hidden{display:none;}
+.detail-row{background:#1a202c;}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- Navbar -->
+<div id="navbar" style="display:flex;justify-content:center;margin-bottom:20px; display:none;">
+  <div style="display:flex;gap:6px;background:#1e293b;padding:6px 12px;border-radius:12px;">
+    <a href="totaladmin.html" style="padding:8px 14px;color:white;background:#334155;border-radius:12px;text-decoration:none;">Total Salary</a>
+    <a href="attendanceadmin.html" style="padding:8px 14px;color:#0f172a;background:#f8fafc;border-radius:12px;text-decoration:none;">Attendance Data</a>
+    <a href="invoiceadmin.html" style="padding:8px 14px;color:white;background:#334155;border-radius:12px;text-decoration:none;">Invoice Data</a>
+  </div>
+</div>
+
+<!-- Login card -->
+<div class="card" id="loginCard">
+  <h1>Admin Dashboard</h1>
+  <div class="subtitle">Masukkan password admin</div>
+  <input type="password" id="adminPassword" placeholder="Password Admin">
+  <button onclick="checkLogin()">Masuk</button>
+  <div id="loginStatus"></div>
+</div>
+
+<!-- Admin Panel -->
+<div class="card hidden" id="adminPanel">
+  <h1>Attendance Dashboard EMS</h1>
+
+<div class="stats">
+  <!-- Card 1: Pending + Valid -->
+  <div class="stat">
+    <div class="stat-title">📊 Status Attendance Minggu Ini</div>
+    <div class="stat-value">
+      <div style="font-size:18px;margin-bottom:6px">
+        ⏳ Pending: <span id="pendingDuty">0</span>
+      </div>
+      <div style="font-size:18px">
+        📄 Valid: <span id="jumlahDuty">0</span>
+      </div>
+    </div>
+  </div>
+
+<!-- Card 2: Jumlah On Duty -->
+<div class="stat">
+  <div class="stat-title">🟢 On Duty Sekarang</div>
+  <div class="stat-value">
+    <span id="onDutyCount">0</span> Orang
+  </div>
+</div>
+
+  <!-- Card 3: Top 3 -->
+  <div class="stat">
+    <div class="stat-title">🏆 Top 3 Duty Mingguan</div>
+    <div class="stat-value" id="topDuty">-</div>
+  </div>
+</div>
+
+  <!-- Filter minggu -->
+  <div class="form-group">
+    <label>Pilih Minggu</label>
+    <select id="weekSelect"></select>
+  </div>
+
+  <!-- Tabel Payroll -->
+  <div class="card">
+    <table>
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Jabatan</th>
+          <th>Divisi</th>
+          <th>Total Jam Valid</th>
+          <th>Rate/Hour</th>
+          <th>Total Gaji</th>
+          <th>Detail</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="7" class="empty">Pilih minggu</td></tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
+const LOGIN_KEY = "ems_admin_login";  
+let allAttendance=[], weekRanges=[];
+let rateCache = {}; 
+
+async function loadRateCache(){
+  const res = await fetch(SCRIPT_URL + "?action=getAllRate"); // nanti kita buat
+  const data = await res.json();
+
+  rateCache = {};
+
+  data.forEach(item => {
+    rateCache[item.divisi] = Number(item.rate || 0);
+  });
+}
+
+// FIX: parser tanggal anti timezone shift
+function parseDateSafe(dateStr){
+  const d = new Date(dateStr);
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+
+// Login Admin
+async function checkLogin(){
+  const pw = document.getElementById("adminPassword").value.trim();
+  document.getElementById("loginStatus").innerText = "⏳ Memeriksa password...";
+  try{
+    const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
+    const data = await res.json();
+	
+	if(data.success){
+		sessionStorage.setItem(LOGIN_KEY, "true");
+
+		document.getElementById("loginCard").classList.add("hidden");
+		document.getElementById("adminPanel").classList.remove("hidden");
+    document.getElementById("navbar").style.display = "flex";
+
+		loadAttendanceData();
+	}
+		
+	else {
+      document.getElementById("loginStatus").innerText = "❌ Password salah";
+    }
+  }catch(e){
+    document.getElementById("loginStatus").innerText = "❌ Gagal memeriksa password";
+  }
+}
+
+// Load Attendance
+let attendanceCache = null;
+
+async function loadAttendanceData(){
+
+  if(!attendanceCache){
+    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
+    attendanceCache = await res.json();
+  }
+
+  allAttendance = attendanceCache;
+
+  // nanti kita ganti potongan → rate
+  if(Object.keys(rateCache).length === 0){
+    await loadRateCache();
+  }
+
+  populateWeeks();
+  renderAttendanceTable();
+}
+
+function populateWeeks(){
+  const select = document.getElementById("weekSelect");
+  select.innerHTML = "";
+
+  const weeks = {};
+
+  allAttendance.forEach(i => {
+    const date = parseDateSafe(i["Start"]); // 🔁 FIX INI
+    date.setHours(0,0,0,0);
+
+    const start = new Date(date);
+    start.setDate(start.getDate() - date.getDay());
+
+    const end = new Date(start);
+    end.setDate(start.getDate() + 6);
+    end.setHours(23,59,59,999);
+
+    const formatDate = (d) =>
+      d.getFullYear() + "-" +
+      String(d.getMonth()+1).padStart(2,"0") + "-" +
+      String(d.getDate()).padStart(2,"0");
+
+    const key = formatDate(start) + "|" + formatDate(end);
+
+    if(!weeks[key]) weeks[key] = { start, end };
+  });
+
+  Object.keys(weeks).forEach(key=>{
+    const opt = document.createElement("option");
+    opt.value = key;
+
+    const [s,e] = key.split("|");
+    opt.textContent = `${s} s/d ${e}`;
+
+    select.appendChild(opt);
+  });
+
+  select.onchange = renderAttendanceTable;
+
+  setTimeout(() => {
+  if (select.options.length > 0) {
+    select.selectedIndex = select.options.length - 1;
+    select.dispatchEvent(new Event("change"));
+  }
+}, 0);
+}
+
+async function renderAttendanceTable(){
+  const select = document.getElementById("weekSelect");
+  const key = select.value;
+  if(!key) return;
+
+  const [startStr, endStr] = key.split("|");
+  const start = new Date(startStr + "T00:00:00");
+  const end = new Date(endStr + "T23:59:59");
+
+  // 🔥 FILTER ATTENDANCE DATA
+  const weekData = allAttendance.filter(i => {
+    const t = parseDateSafe(i["Start"]); // COL C dari sheet kamu
+    return t >= start && t <= end;
+  });
+
+  // =========================
+  // 1. STATUS DUTY (CARD 1)
+  // =========================
+  const validDuty = weekData.filter(i => i.Status === "VALID");
+  const pendingDuty = weekData.filter(i => i.Status === "PENDING");
+
+  document.getElementById("pendingDuty").innerText = pendingDuty.length;
+  document.getElementById("jumlahDuty").innerText = validDuty.length;
+
+  // =========================
+  // 2. ON DUTY (CARD 2)
+  // =========================
+  const onDuty = weekData.filter(i => !i.Finish || i.Finish === "");
+  document.getElementById("onDutyCount").innerText = onDuty.length;
+
+  // =========================
+  // 3. GROUPING PER ORANG
+  // =========================
+  const payroll = {};
+
+  for (const i of weekData) {
+
+    const nama = i["Nama"];
+    const divisi = String(i["Divisi"] || "").trim().toUpperCase();
+    const jabatan = i["Jabatan"];
+
+    // durasi sudah ada di sheet (kolom E)
+    const durasiStr = i["Durasi"] || "0h 0m";
+
+    // convert "2h 30m" → menit
+    const match = durasiStr.match(/(\d+)h\s*(\d+)m/);
+    const minutes = match ? (parseInt(match[1]) * 60 + parseInt(match[2])) : 0;
+
+    if (!payroll[nama]) {
+      payroll[nama] = {
+        nama,
+        divisi,
+        jabatan,
+        totalMinutes: 0,
+        sessions: []
+      };
+    }
+
+    if (i.Status === "VALID") {
+      payroll[nama].totalMinutes += minutes;
+    }
+
+    payroll[nama].sessions.push(i);
+  }
+
+  // =========================
+  // 4. TOP 3 DUTY
+  // =========================
+  const top3 = Object.values(payroll)
+    .sort((a,b) => b.totalMinutes - a.totalMinutes)
+    .slice(0,3);
+
+  const formatHM = (min) => {
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return `${h}h ${m}m`;
+  };
+
+  document.getElementById("topDuty").innerHTML =
+    top3.map((x, i) => `
+      <div style="margin-bottom:8px">
+        <div class="top-name">${["🥇","🥈","🥉"][i]} ${x.nama}</div>
+        <div class="top-salary">${formatHM(x.totalMinutes)}</div>
+      </div>
+    `).join("");
+
+  // =========================
+  // 5. TABLE RENDER
+  // =========================
+  const tbody = document.getElementById("tbody");
+
+  if(Object.keys(payroll).length === 0){
+    tbody.innerHTML = `<tr><td colspan="7" class="empty">Belum ada data attendance</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = Object.values(payroll).map((v, idx) => {
+
+    const rate = rateCache[v.divisi] || 0;
+    const hours = v.totalMinutes / 60;
+    const totalPay = hours * rate;
+
+    return `
+      <tr>
+        <td>${v.nama}</td>
+        <td>${v.jabatan}</td>
+        <td>${v.divisi}</td>
+        <td>${formatHM(v.totalMinutes)}</td>
+        <td>${rate.toLocaleString("id-ID")}</td>
+        <td>${totalPay.toLocaleString("id-ID")}</td>
+        <td><a onclick="toggleDetail(${idx})">Detail</a></td>
+      </tr>
+
+      <tr class="detail-row hidden" id="detail-${idx}">
+        <td colspan="7">
+          <table style="width:100%">
+            <thead>
+              <tr>
+                <th>Start</th>
+                <th>Finish</th>
+                <th>Durasi</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${v.sessions.map(s => `
+                <tr>
+                  <td>${s.Start}</td>
+                  <td>${s.Finish || "-"}</td>
+                  <td>${s.Durasi}</td>
+                  <td>${s.Status}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </td>
+      </tr>
+    `;
+  }).join("");
+}
+
+function toggleDetail(idx){
+  const id = "detail-" + idx;
+  const row = document.getElementById(id);
+  if(row) row.classList.toggle("hidden");
+}
+
+function updateAttendanceStatus(rowId, status){
+
+  fetch(`${SCRIPT_URL}?action=updateAttendanceStatus&rowId=${rowId}&status=${status}`)
+    .then(res => res.json())
+    .then(data => {
+      if(data.success){
+
+        // safety check
+        const item = allAttendance.find(x => String(x.RowIndex) == String(rowId));
+        if(item) item.Status = status;
+                
+        // re-render UI
+        renderAttendanceTable();
+
+      } else {
+        alert("Gagal update status");
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      alert("Error update status");
+    });
+}
+
+window.addEventListener("load", () => {
+  const isLoggedIn = sessionStorage.getItem(LOGIN_KEY);
+
+  if(isLoggedIn === "true"){
+    document.getElementById("loginCard").classList.add("hidden");
+    document.getElementById("adminPanel").classList.remove("hidden");
+    loadAttendanceData();
+  }
+});
+
+</script>
+</body>
+</html>
