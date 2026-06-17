@@ -137,22 +137,14 @@ let allInvoices=[], weekRanges=[];
 let potonganCache = {}; 
 
 async function loadPotonganCache(){
-  const divisiList = [...new Set(
-    allInvoices.map(i =>
-      String(i.Divisi || "").trim().toUpperCase()
-    )
-  )];
 
-  for(const d of divisiList){
+  const res = await fetch(SCRIPT_URL + "?action=getAllPotongan");
+  const data = await res.json();
 
-    console.log("DIVISI:", d);
+  potonganCache = {};
 
-    const res = await fetch(SCRIPT_URL + "?action=getPotonganAPI&divisi=" + encodeURIComponent(d));
-    const data = await res.json();
-
-    console.log("RESPONSE:", data);
-    
-    potonganCache[String(d).trim().toUpperCase()] = Number(data.potongan || 0);
+  for(const key in data){
+    potonganCache[key.trim().toUpperCase()] = Number(data[key] || 0);
   }
 }
 
@@ -189,9 +181,13 @@ async function checkLogin(){
 
 // Load invoice
 async function loadData(){
-  const res = await fetch(SCRIPT_URL+"?action=getInvoices");
-  allInvoices = await res.json();
-  await loadPotonganCache();
+  const [invoiceRes] = await Promise.all([
+    fetch(SCRIPT_URL+"?action=getInvoices"),
+    loadPotonganCache()
+  ]);
+
+  allInvoices = await invoiceRes.json();
+
   populateWeeks();
   renderTable();
 }
