@@ -428,11 +428,20 @@ window.addEventListener("load", () => {
   }
 });
 
-window.addEventListener("load", () => {
-  if (sessionStorage.getItem("ems_admin_login") === "true") {
-    document.getElementById("navbar").style.display = "flex";
+function handleNavbar(){
+  const navbar = document.getElementById("navbar");
+  if (!navbar) return;
+
+  const isLoggedIn = sessionStorage.getItem("ems_admin_login");
+
+  if (isLoggedIn === "true") {
+    navbar.style.display = "flex";
+  } else {
+    navbar.style.display = "none";
   }
-});
+}
+
+window.addEventListener("load", handleNavbar);
 
 </script>
 </body>
