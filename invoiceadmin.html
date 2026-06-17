@@ -137,15 +137,14 @@ let allInvoices=[], weekRanges=[];
 let potonganCache = {}; 
 
 async function loadPotonganCache(){
-
   const res = await fetch(SCRIPT_URL + "?action=getAllPotongan");
   const data = await res.json();
 
   potonganCache = {};
 
-  for(const key in data){
-    potonganCache[key.trim().toUpperCase()] = Number(data[key] || 0);
-  }
+  data.forEach(item => {
+    potonganCache[item.divisi] = Number(item.potongan || 0);
+  });
 }
 
 // FIX: parser tanggal anti timezone shift
@@ -180,13 +179,19 @@ async function checkLogin(){
 }
 
 // Load invoice
-async function loadData(){
-  const [invoiceRes] = await Promise.all([
-    fetch(SCRIPT_URL+"?action=getInvoices"),
-    loadPotonganCache()
-  ]);
+let invoiceCache = null;
 
-  allInvoices = await invoiceRes.json();
+async function loadData(){
+
+  if(!invoiceCache){
+    const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+    invoiceCache = await res.json();
+  }
+
+  allInvoices = invoiceCache;
+  if(Object.keys(potonganCache).length === 0){
+    await loadPotonganCache();
+  }
 
   populateWeeks();
   renderTable();
@@ -373,7 +378,7 @@ function updateStatus(rowIndex,status){
     .then(res=>res.json())
 	.then(data=>{
       if(data.success){
-        loadData(); // data reload dari server
+        document.getElementById("weekSelect").dispatchEvent(new Event("change"));
       }
     });
 }
