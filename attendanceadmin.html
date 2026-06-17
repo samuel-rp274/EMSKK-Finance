@@ -428,6 +428,12 @@ window.addEventListener("load", () => {
   }
 });
 
+window.addEventListener("load", () => {
+  if (sessionStorage.getItem("ems_admin_login") === "true") {
+    document.getElementById("navbar").style.display = "flex";
+  }
+});
+
 </script>
 </body>
 </html>
