@@ -160,7 +160,7 @@ function safeGet(obj, key){
 // =========================
 async function checkLogin(){
   const pw = document.getElementById("adminPassword").value.trim();
-  document.getElementById("loginStatus").innerText = "⏳ Checking...";
+  document.getElementById("loginStatus").innerText = "⏳ Memeriksa password...";
 
   try{
     const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
@@ -175,10 +175,10 @@ async function checkLogin(){
 
       loadAttendanceData();
     } else {
-      document.getElementById("loginStatus").innerText = "❌ Password salah";
+      document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
     }
   } catch(e){
-    document.getElementById("loginStatus").innerText = "❌ Server error";
+    document.getElementById("loginStatus").innerText = "❌ Server error, silahkan hubungi FINANCE";
   }
 }
 
