@@ -626,10 +626,20 @@ function saveEdit(){
     .then(res => res.json())
     .then(data => {
       if(data.success){
+
+        // AUTO SET VALID setelah edit sukses
+        return fetch(`${SCRIPT_URL}?action=updateAttendanceStatus&rowIndex=${currentEditId}&status=VALID`);
+      } else {
+        throw new Error("Gagal update waktu");
+      }
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.success){
         closeModal();
         loadAttendanceData();
       } else {
-        alert("Gagal update");
+        alert("Gagal set status VALID");
       }
     })
     .catch(err => {
