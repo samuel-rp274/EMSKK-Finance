@@ -225,6 +225,25 @@ function normalizeDate(d){
   return x;
 }
 
+function parseWIB(dateStr){
+  if(!dateStr) return null;
+
+  // format: yyyy-MM-dd HH:mm:ss
+  const [date, time] = dateStr.split(" ");
+  if(!date || !time) return null;
+
+  const [y,m,d] = date.split("-").map(Number);
+  const [hh,mm,ss] = time.split(":").map(Number);
+
+  // paksa jadi WIB (tanpa konversi browser)
+  return new Date(y, m-1, d, hh, mm, ss);
+}
+
+function parseKeyDate(str){
+  const [y,m,d] = str.split("-").map(Number);
+  return new Date(y, m-1, d, 0, 0, 0);
+}
+
 // =========================
 // WEEK DROPDOWN
 // =========================
@@ -240,8 +259,8 @@ function populateWeeks(){
   allAttendance.forEach(i => {
     if(!i.Start) return;
 
-    const d = new Date(i.Start);
-    if(isNaN(d.getTime())) return;
+    const d = parseWIB(i.Start);
+    if(!d) return;
 
     // normalize ke hari (WIB-safe basic)
     const local = new Date(d);
@@ -292,8 +311,8 @@ function populateWeeks(){
   let currentWeek = keys.find(k => {
     const [startStr, endStr] = k.split("|");
 
-    const start = new Date(startStr);
-    const end = new Date(endStr);
+    const start = parseKeyDate(startStr);
+    const end = parseKeyDate(endStr);
     end.setHours(23,59,59,999);
 
     return now >= start && now <= end;
@@ -338,8 +357,8 @@ function renderAttendanceTable(){
   const weekData = allAttendance.filter(i => {
     if(!i.Start) return false;
 
-    const t = new Date(i.Start);
-    if(isNaN(t.getTime())) return false;
+    const t = parseWIB(i.Start);
+    if(!t) return false;
 
     return t >= start && t <= end;
   });
