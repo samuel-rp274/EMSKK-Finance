@@ -34,7 +34,6 @@ body{background:var(--bg);color:var(--text);padding:30px;}
   z-index:2;
 }
 
-
 h1{margin-bottom:5px;}
 .subtitle{color:var(--muted);margin-bottom:25px;}
 .form-group{margin-bottom:18px;}
@@ -221,16 +220,14 @@ fetch(SCRIPT_URL + "?action=getPriceList")
   .then(res => res.json())
   .then(data => {
 
-    // 1. inject dari SHEET dulu
-    data.forEach(item => {
+        data.forEach(item => {
       const opt = document.createElement("option");
       opt.value = item.label;
       opt.textContent = item.label;
       opt.dataset.price = item.price;
       invoiceType.appendChild(opt);
     });
-
-    // 2. baru inject special
+    
     injectSpecialOptions();
   });
 
@@ -346,33 +343,24 @@ invoiceType.addEventListener("change", function () {
     const selected = this.options[this.selectedIndex];
     const price = selected?.dataset?.price;
 
-    // =====================
-    // MODE OPERASI
-    // =====================
     if (this.value === "operasi") {
         operasiSection.classList.remove("hidden");
         harga.value = "";
     }
 
-    // SURAT
     else if (this.value === "surat") {
         suratSection.classList.remove("hidden");
         harga.value = "";
     }
 
-    // LAIN
     else if (this.value === "lain") {
         lainSection.classList.remove("hidden");
         harga.value = "";
     }
 
-    // =====================
-    // SIMPLE INVOICE (INI FIX UTAMA)
-    // =====================
     else {
         normalSection.classList.remove("hidden");
-
-        // 🔥 INI YANG HILANG DI KAMU
+        
         harga.value = price || 0;
     }
 
