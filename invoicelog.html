@@ -317,12 +317,8 @@ async function loadEMS(){
 }
 
 async function loadData(){
-
     const cached = localStorage.getItem(CACHE_KEY_INV);
 
-    // =========================
-    // 1. CEK CACHE
-    // =========================
     if(cached){
 
         let parsed = null;
@@ -337,15 +333,11 @@ async function loadData(){
             allInvoices = parsed.data || [];
             requestAnimationFrame(() => renderTable());
 
-            // refresh background
             refreshFromServer();
             return;
         }
     }
 
-    // =========================
-    // 2. FETCH SERVER
-    // =========================
     try {
         const res = await fetch(SCRIPT_URL+"?action=getInvoices");
         const data = await res.json();
@@ -362,9 +354,6 @@ async function loadData(){
         allInvoices = [];
     }
 
-    // =========================
-    // 3. RENDER UI
-    // =========================
     requestAnimationFrame(() => renderTable());
 }
 
@@ -388,7 +377,6 @@ async function refreshFromServer(){
 }
 
 function getWeekRange(date){
-
     const d = new Date(date);
 
     const day = d.getDay();
