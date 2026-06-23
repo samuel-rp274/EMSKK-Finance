@@ -74,25 +74,35 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 
 <div class="stats">
 
-  <!-- Card 1: Duty -->
-  <div class="stat">
-    <div class="stat-title">💰 Total Gaji Duty Minggu Ini</div>
-    <div class="stat-value">
-      <div style="font-size:18px;margin-bottom:6px">
-        Total: <span id="totalDuty">0</span>
-      </div>
+  <!-- Card 1: Duty + Invoice Detail -->
+<div class="stat">
+  <div class="stat-title">
+    💰 Total Gaji Minggu Ini (Detail)
+  </div>
+  <div class="stat-value">
+    <div style="font-size:16px;margin-bottom:6px">
+      💰 Duty: <span id="totalDuty">0</span>
+    </div>
+    <div style="font-size:16px">
+      💰 Invoice: <span id="totalInvoice">0</span>
     </div>
   </div>
+</div>
 
-  <!-- Card 2: Invoice -->
-  <div class="stat">
-    <div class="stat-title">💰 Total Gaji Invoice Minggu Ini</div>
-    <div class="stat-value">
-      <div style="font-size:18px;margin-bottom:6px">
-        Total: <span id="totalInvoice">0</span>
-      </div>
+  <!-- Card 2: Total + Sisa -->
+<div class="stat">
+  <div class="stat-title">
+    💰 Ringkasan Gaji Minggu Ini
+  </div>
+  <div class="stat-value">
+    <div style="font-size:16px;margin-bottom:6px">
+      💰 Total: <span id="totalWeek">0</span>
+    </div>
+    <div style="font-size:16px">
+      💸 Sisa: <span id="sisaWeek">0</span>
     </div>
   </div>
+</div>
 
   <!-- Card 3: Top 3 -->
   <div class="stat">
@@ -136,6 +146,12 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 const LOGIN_KEY = "ems_admin_login";
 
 let allSalaryData = [];
+const CACHE_KEY_SALARY = "salary_cache_v1";
+const CACHE_TTL = 1000 * 60 * 5; // 5 menit
+
+function isCacheValid(time){
+  return (Date.now() - time) < CACHE_TTL;
+}
 
 // =========================
 // LOGIN ADMIN
@@ -172,13 +188,82 @@ async function checkLogin(){
 // =========================
 async function loadData(){
 
-  const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
-  const data = await res.json();
+  const cached = localStorage.getItem(CACHE_KEY_SALARY);
 
-  allSalaryData = data;
+  // =========================
+  // 1. CEK CACHE SAFETY
+  // =========================
+  if(cached){
 
-  populateWeeks();
-  renderTable();
+    let parsed = null;
+
+    try {
+      parsed = JSON.parse(cached);
+    } catch(e){
+      console.warn("Cache rusak, dihapus");
+      localStorage.removeItem(CACHE_KEY_SALARY);
+    }
+
+    // =========================
+    // 2. PAKAI CACHE JIKA VALID
+    // =========================
+    if(parsed && isCacheValid(parsed.time)){
+      allSalaryData = parsed.data || [];
+
+      populateWeeks();
+      renderTable();
+
+      refreshFromServer();
+      return;
+    }
+  }
+
+  // =========================
+  // 3. FETCH SERVER (FALLBACK)
+  // =========================
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
+    const data = await res.json();
+
+    allSalaryData = data || [];
+
+    localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({
+      data: allSalaryData,
+      time: Date.now()
+    }));
+
+  } catch(e){
+    console.error("Gagal fetch server:", e);
+    allSalaryData = [];
+  }
+
+  // =========================
+  // 4. RENDER UI
+  // =========================
+  requestAnimationFrame(() => {
+    populateWeeks();
+    renderTable();
+  });
+}
+
+async function refreshFromServer(){
+  try{
+    const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
+    const fresh = await res.json();
+
+    allSalaryData = fresh;
+
+    localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({
+      data: fresh,
+      time: Date.now()
+    }));
+
+    populateWeeks();
+    renderTable();
+
+  } catch(e){
+    console.log("sync gagal, pakai cache");
+  }
 }
 
 // =========================
@@ -268,32 +353,50 @@ async function renderTable(){
   const filtered = allSalaryData.filter(x => x.week === week);
 
   // =========================
-  // CARD 1 - DUTY
+  // CARD 1 - DETAIL DUTY + INVOICE
   // =========================
-  const totalDuty = filtered.reduce((a,b)=>a + (b.duty || 0), 0);
+  const totalDuty = filtered.reduce((a,b)=>a + (Number(b.duty) || 0), 0);
+  const totalInvoice = filtered.reduce((a,b)=>a + (Number(b.invoice) || 0), 0);
+
   document.getElementById("totalDuty").innerText =
     totalDuty.toLocaleString("id-ID");
 
-  // =========================
-  // CARD 2 - INVOICE
-  // =========================
-  const totalInvoice = filtered.reduce((a,b)=>a + (b.invoice || 0), 0);
   document.getElementById("totalInvoice").innerText =
     totalInvoice.toLocaleString("id-ID");
+
+
+  // =========================
+  // CARD 2 - TOTAL + SISA
+  // =========================
+  const totalWeek = totalDuty + totalInvoice;
+
+  const paidAmount = filtered
+    .filter(x => x.paid === "PAID")
+    .reduce((a,b)=>a + (Number(b.duty) || 0) + (Number(b.invoice) || 0), 0);
+
+  const sisaWeek = totalWeek - paidAmount;
+
+  document.getElementById("totalWeek").innerText =
+    totalWeek.toLocaleString("id-ID");
+
+  document.getElementById("sisaWeek").innerText =
+    sisaWeek.toLocaleString("id-ID");
+
 
   // =========================
   // CARD 3 - TOP 3
   // =========================
   const top3 = [...filtered]
-    .sort((a,b)=>(b.duty + b.invoice) - (a.duty + a.invoice))
+    .sort((a,b)=>(Number(b.duty) + Number(b.invoice)) - (Number(a.duty) + Number(a.invoice)))
     .slice(0,3);
 
   document.getElementById("topGaji").innerHTML =
     top3.map((x,i)=>`
       <div style="font-size:14px; font-weight:600;">
-        ${["🥇","🥈","🥉"][i]} ${x.nama} - $KK ${(x.duty + x.invoice).toLocaleString("id-ID")}
+        ${["🥇","🥈","🥉"][i] || ""} ${x.nama} - $KK ${(Number(x.duty) + Number(x.invoice)).toLocaleString("id-ID")}
       </div>
     `).join("");
+
 
   // =========================
   // TABLE
@@ -301,18 +404,22 @@ async function renderTable(){
   const tbody = document.getElementById("tbody");
 
   tbody.innerHTML = filtered.map(x=>{
-    const total = x.duty + x.invoice;
+
+    const duty = Number(x.duty) || 0;
+    const invoice = Number(x.invoice) || 0;
+    const total = duty + invoice;
 
     return `
       <tr>
         <td>${x.nama}</td>
-        <td>${x.duty.toLocaleString("id-ID")}</td>
-        <td>${x.invoice.toLocaleString("id-ID")}</td>
+        <td>${duty.toLocaleString("id-ID")}</td>
+        <td>${invoice.toLocaleString("id-ID")}</td>
         <td><b>${total.toLocaleString("id-ID")}</b></td>
         <td>
           <input type="checkbox"
-          onchange="markPaid('${x.nama}','${x.week}', this.checked)"
-          ${x.paid === "PAID" ? "checked" : ""}>
+            onchange="markPaid('${x.nama}','${x.week}', this.checked)"
+            ${x.paid === "PAID" ? "checked" : ""}
+          >
         </td>
       </tr>
     `;
@@ -335,12 +442,34 @@ window.addEventListener("load", () => {
 });
 
 function markPaid(nama, week, checked){
+
   fetch(SCRIPT_URL +
     "?action=updatePaidStatus" +
     "&nama=" + encodeURIComponent(nama) +
     "&week=" + encodeURIComponent(week) +
     "&status=" + (checked ? "PAID" : "UNPAID")
-  );
+  ).then(() => {
+
+    // update cache lokal
+    const cached = localStorage.getItem(CACHE_KEY_SALARY);
+
+    if(cached){
+      const parsed = JSON.parse(cached);
+
+      parsed.data = parsed.data.map(i =>
+        (i.nama === nama && i.week === week)
+          ? { ...i, paid: checked ? "PAID" : "UNPAID" }
+          : i
+      );
+
+      parsed.time = Date.now();
+      localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify(parsed));
+
+      allSalaryData = parsed.data;
+    }
+
+    renderTable();
+  });
 }
 </script>
 </body>
