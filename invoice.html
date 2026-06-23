@@ -22,7 +22,6 @@ body{background:var(--bg);color:var(--text);padding:30px;}
   margin-top:60px;
 }
 
-/* GLASS CARD (MATCH INDEX) */
 .card{
   background:rgba(255,255,255,0.06);
   border:1px solid rgba(255,255,255,0.08);
@@ -224,7 +223,6 @@ const tanggalInvoice = document.getElementById("tanggalInvoice");
 invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 
 function loadPriceList(){
-
   const cached = localStorage.getItem(CACHE_KEY_PRICE);
 
   if(cached){
@@ -256,7 +254,6 @@ function loadPriceList(){
 }
 
 function injectPrice(data){
-
     invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 
     data.forEach(item => {
@@ -286,7 +283,6 @@ function injectSpecialOptions() {
 }
 
 (function(){
-
     const now = new Date();
 
     const start = new Date(now);
