@@ -138,7 +138,13 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 const LOGIN_KEY = "ems_admin_login";  
 let allInvoices=[], weekRanges=[];
-let potonganCache = {}; 
+let potonganCache = {};
+const CACHE_KEY_INV = "invoice_cache_v1";
+const CACHE_TTL = 1000 * 60 * 5; // 5 menit 
+
+function isCacheValid(time){
+  return (Date.now() - time) < CACHE_TTL;
+}
 
 async function loadPotonganCache(){
   const res = await fetch(SCRIPT_URL + "?action=getAllPotongan");
@@ -183,23 +189,59 @@ async function checkLogin(){
   }
 }
 
-// Load invoice
-let invoiceCache = null;
-
 async function loadData(){
 
-  if(!invoiceCache){
-    const res = await fetch(SCRIPT_URL+"?action=getInvoices");
-    invoiceCache = await res.json();
+  const cached = localStorage.getItem(CACHE_KEY_INV);
+
+  if(cached){
+    const parsed = JSON.parse(cached);
+
+    if(isCacheValid(parsed.time)){
+      allInvoices = parsed.data;
+
+      await loadPotonganCache();
+
+      populateWeeks();
+      renderTable();
+
+      refreshFromServer();
+      return;
+    }
   }
 
-  allInvoices = invoiceCache;
-  if(Object.keys(potonganCache).length === 0){
-    await loadPotonganCache();
-  }
+  const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+  const data = await res.json();
 
+  allInvoices = data;
+
+  localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
+    data: allInvoices,
+    time: Date.now()
+  }));
+
+  await loadPotonganCache();
   populateWeeks();
   renderTable();
+}
+
+async function refreshFromServer(){
+  try{
+    const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+    const fresh = await res.json();
+
+    allInvoices = fresh;
+
+    localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
+      data: fresh,
+      time: Date.now()
+    }));
+
+    populateWeeks();
+    renderTable();
+
+  } catch(e){
+    console.log("sync gagal, pakai cache");
+  }
 }
 
 // Populate minggu (Minggu → Sabtu)
@@ -378,15 +420,52 @@ function toggleDetail(idx){
   if(row) row.classList.toggle("hidden");
 }
 
-function updateStatus(rowIndex,status){
+function updateStatus(rowIndex, status){
+
   fetch(`${SCRIPT_URL}?action=updateStatus&rowIndex=${rowIndex}&status=${status}`)
-    .then(res=>res.json())
-    .then(async data=>{
-      if(data.success){
-        // 🔥 HAPUS CACHE BIAR DATA BARU KELOAD
-        invoiceCache = null;
-        await loadData(); // reload full data tapi sudah lebih cepat karena potongan cache aman
+    .then(res => res.json())
+    .then(data => {
+
+      if(!data.success) return;
+
+      // =========================
+      // 1. UPDATE CACHE LOKAL
+      // =========================
+      let cached = localStorage.getItem(CACHE_KEY_INV);
+      if(!cached) return;
+
+      try {
+        cached = JSON.parse(cached);
+      } catch(e){
+        localStorage.removeItem(CACHE_KEY_INV);
+        return;
       }
+
+      cached.data = cached.data.map(i =>
+        String(i.RowIndex) === String(rowIndex)
+          ? { ...i, Status: status }
+          : i
+      );
+
+      cached.time = Date.now();
+      localStorage.setItem(CACHE_KEY_INV, JSON.stringify(cached));
+
+      // =========================
+      // 2. UPDATE DATA MEMORY (biar langsung konsisten)
+      // =========================
+      allInvoices = cached.data;
+
+      // =========================
+      // 3. UPDATE UI TANPA RELOAD SERVER
+      // =========================
+
+      requestAnimationFrame(() => {
+        renderTable();
+      });
+    })
+    .catch(err => {
+      console.error("Update gagal:", err);
+      alert("Gagal update status");
     });
 }
 
