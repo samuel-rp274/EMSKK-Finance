@@ -300,6 +300,12 @@ const API="https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXm
 
 let emsData={},ts;
 let currentUser=null;
+const CACHE_KEY_EMS = "ems_cache_v1";
+const CACHE_TTL = 1000 * 60 * 10; // 10 menit
+
+function isCacheValid(time){
+  return (Date.now() - time) < CACHE_TTL;
+}
 
 setInterval(()=>{
   const now = new Date(
@@ -322,30 +328,81 @@ function setStatus(type,text){
 }
 
 async function loadEMS(){
-  if (ts) {
-	ts.destroy();
-  }
-  
-  const res=await fetch(API+"?action=getEMS");
-  const data=await res.json();
-  
-  nama.innerHTML = `<option value="">Cari Nama EMS...</option>`;
 
-  data
-  .sort((a,b)=>a.nama.localeCompare(b.nama))
-  .forEach(u=>{
-    emsData[u.nama]=u;
-	
-    let opt=document.createElement("option");
-    opt.value=u.nama;
-    opt.textContent=u.nama;
-    nama.appendChild(opt);
+  // reset TomSelect aman
+  if(ts){
+    ts.destroy();
+    ts = null;
+  }
+
+  const select = document.getElementById("nama");
+  select.innerHTML = `<option value="">Cari Nama EMS...</option>`;
+
+  const cached = localStorage.getItem(CACHE_KEY_EMS);
+
+  let emsList = null;
+
+  // =========================
+  // 1. CACHE CHECK
+  // =========================
+  if(cached){
+    try {
+      const parsed = JSON.parse(cached);
+
+      if(parsed?.data && Array.isArray(parsed.data) && parsed.data.length){
+        emsList = parsed.data;
+      }
+    } catch(e){
+      localStorage.removeItem(CACHE_KEY_EMS);
+    }
+  }
+
+  // =========================
+  // 2. FALLBACK KE SERVER
+  // =========================
+  if(!emsList){
+    try {
+      const res = await fetch(API + "?action=getEMS");
+      const data = await res.json();
+
+      emsList = Array.isArray(data) ? data : [];
+
+      localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
+        data: emsList,
+        time: Date.now()
+      }));
+
+    } catch(err){
+      console.error("EMS gagal load:", err);
+      emsList = [];
+    }
+  }
+
+  // =========================
+  // 3. BUILD OPTION (WAJIB VALIDASI)
+  // =========================
+  emsList
+    .filter(u => u && u.nama)
+    .sort((a,b)=>a.nama.localeCompare(b.nama))
+    .forEach(u=>{
+      emsData[u.nama] = u;
+
+      const opt = document.createElement("option");
+      opt.value = u.nama;
+      opt.textContent = u.nama;
+      select.appendChild(opt);
+    });
+
+  // =========================
+  // 4. INIT TOMSELECT
+  // =========================
+  ts = new TomSelect("#nama",{
+    create:false,
+    highlight:true
   });
 
-ts=new TomSelect("#nama",{create:false,highlight:true});
-
-ts.on("change",(v)=>{
-  currentUser=v;
+  ts.on("change",(v)=>{
+    currentUser = v;
 
     if(!v){
       jabatan.value="";
@@ -354,13 +411,21 @@ ts.on("change",(v)=>{
       return;
     }
 
-    jabatan.value=emsData[v].jabatan;
-    divisi.value=emsData[v].divisi;
+    jabatan.value = emsData[v]?.jabatan || "";
+    divisi.value = emsData[v]?.divisi || "";
 
     checkSession(v);
   });
 
+  // =========================
+  // 5. RESTORE SESSION
+  // =========================
   restoreSession();
+
+  // =========================
+  // 6. LOAD DATA
+  // =========================
+  loadData();
 }
 
 async function checkSession(nama){
