@@ -274,7 +274,7 @@ let allData = [];
 let ts;
 const CACHE_KEY_EMS = "ems_cache_v1";
 const CACHE_KEY_ATT = "attendance_cache_v1";
-const CACHE_TTL = 1000 * 60 * 5;
+const CACHE_TTL = 1000 * 60 * 8;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
