@@ -137,6 +137,9 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
 <script>
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 const LOGIN_KEY = "ems_admin_login";
+const CACHE_KEY_ATT = "attendance_cache_v1";
+const CACHE_KEY_RATE = "rates_cache_v1";
+const CACHE_TTL = 1000 * 60 * 5; // 5 menit
 
 let allAttendance = [];
 let rateDivisiCache = {};
@@ -153,6 +156,10 @@ function safeGet(obj, key){
     ?? obj[key?.toUpperCase?.()]
     ?? obj[key?.toLowerCase?.()]
     ?? null;
+}
+
+function isCacheValid(time){
+  return (Date.now() - time) < CACHE_TTL;
 }
 
 // =========================
@@ -173,7 +180,8 @@ async function checkLogin(){
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("navbar").style.display = "flex";
 
-      loadAttendanceData();
+      await loadRates();
+      await loadAttendanceData();
     } else {
       document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
     }
@@ -186,36 +194,85 @@ async function checkLogin(){
 // LOAD DATA
 // =========================
 async function loadAttendanceData(){
+
+  const cached = localStorage.getItem(CACHE_KEY_ATT);
+
+  if(cached){
+    const parsed = JSON.parse(cached);
+
+    // kalau cache masih fresh
+    if(isCacheValid(parsed.time)){
+      allAttendance = parsed.data;
+
+      populateWeeks();
+
+      // sync server di background
+      refreshFromServer();
+      return;
+    }
+  }
+
+  // kalau tidak ada cache / expired
   const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
   allAttendance = await res.json();
 
-  await loadPotonganCache();
-
-  await loadRates();
+  localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
+    data: allAttendance,
+    time: Date.now()
+  }));
 
   populateWeeks();
 }
 
+async function refreshFromServer(){
+  try{
+    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
+    const fresh = await res.json();
+
+    allAttendance = fresh;
+
+    localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
+      data: fresh,
+      time: Date.now()
+    }));
+
+    populateWeeks();
+
+    // 🔥 juga sync rates ringan (optional)
+    loadRates();
+
+  } catch(e){
+    console.log("sync gagal, pakai cache");
+  }
+}
+
 async function loadRates(){
+
+  const cached = localStorage.getItem(CACHE_KEY_RATE);
+
+  if(cached){
+    const data = JSON.parse(cached);
+    mapRates(data);
+    return;
+  }
+
   const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
   const data = await res.json();
 
-  // =========================
-  // MAP DIVISI
-  // =========================
+  localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
+  mapRates(data);
+}
+
+function mapRates(data){
+  rateDivisiMap = {};
+  rateJabatanMap = {};
+
   data.divisi.forEach(r => {
-    const key = String(r[0]).trim().toUpperCase();
-    const val = Number(r[1]);
-    rateDivisiMap[key] = val;
+    rateDivisiMap[String(r[0]).trim().toUpperCase()] = Number(r[1]);
   });
 
-  // =========================
-  // MAP JABATAN
-  // =========================
   data.jabatan.forEach(r => {
-    const key = String(r[0]).trim().toUpperCase();
-    const val = Number(r[1]);
-    rateJabatanMap[key] = val;
+    rateJabatanMap[String(r[0]).trim().toUpperCase()] = Number(r[1]);
   });
 }
 
@@ -598,8 +655,38 @@ function setStatus(rowIndex, status){
         throw new Error("Gagal update status");
       }
 
-      // 🔥 update server selesai → refresh data lokal
-      return loadAttendanceData();
+      // =========================
+      // 1. UPDATE UI LANGSUNG (FAST)
+      // =========================
+      updateStatusLocal(rowIndex, status);
+
+      // =========================
+      // 2. UPDATE CACHE LOKAL
+      // =========================
+      const cached = localStorage.getItem(CACHE_KEY_ATT);
+
+      if(cached){
+        const parsed = JSON.parse(cached);
+
+        parsed.data = parsed.data.map(item => {
+          if(String(item.RowIndex) === String(rowIndex)){
+            return {
+              ...item,
+              Status: status
+            };
+          }
+          return item;
+        });
+
+        parsed.time = Date.now(); // refresh timestamp cache
+
+        localStorage.setItem(CACHE_KEY_ATT, JSON.stringify(parsed));
+      }
+
+      // =========================
+      // 3. REFRESH RINGAN (bukan reload full data)
+      // =========================
+      renderAttendanceTable();
     })
     .catch(err => {
       console.error(err);
@@ -645,7 +732,7 @@ function saveEdit(){
       closeModal();
 
       // 🔥 AMAN: reload data dari server (ini yang benar)
-      return loadAttendanceData();
+      refreshFromServer();
     })
     .catch(err => {
       console.error(err);
