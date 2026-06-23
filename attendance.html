@@ -301,7 +301,7 @@ const API="https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXm
 let emsData={},ts;
 let currentUser=null;
 const CACHE_KEY_EMS = "ems_cache_v1";
-const CACHE_TTL = 1000 * 60 * 10; // 10 menit
+const CACHE_TTL = 1000 * 60 * 10;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
@@ -329,7 +329,6 @@ function setStatus(type,text){
 
 async function loadEMS(){
 
-  // reset TomSelect aman
   if(ts){
     ts.destroy();
     ts = null;
@@ -342,9 +341,6 @@ async function loadEMS(){
 
   let emsList = null;
 
-  // =========================
-  // 1. CACHE CHECK
-  // =========================
   if(cached){
     try {
       const parsed = JSON.parse(cached);
@@ -357,9 +353,6 @@ async function loadEMS(){
     }
   }
 
-  // =========================
-  // 2. FALLBACK KE SERVER
-  // =========================
   if(!emsList){
     try {
       const res = await fetch(API + "?action=getEMS");
@@ -378,9 +371,6 @@ async function loadEMS(){
     }
   }
 
-  // =========================
-  // 3. BUILD OPTION (WAJIB VALIDASI)
-  // =========================
   emsList
     .filter(u => u && u.nama)
     .sort((a,b)=>a.nama.localeCompare(b.nama))
@@ -393,9 +383,6 @@ async function loadEMS(){
       select.appendChild(opt);
     });
 
-  // =========================
-  // 4. INIT TOMSELECT
-  // =========================
   ts = new TomSelect("#nama",{
     create:false,
     highlight:true
@@ -417,14 +404,8 @@ async function loadEMS(){
     checkSession(v);
   });
 
-  // =========================
-  // 5. RESTORE SESSION
-  // =========================
   restoreSession();
-
-  // =========================
-  // 6. LOAD DATA
-  // =========================
+  
   loadData();
 }
 
