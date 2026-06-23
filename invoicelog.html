@@ -275,6 +275,12 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 
 let allInvoices = [];
 let tomSelectInstance = null;
+const CACHE_KEY_INV = "invoice_cache_v1";
+const CACHE_TTL = 1000 * 60 * 5;
+
+function isCacheValid(time){
+  return (Date.now() - time) < CACHE_TTL;
+}
 
 async function loadEMS(){
     const res = await fetch(SCRIPT_URL+"?action=getEMS");
@@ -295,7 +301,7 @@ async function loadEMS(){
 		dropdownParent: "body",
         onChange: function(value){
           localStorage.setItem("ems_name", value);
-          renderTable();
+          requestAnimationFrame(() => renderTable());
         }
     });
 
@@ -304,16 +310,81 @@ async function loadEMS(){
     if (saved) {
       setTimeout(() => {
         tomSelectInstance.setValue(saved);
-        renderTable();
+        requestAnimationFrame(() => renderTable());
       }, 100);
     }
     loadData();
 }
 
 async function loadData(){
-    const res = await fetch(SCRIPT_URL+"?action=getInvoices");
-    allInvoices = await res.json();
-    renderTable();
+
+    const cached = localStorage.getItem(CACHE_KEY_INV);
+
+    // =========================
+    // 1. CEK CACHE
+    // =========================
+    if(cached){
+
+        let parsed = null;
+
+        try {
+            parsed = JSON.parse(cached);
+        } catch(e){
+            localStorage.removeItem(CACHE_KEY_INV);
+        }
+
+        if(parsed && isCacheValid(parsed.time)){
+            allInvoices = parsed.data || [];
+            requestAnimationFrame(() => renderTable());
+
+            // refresh background
+            refreshFromServer();
+            return;
+        }
+    }
+
+    // =========================
+    // 2. FETCH SERVER
+    // =========================
+    try {
+        const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+        const data = await res.json();
+
+        allInvoices = data || [];
+
+        localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
+            data: allInvoices,
+            time: Date.now()
+        }));
+
+    } catch(e){
+        console.error("Gagal fetch invoice:", e);
+        allInvoices = [];
+    }
+
+    // =========================
+    // 3. RENDER UI
+    // =========================
+    requestAnimationFrame(() => renderTable());
+}
+
+async function refreshFromServer(){
+    try{
+        const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+        const fresh = await res.json();
+
+        allInvoices = fresh;
+
+        localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
+            data: fresh,
+            time: Date.now()
+        }));
+
+        requestAnimationFrame(() => renderTable());
+
+    } catch(e){
+        console.log("sync gagal, pakai cache");
+    }
 }
 
 function getWeekRange(date){
