@@ -147,6 +147,7 @@ let rateJabatanCache = {};
 let potonganCache = {};
 let rateDivisiMap = {};
 let rateJabatanMap = {};
+let ratesReady = false;
 
 function safeGet(obj, key){
   if(!obj) return null;
@@ -204,7 +205,9 @@ async function loadAttendanceData(){
     if(isCacheValid(parsed.time)){
       allAttendance = parsed.data;
 
-      populateWeeks();
+      if(ratesReady && allAttendance.length){
+        requestAnimationFrame(() => populateWeeks());
+      }
 
       // sync server di background
       refreshFromServer();
@@ -221,7 +224,9 @@ async function loadAttendanceData(){
     time: Date.now()
   }));
 
-  populateWeeks();
+  if(ratesReady && allAttendance.length){  
+    requestAnimationFrame(() => populateWeeks());
+  }
 }
 
 async function refreshFromServer(){
@@ -236,10 +241,9 @@ async function refreshFromServer(){
       time: Date.now()
     }));
 
-    populateWeeks();
-
-    // 🔥 juga sync rates ringan (optional)
-    loadRates();
+    if(ratesReady && allAttendance.length){
+      requestAnimationFrame(() => populateWeeks());
+    }
 
   } catch(e){
     console.log("sync gagal, pakai cache");
@@ -250,17 +254,43 @@ async function loadRates(){
 
   const cached = localStorage.getItem(CACHE_KEY_RATE);
 
+  let data = null;
+
+  // =========================
+  // 1. CACHE
+  // =========================
   if(cached){
-    const data = JSON.parse(cached);
-    mapRates(data);
+    try {
+      data = JSON.parse(cached);
+    } catch(e){
+      localStorage.removeItem(CACHE_KEY_RATE);
+    }
+  }
+
+  // =========================
+  // 2. FALLBACK FETCH
+  // =========================
+  if(!data){
+    const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
+    data = await res.json();
+
+    localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
+  }
+
+  // =========================
+  // 3. VALIDASI DATA (INI PENTING)
+  // =========================
+  if(!data || !data.divisi || !data.jabatan){
+    console.error("Rates format invalid:", data);
+    ratesReady = false;
     return;
   }
 
-  const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
-  const data = await res.json();
-
-  localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
+  // =========================
+  // 4. MAP
+  // =========================
   mapRates(data);
+  ratesReady = true;
 }
 
 function mapRates(data){
