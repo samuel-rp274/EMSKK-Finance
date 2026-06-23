@@ -147,7 +147,7 @@ const LOGIN_KEY = "ems_admin_login";
 
 let allSalaryData = [];
 const CACHE_KEY_SALARY = "salary_cache_v1";
-const CACHE_TTL = 1000 * 60 * 5; // 5 menit
+const CACHE_TTL = 1000 * 60 * 3;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
