@@ -140,7 +140,7 @@ const LOGIN_KEY = "ems_admin_login";
 let allInvoices=[], weekRanges=[];
 let potonganCache = {};
 const CACHE_KEY_INV = "invoice_cache_v1";
-const CACHE_TTL = 1000 * 60 * 5;
+const CACHE_TTL = 1000 * 60 * 3;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
