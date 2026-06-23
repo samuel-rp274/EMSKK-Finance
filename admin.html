@@ -153,9 +153,6 @@ function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
 }
 
-// =========================
-// LOGIN ADMIN
-// =========================
 async function checkLogin(){
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerText = "⏳ Memeriksa password...";
@@ -183,16 +180,9 @@ async function checkLogin(){
   }
 }
 
-// =========================
-// LOAD DATA (TOTAL SALARY)
-// =========================
 async function loadData(){
-
   const cached = localStorage.getItem(CACHE_KEY_SALARY);
 
-  // =========================
-  // 1. CEK CACHE SAFETY
-  // =========================
   if(cached){
 
     let parsed = null;
@@ -204,9 +194,6 @@ async function loadData(){
       localStorage.removeItem(CACHE_KEY_SALARY);
     }
 
-    // =========================
-    // 2. PAKAI CACHE JIKA VALID
-    // =========================
     if(parsed && isCacheValid(parsed.time)){
       allSalaryData = parsed.data || [];
 
@@ -218,9 +205,6 @@ async function loadData(){
     }
   }
 
-  // =========================
-  // 3. FETCH SERVER (FALLBACK)
-  // =========================
   try {
     const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
     const data = await res.json();
@@ -237,9 +221,6 @@ async function loadData(){
     allSalaryData = [];
   }
 
-  // =========================
-  // 4. RENDER UI
-  // =========================
   requestAnimationFrame(() => {
     populateWeeks();
     renderTable();
@@ -266,17 +247,10 @@ async function refreshFromServer(){
   }
 }
 
-// =========================
-// PARSE WEEK SAFE
-// =========================
 function parseDateSafe(dateStr){
   const [y, m, d] = dateStr.split("|")[0].split("-");
   return new Date(Number(y), Number(m)-1, Number(d));
 }
-
-// =========================
-// BUILD WEEK SELECT
-// =========================
 
 function populateWeeks(){
   const select = document.getElementById("weekSelect");
@@ -284,9 +258,6 @@ function populateWeeks(){
 
   const weeks = {};
 
-  // =========================
-  // BUILD UNIQUE WEEK LIST
-  // =========================
   allSalaryData.forEach(i => {
     if (!i.week) return;
     weeks[i.week] = true;
@@ -294,17 +265,11 @@ function populateWeeks(){
 
   const weekKeys = Object.keys(weeks);
 
-  // =========================
-  // TODAY (FOR AUTO SELECT)
-  // =========================
   const today = new Date();
   today.setHours(0,0,0,0);
 
   let defaultIndex = 0;
 
-  // =========================
-  // CREATE OPTIONS
-  // =========================
   weekKeys.forEach((key, index) => {
     const opt = document.createElement("option");
     opt.value = key;
@@ -314,12 +279,8 @@ function populateWeeks(){
     const startDate = new Date(startStr);
     const endDate = new Date(endStr);
 
-    // FORMAT LABEL
-    opt.textContent = `${startStr} s/d ${endStr}`;
+     opt.textContent = `${startStr} s/d ${endStr}`;
 
-    // =========================
-    // AUTO SELECT CURRENT WEEK
-    // =========================
     if (today >= startDate && today <= endDate) {
       defaultIndex = index;
     }
@@ -327,34 +288,21 @@ function populateWeeks(){
     select.appendChild(opt);
   });
 
-  // =========================
-  // EVENT CHANGE
-  // =========================
   select.addEventListener("change", renderTable);
 
-  // =========================
-  // AUTO SELECT + TRIGGER
-  // =========================
   if (select.options.length > 0) {
     select.selectedIndex = defaultIndex;
     select.dispatchEvent(new Event("change"));
   }
 }
 
-// =========================
-// RENDER DASHBOARD
-// =========================
 async function renderTable(){
-
   const select = document.getElementById("weekSelect");
   const week = select.value;
   if(!week) return;
 
   const filtered = allSalaryData.filter(x => x.week === week);
 
-  // =========================
-  // CARD 1 - DETAIL DUTY + INVOICE
-  // =========================
   const totalDuty = filtered.reduce((a,b)=>a + (Number(b.duty) || 0), 0);
   const totalInvoice = filtered.reduce((a,b)=>a + (Number(b.invoice) || 0), 0);
 
@@ -364,10 +312,6 @@ async function renderTable(){
   document.getElementById("totalInvoice").innerText =
     totalInvoice.toLocaleString("id-ID");
 
-
-  // =========================
-  // CARD 2 - TOTAL + SISA
-  // =========================
   const totalWeek = totalDuty + totalInvoice;
 
   const paidAmount = filtered
@@ -382,10 +326,6 @@ async function renderTable(){
   document.getElementById("sisaWeek").innerText =
     sisaWeek.toLocaleString("id-ID");
 
-
-  // =========================
-  // CARD 3 - TOP 3
-  // =========================
   const top3 = [...filtered]
     .sort((a,b)=>(Number(b.duty) + Number(b.invoice)) - (Number(a.duty) + Number(a.invoice)))
     .slice(0,3);
@@ -397,10 +337,6 @@ async function renderTable(){
       </div>
     `).join("");
 
-
-  // =========================
-  // TABLE
-  // =========================
   const tbody = document.getElementById("tbody");
 
   tbody.innerHTML = filtered.map(x=>{
@@ -427,9 +363,6 @@ async function renderTable(){
 
 }
 
-// =========================
-// AUTO LOGIN CHECK
-// =========================
 window.addEventListener("load", () => {
   const isLoggedIn = sessionStorage.getItem(LOGIN_KEY);
 
@@ -442,7 +375,6 @@ window.addEventListener("load", () => {
 });
 
 function markPaid(nama, week, checked){
-
   fetch(SCRIPT_URL +
     "?action=updatePaidStatus" +
     "&nama=" + encodeURIComponent(nama) +
@@ -450,7 +382,6 @@ function markPaid(nama, week, checked){
     "&status=" + (checked ? "PAID" : "UNPAID")
   ).then(() => {
 
-    // update cache lokal
     const cached = localStorage.getItem(CACHE_KEY_SALARY);
 
     if(cached){
