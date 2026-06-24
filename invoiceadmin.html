@@ -198,10 +198,12 @@ async function loadData(){
 
       await loadPotonganCache();
 
-      populateWeeks();
-      renderTable();
+      requestAnimationFrame(() => {
+        populateWeeks();
+        renderTable();
+      });
 
-      refreshFromServer();
+      setTimeout(refreshFromServer, 1000);
       return;
     }
   }
@@ -217,8 +219,11 @@ async function loadData(){
   }));
 
   await loadPotonganCache();
-  populateWeeks();
-  renderTable();
+
+  requestAnimationFrame(() => {
+    populateWeeks();
+    renderTable();
+  });
 }
 
 async function refreshFromServer(){
@@ -233,8 +238,10 @@ async function refreshFromServer(){
       time: Date.now()
     }));
 
-    populateWeeks();
-    renderTable();
+    requestAnimationFrame(() => {
+      populateWeeks();
+      renderTable();
+      });
 
   } catch(e){
     console.log("sync gagal, pakai cache");
@@ -281,7 +288,10 @@ function populateWeeks(){
     select.appendChild(opt);
   });
 
-select.addEventListener("change", renderTable);
+if(!select.dataset.bound){
+  select.addEventListener("change", renderTable);
+  select.dataset.bound = "1";
+}
 
 requestAnimationFrame(() => {
   setTimeout(() => {
