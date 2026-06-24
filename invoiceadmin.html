@@ -196,11 +196,15 @@ async function loadData(){
     if(isCacheValid(parsed.time)){
       allInvoices = parsed.data;
 
-      await loadPotonganCache();
-
       requestAnimationFrame(() => {
         populateWeeks();
         renderTable();
+      });
+
+      loadPotonganCache().then(() => {
+        requestAnimationFrame(() => {
+          renderTable();
+        });
       });
 
       setTimeout(refreshFromServer, 1000);
@@ -218,11 +222,15 @@ async function loadData(){
     time: Date.now()
   }));
 
-  await loadPotonganCache();
-
   requestAnimationFrame(() => {
     populateWeeks();
     renderTable();
+  });
+
+  loadPotonganCache().then(() => {
+    requestAnimationFrame(() => {
+      renderTable(); // update ringan saja
+    });
   });
 }
 
