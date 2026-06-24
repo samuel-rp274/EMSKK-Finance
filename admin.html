@@ -146,11 +146,23 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 const LOGIN_KEY = "ems_admin_login";
 
 let allSalaryData = [];
+let renderLock = false;
 const CACHE_KEY_SALARY = "salary_cache_v1";
 const CACHE_TTL = 1000 * 60 * 3;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
+}
+
+function safeRender(){
+  if(renderLock) return;
+
+  renderLock = true;
+
+  requestAnimationFrame(() => {
+    safeRender();
+    renderLock = false;
+  });
 }
 
 async function checkLogin(){
@@ -168,7 +180,7 @@ async function checkLogin(){
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("navbar").style.display = "flex";
 
-      loadData();
+      requestAnimationFrame(loadData);
     } else {
       document.getElementById("loginStatus").innerText =
         "❌ Password salah, maksimal 3x salah maka IP akan di block";
@@ -197,10 +209,12 @@ async function loadData(){
     if(parsed && isCacheValid(parsed.time)){
       allSalaryData = parsed.data || [];
 
-      populateWeeks();
-      renderTable();
-
-      refreshFromServer();
+      requestAnimationFrame(() => {
+        populateWeeks();
+        safeRender();
+      });
+      
+      setTimeout(refreshFromServer, 2000);
       return;
     }
   }
@@ -223,7 +237,7 @@ async function loadData(){
 
   requestAnimationFrame(() => {
     populateWeeks();
-    renderTable();
+    safeRender();
   });
 }
 
@@ -239,8 +253,10 @@ async function refreshFromServer(){
       time: Date.now()
     }));
 
-    populateWeeks();
-    renderTable();
+    requestAnimationFrame(() => {
+      populateWeeks();
+      safeRender();
+    });
 
   } catch(e){
     console.log("sync gagal, pakai cache");
@@ -288,7 +304,10 @@ function populateWeeks(){
     select.appendChild(opt);
   });
 
-  select.addEventListener("change", renderTable);
+  if(!select.dataset.bound){
+    select.addEventListener("change", renderTable);
+    select.dataset.bound = "1";
+  }
 
   if (select.options.length > 0) {
     select.selectedIndex = defaultIndex;
@@ -370,7 +389,7 @@ window.addEventListener("load", () => {
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
     document.getElementById("navbar").style.display = "flex";
-    loadData();
+    requestAnimationFrame(loadData);
   }
 });
 
@@ -385,13 +404,21 @@ function markPaid(nama, week, checked){
     const cached = localStorage.getItem(CACHE_KEY_SALARY);
 
     if(cached){
-      const parsed = JSON.parse(cached);
+      let parsed = null;
 
-      parsed.data = parsed.data.map(i =>
-        (i.nama === nama && i.week === week)
-          ? { ...i, paid: checked ? "PAID" : "UNPAID" }
-          : i
-      );
+      try {
+        parsed = JSON.parse(cached);
+      } catch(e){
+        localStorage.removeItem(CACHE_KEY_SALARY);
+      }
+      
+      if(parsed?.data){
+        parsed.data = parsed.data.map(i =>
+          (i.nama === nama && i.week === week)
+            ? { ...i, paid: checked ? "PAID" : "UNPAID" }
+            : i
+        );
+      }
 
       parsed.time = Date.now();
       localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify(parsed));
@@ -399,7 +426,7 @@ function markPaid(nama, week, checked){
       allSalaryData = parsed.data;
     }
 
-    renderTable();
+    requestAnimationFrame(renderTable);
   });
 }
 </script>
