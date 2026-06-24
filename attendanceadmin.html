@@ -180,6 +180,8 @@ async function checkLogin(){
 
       await loadRates();
       await loadAttendanceData();
+
+      requestIdleCallback(refreshFromServer);
     } else {
       document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
     }
@@ -207,7 +209,12 @@ async function loadAttendanceData(){
         requestAnimationFrame(() => populateWeeks());
       }
 
-      refreshFromServer();
+      setTimeout(() => {
+        if(ratesReady){
+          refreshFromServer();
+        }
+      }, 1000);
+      
       return;
     }
   }
@@ -274,6 +281,10 @@ async function loadRates(){
 
   mapRates(data);
   ratesReady = true;
+
+  if(allAttendance.length){
+    requestAnimationFrame(() => populateWeeks());
+  }
 }
 
 function mapRates(data){
@@ -379,9 +390,15 @@ function populateWeeks(){
 
   select.value = currentWeek;
 
-  select.onchange = renderAttendanceTable;
-
-  renderAttendanceTable();
+  select.onchange = () => {
+    if(ratesReady){
+      requestAnimationFrame(() => renderAttendanceTable());
+    }
+  };
+  
+  if(ratesReady && allAttendance.length){
+    requestAnimationFrame(() => renderAttendanceTable());
+  }
 }
 
 function renderAttendanceTable(){
@@ -643,8 +660,11 @@ function setStatus(rowIndex, status){
         localStorage.setItem(CACHE_KEY_ATT, JSON.stringify(parsed));
       }
 
-      renderAttendanceTable();
+      if(ratesReady && allAttendance.length){
+        requestAnimationFrame(() => renderAttendanceTable());
+      }
     })
+
     .catch(err => {
       console.error(err);
       alert("Error koneksi server");
@@ -687,8 +707,13 @@ function saveEdit(){
 
       closeModal();
 
-      refreshFromServer();
+      setTimeout(() => {
+        if(ratesReady){
+          refreshFromServer();
+        }
+      }, 1000);
     })
+
     .catch(err => {
       console.error(err);
       alert("Server error");
