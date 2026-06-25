@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Portal</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter', sans-serif;
+}
+
+body{
+  background:#0b1220;
+  color:white;
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:70px;
+  overflow-x:hidden;
+}
+
+/* BACKGROUND BLOBS */
+.blob{
+  position:fixed;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  filter: blur(90px);
+  opacity:0.35;
+  z-index:0;
+  animation: float 10s ease-in-out infinite;
+}
+
+.blob.one{
+  background:#38bdf8;
+  top:-120px;
+  left:-120px;
+}
+
+.blob.two{
+  background:#22c55e;
+  bottom:-140px;
+  right:-140px;
+  animation-delay:2s;
+}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(30px)}
+}
+
+/* CONTAINER */
+.container{
+  width:100%;
+  max-width:600px;
+  margin:0 auto;
+  padding:0 16px;
+  z-index:2;
+  text-align:center;
+}
+
+/* LOGO */
+.logo-wrapper{
+  display:flex;
+  justify-content:center;
+  margin-bottom:14px;
+}
+
+.logo-wrapper img{
+  width:85px;
+  height:85px;
+  object-fit:contain;
+  border-radius:50%;
+  padding:10px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  box-shadow:0 10px 30px rgba(0,0,0,0.4);
+}
+
+/* TITLE */
+h1{
+  font-size:30px;
+  font-weight:700;
+  letter-spacing:1px;
+}
+
+p{
+  color:#94a3b8;
+  margin-bottom:24px;
+  font-size:13px;
+}
+
+/* MENU */
+.menu{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* CARD */
+.card{
+  padding:22px;
+  border-radius:18px;
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter: blur(12px);
+  cursor:pointer;
+  transition:0.25s ease;
+  text-align:left;
+  position:relative;
+  overflow:hidden;
+}
+
+.card:hover{
+  transform: translateY(-7px);
+  border-color:rgba(56,189,248,0.6);
+  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+}
+
+.card:active{
+  transform:scale(0.98);
+}
+
+/* ACCENT LINE */
+.card::before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  width:4px;
+  height:100%;
+  background:#38bdf8;
+}
+
+.card.attendance::before { background:#ff4d6d; }
+.card.attendancelog::before { background:#facc15; }
+.card.invoice::before { background:#22c55e; }
+.card.invoicelog::before { background:#00d4ff; }
+
+/* CONTENT */
+.icon{
+  font-size:22px;
+  margin-bottom:6px;
+}
+
+.title{
+  font-size:16px;
+  font-weight:700;
+}
+
+.desc{
+  font-size:12px;
+  color:#94a3b8;
+  margin-top:4px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="blob one"></div>
+<div class="blob two"></div>
+
+<div class="container">
+
+  <!-- LOGO -->
+  <div class="logo-wrapper">
+    <img src="logo.png" alt="EMSKK Paramedic Logo">
+  </div>
+
+  <h1>EMSKK PORTAL</h1>
+  <p>Finance Dashboard Navigation Hub</p>
+
+  <div class="menu">
+
+    <div class="card attendance" onclick="go('attendance.html')">
+      <div class="icon">🕒</div>
+      <div class="title">Attendance</div>
+      <div class="desc">Realtime on-duty tracking system</div>
+    </div>
+
+    <div class="card attendancelog" onclick="go('attendancelog.html')">
+      <div class="icon">⏱</div>
+      <div class="title">Attendance Overview</div>
+      <div class="desc">Weekly working hours & duty summary</div>
+    </div>
+
+    <div class="card invoice" onclick="go('invoice.html')">
+      <div class="icon">💳</div>
+      <div class="title">Invoice Input</div>
+      <div class="desc">Create and upload invoices records</div>
+    </div>
+
+    <div class="card invoicelog" onclick="go('invoicelog.html')">
+      <div class="icon">📊</div>
+      <div class="title">Invoice Overview</div>
+      <div class="desc">Weekly invoice submission summary</div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function go(page){
+  window.location.href = page;
+}
+</script>
+
+</body>
+</html>
