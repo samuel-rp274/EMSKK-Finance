@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Tutorial</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Inter', sans-serif;
+}
+
+body{
+  background:#0b1220;
+  color:white;
+  padding-top:70px;
+  min-height:100vh;
+}
+
+/* NAVBAR */
+.topnav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:999;
+}
+
+.topnav a{
+  color:#cbd5e1;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+}
+
+.topnav .title{
+  font-size:13px;
+  font-weight:700;
+  color:#94a3b8;
+  letter-spacing:1px;
+}
+
+.blob{
+  position:fixed;
+  width:420px;
+  height:420px;
+  border-radius:50%;
+  filter:blur(90px);
+  opacity:0.35;
+  z-index:0;
+  animation:float 10s ease-in-out infinite;
+}
+
+.blob.one{background:#38bdf8;top:-120px;left:-120px;}
+.blob.two{background:#22c55e;bottom:-140px;right:-140px;animation-delay:2s;}
+
+@keyframes float{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(30px)}
+}
+
+.container{
+  max-width:900px;
+  margin:0 auto;
+  position:relative;
+  z-index:2;
+}
+
+.header{
+  text-align:center;
+  margin:10px 0 25px;
+}
+
+.header h1{
+  font-size:28px;
+  font-weight:800;
+}
+
+.header p{
+  color:#94a3b8;
+  font-size:13px;
+}
+
+.card{
+  background:rgba(255,255,255,0.06);
+  border:1px solid rgba(255,255,255,0.08);
+  backdrop-filter:blur(12px);
+  border-radius:18px;
+  padding:22px;
+  margin-bottom:16px;
+}
+
+.card h2{
+  color:#38bdf8;
+  font-size:16px;
+  margin-bottom:8px;
+}
+
+.card p, .card li{
+  font-size:13px;
+  color:#cbd5e1;
+  line-height:1.6;
+}
+
+ul{
+  padding-left:18px;
+  margin-top:8px;
+}
+
+.highlight{
+  color:#22c55e;
+  font-weight:600;
+}
+
+.note{
+  margin-top:10px;
+  padding:12px;
+  border-radius:12px;
+  background:rgba(255,255,255,0.04);
+  border:1px solid rgba(255,255,255,0.06);
+}
+
+.note-title{
+  font-size:12px;
+  font-weight:700;
+  color:#facc15;
+  margin-bottom:6px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="topnav">
+  <a href="index.html">← Home</a>
+  <div class="title">EMSKK SYSTEM</div>
+</div>
+
+<div class="blob one"></div>
+<div class="blob two"></div>
+
+<div class="container">
+
+  <div class="header">
+    <h1>EMSKK SYSTEM TUTORIAL</h1>
+    <p>Panduan penggunaan Attendance & Invoice System</p>
+  </div>
+
+  <div class="card">
+    <h2>1. Attendance</h2>
+    <ul>
+      <li>Pilih Nama EMS</li>
+      <li>Klik <span class="highlight">START DUTY</span> → ON DUTY</li>
+      <li>Klik <span class="highlight">FINISH DUTY</span> → OFF DUTY</li>
+      <li>Data otomatis tersimpan</li>
+    </ul>
+
+    <div class="note">
+      <div class="note-title">💡 Catatan</div>
+      <ul>
+        <li>Sistem menggunakan zona waktu WIB (UTC +7), durasi kerja dihitung otomatis dari START → FINISH</li>
+        <li>Apabila melamun diharapkan OFF DUTY</li>
+        <li>Setelah ON DUTY, browser boleh ditutup, dan timer akan tetap berjalan</li>
+        <li>Jika terlambat ON DUTY atau lupa OFF DUTY silakan hubungi Finance</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>2. Attendance Overview</h2>
+    <ul>
+      <li>Total jam kerja minggu ini</li>
+      <li>Total jam kerja bulan ini</li>
+      <li>Waktu duty terakhir</li>
+      <li>Detail start & finish</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>3. Invoice Input</h2>
+    <ul>
+      <li>Pilih EMS</li>
+      <li>Isi invoice</li>
+      <li>Pilih jenis invoice</li>
+      <li>Isi harga & qty</li>
+      <li>Upload bukti Discord</li>
+      <li>Simpan invoice</li>
+    </ul>
+
+    <div class="note">
+      <div class="note-title">💡 Catatan</div>
+      <ul>
+        <li>Bukti wajib berupa link dari Discord</li>
+        <li>Format harga tanpa titik (contoh: 200000)</li>
+        <li>Kesalahan input invoice silakan hubungi Finance</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>4. Invoice Overview</h2>
+    <ul>
+      <li>Filter EMS</li>
+      <li>Lihat total minggu ini</li>
+      <li>Lihat jumlah invoice</li>
+      <li>Lihat upload terakhir</li>
+    </ul>
+  </div>
+
+</div>
+
+</body>
+</html>
