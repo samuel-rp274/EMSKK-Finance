@@ -28,6 +28,18 @@ body{
   overflow-x:hidden;
 }
 
+body::after{
+  content:"system by Samuel";
+  position:fixed;
+  bottom:10px;
+  right:12px;
+  font-size:10px;
+  color:rgba(148,163,184,0.35);
+  letter-spacing:0.5px;
+  pointer-events:none;
+  z-index:9999;
+}
+
 .blob{
     position:fixed;
     width:420px;
@@ -57,7 +69,6 @@ body{
   50%{transform:translateY(30px)}
 }
 
-/* CONTAINER */
 .container{
   width: 100%;
   max-width:600px;
@@ -67,7 +78,6 @@ body{
   text-align:center;
 }
 
-/* TITLE */
 h1{
   font-size:30px;
   font-weight:700;
@@ -80,7 +90,6 @@ p{
   font-size:13px;
 }
 
-/* MENU GRID */
 .menu{
   display:flex;
   flex-direction:column;
@@ -101,14 +110,12 @@ p{
   overflow:hidden;
 }
 
-/* HOVER LIFT */
 .card:hover{
   transform: translateY(-6px);
   border-color:rgba(56,189,248,0.6);
   box-shadow:0 15px 40px rgba(0,0,0,0.4);
 }
 
-/* LEFT ACCENT LINE */
 .card::before{
   content:"";
   position:absolute;
@@ -124,26 +131,22 @@ p{
 .card.invoice::before { background:#22c55e; }
 .card.invoicelog::before { background:#00d4ff; }
 
-/* ICON */
 .icon{
   font-size:22px;
   margin-bottom:6px;
 }
 
-/* TITLE */
 .title{
   font-size:16px;
   font-weight:700;
 }
 
-/* DESC */
 .desc{
   font-size:12px;
   color:#94a3b8;
   margin-top:4px;
 }
 
-/* CLICK EFFECT */
 .card:active{
   transform:scale(0.98);
 }
@@ -168,23 +171,23 @@ p{
       <div class="desc">Realtime on-duty tracking system</div>
     </div>
 
-	<div class="card attendancelog" onclick="go('attendancelog.html')">
-	 <div class="icon">⏱</div>
-	 <div class="title">Attendance Overview</div>
-	 <div class="desc">Weekly working hours & duty summary</div>
-	</div>
+    <div class="card attendancelog" onclick="go('attendancelog.html')">
+      <div class="icon">⏱</div>
+      <div class="title">Attendance Overview</div>
+      <div class="desc">Weekly working hours & duty summary</div>
+    </div>
 
     <div class="card invoice" onclick="go('invoice.html')">
       <div class="icon">💳</div>
       <div class="title">Invoice Input</div>
       <div class="desc">Create and upload invoices records</div>
     </div>
-	
-	<div class="card invoicelog" onclick="go('invoicelog.html')">
-	 <div class="icon">📊</div>
-	 <div class="title">Invoice Overview</div>
-	 <div class="desc">Weekly invoice submission summary</div>
-	</div>
+
+    <div class="card invoicelog" onclick="go('invoicelog.html')">
+      <div class="icon">📊</div>
+      <div class="title">Invoice Overview</div>
+      <div class="desc">Weekly invoice submission summary</div>
+    </div>
 
   </div>
 
