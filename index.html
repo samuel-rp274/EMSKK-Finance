@@ -62,6 +62,7 @@ body::after{
 .container{
   width:100%;
   max-width:600px;
+  margin:0 auto;
   padding:0 16px;
   z-index:2;
   text-align:center;
@@ -70,6 +71,7 @@ body::after{
 h1{
   font-size:30px;
   font-weight:700;
+  letter-spacing:1px;
 }
 
 p{
@@ -95,6 +97,7 @@ p{
   transition:0.25s ease;
   text-align:left;
   position:relative;
+  overflow:hidden;
 }
 
 .card:hover{
@@ -150,7 +153,6 @@ p{
   background:rgba(255,255,255,0.12);
 }
 
-/* tooltip */
 .fab-tutorial::after{
   content:"Tutorial";
   position:absolute;
