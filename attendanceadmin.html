@@ -412,8 +412,16 @@ function renderAttendanceTable(){
   }
 
   const [startStr, endStr] = key.split("|");
-  const start = new Date(startStr);
-  const end = new Date(endStr);
+
+  function parseKeyDate(str){
+    const [y,m,d] = str.split("-").map(Number);
+    return new Date(y, m-1, d, 0, 0, 0);
+  }
+
+  const start = parseKeyDate(startStr);
+  const end = parseKeyDate(endStr);
+
+  end.setHours(23,59,59,999);
 
   const normalize = s => String(s || "").trim().toUpperCase();
 
