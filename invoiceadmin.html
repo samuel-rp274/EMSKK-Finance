@@ -229,7 +229,7 @@ async function loadData(){
 
   loadPotonganCache().then(() => {
     requestAnimationFrame(() => {
-      renderTable(); // update ringan saja
+      renderTable();
     });
   });
 }
@@ -379,8 +379,23 @@ async function renderTable(){
   `).join("");
 
   const tbody=document.getElementById("tbody");
-  if(Object.keys(payroll).length===0){tbody.innerHTML='<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>'; return;}
-  tbody.innerHTML=Object.entries(payroll).map(([n,v], idx)=>`
+    if(Object.keys(payroll).length===0){
+      tbody.innerHTML='<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>'; 
+      return;
+    }
+  
+  const sortedPayroll = Object.entries(payroll)
+    .sort((a, b) => {
+      const aHasPending = a[1].invoices.some(i => i.Status === "PENDING");
+      const bHasPending = b[1].invoices.some(i => i.Status === "PENDING");
+
+      if (aHasPending && !bHasPending) return -1;
+      if (!aHasPending && bHasPending) return 1;
+
+      return a[0].localeCompare(b[0]);
+    });
+
+  tbody.innerHTML = sortedPayroll.map(([n,v], idx)=>`
     <tr>
       <td>${n}</td>
       <td>${v.divisi}</td>
