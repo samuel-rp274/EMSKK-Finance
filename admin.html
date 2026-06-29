@@ -81,10 +81,10 @@ a{color:#60a5fa;cursor:pointer;text-decoration:underline;}
   </div>
   <div class="stat-value">
     <div style="font-size:16px;margin-bottom:6px">
-      💰 Duty: <span id="totalDuty">0</span>
+      💰 Invoice: <span id="totalInvoice">0</span>
     </div>
     <div style="font-size:16px">
-      💰 Invoice: <span id="totalInvoice">0</span>
+      💰 Duty: <span id="totalDuty">0</span>
     </div>
   </div>
 </div>
@@ -326,10 +326,10 @@ async function renderTable(){
   const totalInvoice = filtered.reduce((a,b)=>a + (Number(b.invoice) || 0), 0);
 
   document.getElementById("totalDuty").innerText =
-    totalDuty.toLocaleString("id-ID");
+    "$KK " + totalDuty.toLocaleString("id-ID");
 
   document.getElementById("totalInvoice").innerText =
-    totalInvoice.toLocaleString("id-ID");
+    "$KK " + totalInvoice.toLocaleString("id-ID");
 
   const totalWeek = totalDuty + totalInvoice;
 
@@ -340,10 +340,10 @@ async function renderTable(){
   const sisaWeek = totalWeek - paidAmount;
 
   document.getElementById("totalWeek").innerText =
-    totalWeek.toLocaleString("id-ID");
+    "$KK " + totalWeek.toLocaleString("id-ID");
 
   document.getElementById("sisaWeek").innerText =
-    sisaWeek.toLocaleString("id-ID");
+    "$KK " + sisaWeek.toLocaleString("id-ID");
 
   const top3 = [...filtered]
     .sort((a,b)=>(Number(b.duty) + Number(b.invoice)) - (Number(a.duty) + Number(a.invoice)))
@@ -358,7 +358,18 @@ async function renderTable(){
 
   const tbody = document.getElementById("tbody");
 
-  tbody.innerHTML = filtered.map(x=>{
+  const sorted = [...filtered].sort((a, b) => {
+
+    const aPaid = a.paid === "PAID";
+    const bPaid = b.paid === "PAID";
+
+    if (!aPaid && bPaid) return -1;
+    if (aPaid && !bPaid) return 1;
+
+    return a.nama.localeCompare(b.nama);
+  });
+
+  tbody.innerHTML = sorted.map(x=>{
 
     const duty = Number(x.duty) || 0;
     const invoice = Number(x.invoice) || 0;
@@ -379,7 +390,6 @@ async function renderTable(){
       </tr>
     `;
   }).join("");
-
 }
 
 window.addEventListener("load", () => {
