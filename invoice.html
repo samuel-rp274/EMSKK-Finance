@@ -157,13 +157,11 @@ button:hover{opacity:.9;}
 </select>
 </div>
 
-<!-- NORMAL -->
 <div id="normalSection">
   <div class="form-group"><label>Harga</label><input type="number" id="harga" readonly min="0"></div>
   <div class="form-group"><label>Kuantitas</label><input type="number" id="qty" value="1" min="1"></div>
 </div>
 
-<!-- OPERASI -->
 <div id="operasiSection" class="hidden">
   <div class="form-group"><label>Jenis Operasi</label><input type="text" id="jenisOperasi"></div>
   <div class="form-group"><label>Rawat Inap</label><select id="rawatInap"><option>Reguler</option><option>VIP</option><option>VVIP</option></select></div>
@@ -172,14 +170,12 @@ button:hover{opacity:.9;}
   <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyOperasi" value="1" min="1"></div>
 </div>
 
-<!-- SURAT -->
 <div id="suratSection" class="hidden">
   <div class="form-group"><label>Jenis Surat</label><input type="text" id="jenisSurat"></div>
   <div class="form-group"><label>Harga</label><input type="number" id="hargaSurat" min="0"></div>
   <div class="form-group"><label>Kuantitas</label><input type="number" id="qtySurat" value="1" min="1"></div>
 </div>
 
-<!-- LAIN -->
 <div id="lainSection" class="hidden">
   <div class="form-group"><label>Deskripsi</label><input type="text" id="deskripsiLain"></div>
   <div class="form-group"><label>Harga</label><input type="number" id="hargaLain" min="0"></div>
@@ -294,7 +290,6 @@ function injectSpecialOptions() {
     const start = new Date(now);
     start.setHours(0,0,0,0);
 
-    // geser ke hari Minggu (0 = Minggu di JS)
     const day = start.getDay(); 
     start.setDate(start.getDate() - day);
 
