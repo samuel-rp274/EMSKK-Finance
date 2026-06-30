@@ -45,6 +45,7 @@ body::after{
 .container{
   width:100%;
   max-width:1000px;
+  margin-top:80px;
 }
 
 h2{
@@ -137,10 +138,48 @@ tr:hover td{
   color:#fbbf24;
   font-weight:700;
 }
+
+.topnav{
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  padding:10px 16px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(255,255,255,0.05);
+  backdrop-filter: blur(12px);
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  z-index:999;
+}
+
+.topnav a{
+  color:#cbd5e1;
+  text-decoration:none;
+  font-size:13px;
+  font-weight:600;
+}
+
+.topnav a:hover{
+  color:#38bdf8;
+}
+
+.topnav .title{
+  font-size:13px;
+  font-weight:700;
+  color:#94a3b8;
+  letter-spacing:1px;
+}
+
 </style>
 </head>
 
 <body>
+<div class="topnav">
+  <a href="index.html">← Home</a>
+  <div class="title">EMSKK SYSTEM</div>
+</div>
 
 <div class="container">
 
