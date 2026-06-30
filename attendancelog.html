@@ -481,12 +481,6 @@ function getWeekRange(){
 
 function render(selectedName){	
 	const name = (selectedName || ts?.getValue() || "").toString().trim();
-	
-	console.log("SELECTED:", ts.getValue());
-	console.log("NAME:", name);
-	console.log("ALL DATA:", allData);
-	console.log("SELECTED EMS:", selectedName);
-	
     if(!name){
     document.getElementById("tbody").innerHTML =
     `<tr><td colspan="4" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
