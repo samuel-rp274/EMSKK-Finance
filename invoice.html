@@ -7,113 +7,262 @@
 
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+
 <style>
-:root{
-    --bg:#0f172a;
-    --card:#1e293b;
-    --input:#334155;
-    --primary:#dc2626;
-    --text:#f8fafc;
-    --muted:#94a3b8;
-}
-*{box-sizing:border-box;margin:0;padding:0;font-family:Inter,sans-serif;}
-body{background:var(--bg);color:var(--text);padding:30px;}
-.container{width:100%;max-width:800px;margin:80px auto 0;}
-
-.container{
-  margin-top:60px;
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Inter', sans-serif;
 }
 
-.card{
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  border-radius:18px;
-  padding:24px;
-  width:100%;
-  position:relative;
-  z-index:2;
+body {
+  background: #030712;
+  color: #f8fafc;
+  min-height: 100vh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 100px 20px 40px 20px;
+  position: relative;
 }
 
-h1{margin-bottom:5px;}
-.subtitle{color:var(--muted);margin-bottom:25px;}
-.form-group{margin-bottom:18px;}
-label{display:block;margin-bottom:8px;font-weight:600;}
-input,select{width:100%;padding:12px;border:none;border-radius:12px;background:var(--input);color:white;font-size:14px;}
-input[readonly]{opacity:.8;}
-.hidden{display:none;}
-.total{margin-top:20px;padding:15px;background:#111827;border-radius:12px;font-size:22px;font-weight:700;}
-button{margin-top:20px;width:100%;padding:14px;border:none;border-radius:12px;background:var(--primary);color:white;font-weight:700;cursor:pointer;}
-button:hover{opacity:.9;}
-#status{text-align:center;margin-top:15px;font-weight:600;}
-.ts-wrapper.single .ts-control{background: var(--input) !important;border: none !important;color: white !important;border-radius: 12px !important;padding: 12px !important;}
-.ts-control input{color: white !important;}
-.ts-dropdown{background: var(--card) !important;border: none !important;color: white !important;}
-.ts-dropdown .option{color: white !important;}
-.ts-dropdown .active{background: var(--primary) !important;}
-.ts-wrapper.focus .ts-control{box-shadow: 0 0 0 2px rgba(220,38,38,.4) !important;}
+.blob {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+.blob.one { background: #3b82f6; top: -150px; left: -150px; }
+.blob.two { background: #22c55e; bottom: -150px; right: -150px; }
 
-.topnav{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  padding:10px 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  background:rgba(255,255,255,0.05);
-  backdrop-filter: blur(12px);
-  border-bottom:1px solid rgba(255,255,255,0.08);
-  z-index:999;
+.topnav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  padding: 16px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  z-index: 999;
 }
 
-.topnav a{
-  color:#cbd5e1;
-  text-decoration:none;
-  font-size:13px;
-  font-weight:600;
+.topnav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
 }
 
-.topnav a:hover{
-  color:#38bdf8;
+.topnav a:hover {
+  color: #38bdf8;
 }
 
-.topnav .title{
-  font-size:13px;
-  font-weight:700;
-  color:#94a3b8;
-  letter-spacing:1px;
+.topnav .title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
 }
 
-.blob{
-    position:fixed;
-    width:420px;
-    height:420px;
-    border-radius:50%;
-    filter: blur(90px);
-    opacity:0.35;
-    z-index:0;
-    animation: float 10s ease-in-out infinite;
+.container {
+  width: 100%;
+  max-width: 650px;
+  z-index: 2;
 }
 
-.blob.one{
-    background:#38bdf8;
-    top:-120px;
-    left:-120px;
+.card {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px;
+  padding: 36px;
+  width: 100%;
+  position: relative;
 }
 
-.blob.two{
-    background:#22c55e;
-    bottom:-140px;
-    right:-140px;
-    animation-delay:2s;
+.card::before {
+  content: "";
+  position: absolute;
+  top: 10%;
+  left: 0;
+  width: 3px;
+  height: 80%;
+  border-radius: 4px;
+  background: #22c55e;
+  box-shadow: 0 0 15px #22c55e;
 }
 
-@keyframes float{
-    0%,100%{transform:translateY(0)}
-    50%{transform:translateY(40px)}
+.card-header-icon {
+  width: 56px;
+  height: 56px;
+  background: rgba(34, 197, 94, 0.15);
+  color: #22c55e;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  box-shadow: inset 0 0 12px rgba(34, 197, 94, 0.2);
 }
+
+h1 {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+h1 span.white { color: #ffffff; }
+h1 span.gradient {
+  background: linear-gradient(to right, #22c55e, #4ade80);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 13px;
+  margin-bottom: 32px;
+  line-height: 1.4;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+input, select {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 14px;
+    background: rgba(15, 23, 42, 0.6);
+    color: white;
+    font-size: 14px;
+    transition: all 0.2s;
+}
+
+input:focus, select:focus {
+    outline: none;
+    border-color: rgba(34, 197, 94, 0.4);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.1);
+}
+
+input[readonly] {
+    opacity: 0.6;
+    background: rgba(15, 23, 42, 0.3);
+    cursor: not-allowed;
+}
+
+.hidden {
+    display: none;
+}
+
+.total {
+    margin-top: 28px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: 700;
+    color: #e2e8f0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#total {
+    color: #22c55e;
+}
+
+button {
+    margin-top: 24px;
+    width: 100%;
+    padding: 16px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    color: white;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(34, 197, 94, 0.2);
+    transition: all 0.2s;
+}
+
+button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(34, 197, 94, 0.3);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+#status {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.ts-wrapper.single .ts-control {
+    background: rgba(15, 23, 42, 0.6) !important;
+    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    color: white !important;
+    border-radius: 14px !important;
+    padding: 14px 16px !important;
+    font-size: 14px !important;
+}
+.ts-wrapper.focus .ts-control {
+    border-color: rgba(34, 197, 94, 0.4) !important;
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.1) !important;
+}
+.ts-control input { color: white !important; font-size: 14px !important; }
+.ts-control input::placeholder { color: #64748b !important; }
+.ts-dropdown {
+    background: #0f172a !important;
+    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    color: white !important;
+    border-radius: 14px !important;
+    margin-top: 6px !important;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    overflow: hidden !important;
+}
+.ts-dropdown .option { padding: 12px 16px !important; font-size: 14px !important; color: white !important; }
+.ts-dropdown .active { background: rgba(34, 197, 94, 0.15) !important; color: #4ade80 !important; }
 
 </style>
 </head>
@@ -122,78 +271,90 @@ button:hover{opacity:.9;}
 <div class="blob two"></div>
 
 <div class="topnav">
-  <a href="index.html">← Home</a>
+  <a href="index.html"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Home</a>
   <div class="title">EMSKK SYSTEM</div>
 </div>
 
 <div class="container">
 <div class="card">
-<h1>EMSKK INVOICE INPUT</h1>
-<div class="subtitle">Create and upload invoices records</div>
+  <div class="card-header-icon">
+    <i data-lucide="file-text"></i>
+  </div>
+  
+  <h1><span class="white">EMSKK</span> <span class="gradient">INVOICE INPUT</span></h1>
+  <div class="subtitle">Create and upload invoices records</div>
 
-<form id="invoiceForm">
-<div class="form-group">
-<label>Nama EMS</label>
-<select id="nama"></select>
+  <form id="invoiceForm">
+    <div class="form-group">
+      <label>Nama EMS</label>
+      <select id="nama"></select>
+    </div>
+
+    <div class="form-group">
+      <label>Jabatan</label>
+      <input type="text" id="jabatan" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>Divisi</label>
+      <input type="text" id="divisi" readonly>
+    </div>
+
+    <div class="form-group">
+      <label>Tanggal Invoice</label>
+      <input type="date" id="tanggalInvoice">
+    </div>
+
+    <div class="form-group">
+      <label>Jenis Invoice</label>
+      <select id="invoiceType">
+        <option value="">Pilih Invoice</option>
+      </select>
+    </div>
+
+    <div id="normalSection">
+      <div class="form-group"><label>Harga</label><input type="number" id="harga" readonly min="0"></div>
+      <div class="form-group"><label>Kuantitas</label><input type="number" id="qty" value="1" min="1"></div>
+    </div>
+
+    <div id="operasiSection" class="hidden">
+      <div class="form-group"><label>Jenis Operasi</label><input type="text" id="jenisOperasi"></div>
+      <div class="form-group"><label>Rawat Inap</label><select id="rawatInap"><option>Reguler</option><option>VIP</option><option>VVIP</option></select></div>
+      <div class="form-group"><label>Pembayaran</label><select id="pembayaran"><option>BPJS</option><option>Non BPJS</option></select></div>
+      <div class="form-group"><label>Harga</label><input type="number" id="hargaOperasi" min="0"></div>
+      <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyOperasi" value="1" min="1"></div>
+    </div>
+
+    <div id="suratSection" class="hidden">
+      <div class="form-group"><label>Jenis Surat</label><input type="text" id="jenisSurat"></div>
+      <div class="form-group"><label>Harga</label><input type="number" id="hargaSurat" min="0"></div>
+      <div class="form-group"><label>Kuantitas</label><input type="number" id="qtySurat" value="1" min="1"></div>
+    </div>
+
+    <div id="lainSection" class="hidden">
+      <div class="form-group"><label>Deskripsi</label><input type="text" id="deskripsiLain"></div>
+      <div class="form-group"><label>Harga</label><input type="number" id="hargaLain" min="0"></div>
+      <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyLain" value="1" min="1"></div>
+    </div>
+
+    <div class="form-group"><label>Link Bukti Invoice</label><input type="url" id="bukti" placeholder="https://cdn.discordapp.com/..."></div>
+    
+    <div class="total">
+      <span>Total Pembayaran</span>
+      <span id="total">$KK 0</span>
+    </div>
+    
+    <button type="submit">SIMPAN INVOICE</button>
+    <div id="status"></div>
+  </form>
 </div>
 
-<div class="form-group">
-<label>Jabatan</label>
-<input type="text" id="jabatan" readonly>
-</div>
-
-<div class="form-group">
-<label>Divisi</label>
-<input type="text" id="divisi" readonly>
-</div>
-
-<div class="form-group">
-<label>Tanggal Invoice</label>
-<input type="date" id="tanggalInvoice">
-</div>
-
-<div class="form-group">
-<label>Jenis Invoice</label>
-<select id="invoiceType">
-  <option value="">Pilih Invoice</option>
-</select>
-</div>
-
-<div id="normalSection">
-  <div class="form-group"><label>Harga</label><input type="number" id="harga" readonly min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qty" value="1" min="1"></div>
-</div>
-
-<div id="operasiSection" class="hidden">
-  <div class="form-group"><label>Jenis Operasi</label><input type="text" id="jenisOperasi"></div>
-  <div class="form-group"><label>Rawat Inap</label><select id="rawatInap"><option>Reguler</option><option>VIP</option><option>VVIP</option></select></div>
-  <div class="form-group"><label>Pembayaran</label><select id="pembayaran"><option>BPJS</option><option>Non BPJS</option></select></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaOperasi" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyOperasi" value="1" min="1"></div>
-</div>
-
-<div id="suratSection" class="hidden">
-  <div class="form-group"><label>Jenis Surat</label><input type="text" id="jenisSurat"></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaSurat" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtySurat" value="1" min="1"></div>
-</div>
-
-<div id="lainSection" class="hidden">
-  <div class="form-group"><label>Deskripsi</label><input type="text" id="deskripsiLain"></div>
-  <div class="form-group"><label>Harga</label><input type="number" id="hargaLain" min="0"></div>
-  <div class="form-group"><label>Kuantitas</label><input type="number" id="qtyLain" value="1" min="1"></div>
-</div>
-
-<div class="form-group"><label>Link Bukti Invoice</label><input type="url" id="bukti"></div>
-<div class="total">Total: <span id="total">$KK 0</span></div>
-<button type="submit">SIMPAN INVOICE</button>
-<div id="status"></div>
-</form>
-</div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script>
+lucide.createIcons();
+
 function getWIBDate() {
     const now = new Date();
     const utc = now.getTime() + (now.getTimezoneOffset() * 60000);
@@ -245,14 +406,11 @@ function loadPriceList(){
   fetch(SCRIPT_URL + "?action=getPriceList")
     .then(res => res.json())
     .then(data => {
-
       const safe = data || [];
-
       localStorage.setItem(CACHE_KEY_PRICE, JSON.stringify({
         data: safe,
         time: Date.now()
       }));
-
       injectPrice(safe);
     });
 }
@@ -308,7 +466,6 @@ function injectSpecialOptions() {
 
     tanggalInvoice.min = formatDate(start);
     tanggalInvoice.max = formatDate(end);
-
 })();
 
 function loadEMS(){
@@ -330,14 +487,11 @@ function loadEMS(){
   fetch(SCRIPT_URL + "?action=getEMS")
     .then(res => res.json())
     .then(data => {
-
       const safe = data || [];
-
       localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
         data: safe,
         time: Date.now()
       }));
-
       buildEMS(safe);
     })
     .catch(err => {
@@ -375,13 +529,11 @@ function buildEMS(data){
 
     tomSelectNama.on("change", (v) => {
         localStorage.setItem("ems_name", v);
-
         jabatan.value = emsData[v]?.jabatan || "";
         divisi.value = emsData[v]?.divisi || "";
     });
 
     const saved = localStorage.getItem("ems_name");
-
     if (saved && emsData[saved]) {
         tomSelectNama.setValue(saved);
     }
@@ -428,23 +580,18 @@ invoiceType.addEventListener("change", function () {
         operasiSection.classList.remove("hidden");
         harga.value = "";
     }
-
     else if (this.value === "surat") {
         suratSection.classList.remove("hidden");
         harga.value = "";
     }
-
     else if (this.value === "lain") {
         lainSection.classList.remove("hidden");
         harga.value = "";
     }
-
     else {
         normalSection.classList.remove("hidden");
-        
         harga.value = price || 0;
     }
-
     updateTotal();
 });
 
