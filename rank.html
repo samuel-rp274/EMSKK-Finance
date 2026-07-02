@@ -9,7 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<!-- Menggunakan Lucide Icons melalui CDN agar serasi dengan seluruh sistem -->
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
@@ -21,7 +20,7 @@
 }
 
 body {
-  background: #030712; /* Background gelap pekat serasi seluruh sistem */
+  background: #030712;
   color: #f8fafc;
   min-height: 100vh;
   overflow-x: hidden;
@@ -33,7 +32,6 @@ body {
   position: relative;
 }
 
-/* Background Blobs Uniform (Cyberpunk Blue & Neon Emerald) */
 .blob {
   position: fixed;
   width: 500px;
@@ -55,7 +53,6 @@ body {
   right: -150px; 
 }
 
-/* Top Navigation Bar */
 .topnav {
   position: fixed;
   top: 0;
@@ -95,14 +92,12 @@ body {
   text-transform: uppercase;
 }
 
-/* Container */
 .container {
   width: 100%;
-  max-width: 900px; /* Lebar optimal untuk halaman leaderboard */
+  max-width: 900px; 
   z-index: 2;
 }
 
-/* Card Leaderboard Main */
 .card-main {
   background: rgba(15, 23, 42, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -115,7 +110,6 @@ body {
   margin-bottom: 24px;
 }
 
-/* Efek Glow Samping Kiri (Khas Aksen Hijau/Biru untuk Ranking) */
 .card-main::before {
   content: "";
   position: absolute;
@@ -154,7 +148,6 @@ h2 span.gradient {
   -webkit-text-fill-color: transparent;
 }
 
-/* Topbar Controls */
 .topbar {
   display: flex;
   gap: 10px;
@@ -211,7 +204,6 @@ select:focus {
   border-color: rgba(251, 191, 36, 0.5);
 }
 
-/* Tables Section Styling */
 .section-title {
   margin: 32px 0 14px;
   font-size: 12px;
@@ -279,12 +271,10 @@ tr:hover td {
   font-weight: 700;
 }
 
-/* Custom design for Podiums (Rank 1, 2, 3) */
 tr:nth-child(1) .rank { color: #f59e0b; font-size: 16px; }
 tr:nth-child(2) .rank { color: #cbd5e1; }
 tr:nth-child(3) .rank { color: #b45309; }
 
-/* Footer Copyright Decor */
 .footer-divider {
   display: flex;
   align-items: center;
@@ -317,7 +307,6 @@ tr:nth-child(3) .rank { color: #b45309; }
 </style>
 </head>
 <body>
-<!-- Background Glow Effects -->
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
@@ -374,7 +363,6 @@ tr:nth-child(3) .rank { color: #b45309; }
   </table>
 </div>
 
-<!-- Footer Decor -->
 <div class="footer-divider">
   <div class="footer-line"></div>
   <i data-lucide="aperture" class="footer-logo"></i>
@@ -385,7 +373,6 @@ tr:nth-child(3) .rank { color: #b45309; }
 </div>
 
 <script>
-// Inisialisasi Ikon SVG Lucide
 lucide.createIcons();
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
@@ -532,7 +519,6 @@ function render(){
   tb.innerHTML = "";
 
   sorted.forEach((x, i) => {
-    // Tambahkan dekorasi medali emoji untuk Top 3
     let trophy = i + 1;
     if(i === 0) trophy = "🥇";
     if(i === 1) trophy = "🥈";
