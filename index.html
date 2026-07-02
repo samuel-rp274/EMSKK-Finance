@@ -8,217 +8,366 @@
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:'Inter', sans-serif;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
 }
 
-body{
-  background:#0b1220;
-  color:white;
-  min-height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding-top:80px;
-  overflow-x:hidden;
+body {
+  background: #030712; 
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 60px 20px;
+  overflow-x: hidden;
+  position: relative;
 }
 
-body::after{
-  content:"system by Samuel";
-  position:fixed;
-  bottom:10px;
-  left:12px;
-  font-size:10px;
-  color:rgba(148,163,184,0.25);
-  letter-spacing:0.5px;
-  pointer-events:none;
-  z-index:9999;
+.blob {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.15;
+  z-index: 0;
+  pointer-events: none;
+}
+.blob.top-left { background: #3b82f6; top: -150px; left: -150px; }
+.blob.bottom-right { background: #22c55e; bottom: -150px; right: -150px; }
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  z-index: 2;
+  text-align: center;
 }
 
-.blob{
-  position:fixed;
-  width:420px;
-  height:420px;
-  border-radius:50%;
-  filter: blur(90px);
-  opacity:0.35;
-  z-index:0;
-  animation: float 10s ease-in-out infinite;
+.logo-container {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 54px;
+  height: 54px;
+  background: linear-gradient(135deg, #a855f7, #3b82f6);
+  border-radius: 50%;
+  margin-bottom: 20px;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+}
+.logo-icon {
+  color: white;
+  width: 28px;
+  height: 28px;
 }
 
-.blob.one{background:#38bdf8; top:-120px; left:-120px;}
-.blob.two{background:#22c55e; bottom:-140px; right:-140px; animation-delay:2s;}
-
-@keyframes float{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(30px)}
+h1 {
+  font-size: 38px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+h1 span.white { color: #ffffff; }
+h1 span.gradient {
+  background: linear-gradient(to right, #38bdf8, #c084fc);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
 
-.container{
-  width:100%;
-  max-width:600px;
-  margin:0 auto;
-  padding:0 16px;
-  z-index:2;
-  text-align:center;
+.subtitle {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
 }
 
-h1{
-  font-size:30px;
-  font-weight:700;
-  letter-spacing:1px;
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.line {
+  height: 1px;
+  width: 100px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+}
+.star {
+  color: #a855f7;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
 }
 
-p{
-  color:#94a3b8;
-  margin-bottom:24px;
-  font-size:13px;
+.menu-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 48px;
 }
 
-.menu{
-  display:flex;
-  flex-direction:column;
-  gap:14px;
+.card {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
 }
 
-.card{
-  padding:22px;
-  border-radius:18px;
-  background:rgba(255,255,255,0.06);
-  border:1px solid rgba(255,255,255,0.08);
-  backdrop-filter: blur(12px);
-  cursor:pointer;
-  transition:0.25s ease;
-  text-align:left;
-  position:relative;
-  overflow:hidden;
+.card::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 0;
+  width: 3px;
+  height: 64%;
+  border-radius: 4px;
+  transition: all 0.3s ease;
 }
 
-.card:hover{
-  transform: translateY(-6px);
-  border-color:rgba(56,189,248,0.6);
-  box-shadow:0 15px 40px rgba(0,0,0,0.4);
+.card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
+.card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
+.card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
+.card.invoice-overview::before { background: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
+
+.icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card.attendance .icon-wrapper { background: rgba(239, 68, 68, 0.15); color: #ef4444; box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.2); }
+.card.attendance-overview .icon-wrapper { background: rgba(245, 158, 11, 0.15); color: #f59e0b; box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2); }
+.card.invoice-input .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
+.card.invoice-overview .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2); }
+
+.card-content {
+  flex-grow: 1;
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+.card-desc {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.4;
 }
 
-.card::before{
-  content:"";
-  position:absolute;
-  left:0;
-  top:0;
-  width:4px;
-  height:100%;
-  background:#38bdf8;
+.arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+.card.attendance .arrow-btn { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+.card.attendance-overview .arrow-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+.card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+.card.invoice-overview .arrow-btn { color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
+
+.card:hover {
+  transform: translateY(-3px);
+  background: rgba(15, 23, 42, 0.6);
+}
+.card.attendance:hover { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.08); }
+.card.attendance-overview:hover { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.08); }
+.card.invoice-input:hover { border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.08); }
+.card.invoice-overview:hover { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08); }
+
+.card:hover .arrow-btn {
+  background: currentColor;
+}
+.card:hover .arrow-btn i {
+  color: #030712 !important;
 }
 
-.card.attendance::before { background:#ff4d6d; }
-.card.attendancelog::before { background:#facc15; }
-.card.invoice::before { background:#22c55e; }
-.card.invoicelog::before { background:#00d4ff; }
+.card:active { transform: scale(0.99); }
 
-.icon{font-size:22px; margin-bottom:6px;}
-.title{font-size:16px; font-weight:700;}
-.desc{font-size:12px; color:#94a3b8; margin-top:4px;}
+.footer-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.footer-logo {
+  color: #94a3b8;
+  width: 16px;
+  height: 16px;
+  opacity: 0.5;
+}
+.credits {
+  font-size: 12px;
+  color: #64748b;
+}
+.credits a {
+  color: #3b82f6;
+  text-decoration: none;
+}
 
-.card:active{transform:scale(0.98);}
-
-.fab-tutorial{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:52px;
-  height:52px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.12);
+.fab-tutorial {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
   backdrop-filter: blur(10px);
-  color:#e2e8f0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:20px;
-  cursor:pointer;
-  box-shadow:0 10px 25px rgba(0,0,0,0.4);
-  transition:0.2s ease;
-  z-index:9998;
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: 0.2s ease;
+  z-index: 9998;
 }
-
-.fab-tutorial:hover{
-  transform:scale(1.08);
-  background:rgba(255,255,255,0.12);
+.fab-tutorial:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.1);
 }
-
-.fab-tutorial::after{
-  content:"Tutorial";
-  position:absolute;
-  right:70px;
-  background:#111827;
-  color:white;
-  padding:6px 10px;
-  font-size:12px;
-  border-radius:8px;
-  opacity:0;
-  transform:translateX(10px);
-  transition:0.2s ease;
-  pointer-events:none;
-  white-space:nowrap;
+.fab-tutorial::after {
+  content: "Tutorial";
+  position: absolute;
+  right: 70px;
+  background: #111827;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
 }
-
-.fab-tutorial:hover::after{
-  opacity:1;
-  transform:translateX(0);
+.fab-tutorial:hover::after {
+  opacity: 1;
+  transform: translateX(0);
 }
 </style>
 </head>
 
 <body>
 
-<div class="blob one"></div>
-<div class="blob two"></div>
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
 
 <div class="container">
 
-  <h1>EMSKK PORTAL</h1>
-  <p>Finance Dashboard Navigation Hub</p>
+  <div class="logo-container">
+    <i data-lucide="aperture" class="logo-icon"></i>
+  </div>
+  
+  <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
+  <div class="subtitle">Finance Dashboard Navigation Hub</div>
 
-  <div class="menu">
+  <div class="divider">
+    <div class="line"></div>
+    <i data-lucide="sparkles" class="star"></i>
+    <div class="line"></div>
+  </div>
+
+  <div class="menu-stack">
 
     <div class="card attendance" onclick="go('attendance.html')">
-      <div class="icon">🕒</div>
-      <div class="title">Attendance</div>
-      <div class="desc">Realtime on-duty tracking system</div>
+      <div class="icon-wrapper">
+        <i data-lucide="clock"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Attendance</div>
+        <div class="card-desc">Realtime on-duty tracking system</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <div class="card attendancelog" onclick="go('attendancelog.html')">
-      <div class="icon">⏱</div>
-      <div class="title">Attendance Overview</div>
-      <div class="desc">Weekly working hours & duty summary</div>
+    <div class="card attendance-overview" onclick="go('attendancelog.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="bar-chart-3"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Attendance Overview</div>
+        <div class="card-desc">Weekly working hours & duty summary</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <div class="card invoice" onclick="go('invoice.html')">
-      <div class="icon">💳</div>
-      <div class="title">Invoice Input</div>
-      <div class="desc">Create and upload invoices records</div>
+    <div class="card invoice-input" onclick="go('invoice.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="credit-card"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Invoice Input</div>
+        <div class="card-desc">Create and upload invoices records</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <div class="card invoicelog" onclick="go('invoicelog.html')">
-      <div class="icon">📊</div>
-      <div class="title">Invoice Overview</div>
-      <div class="desc">Weekly invoice submission summary</div>
+    <div class="card invoice-overview" onclick="go('invoicelog.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="trending-up"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Invoice Overview</div>
+        <div class="card-desc">Weekly invoice submission summary</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
+
   </div>
+
+  <div class="footer-divider">
+    <div class="line" style="width: 150px;"></div>
+    <i data-lucide="aperture" class="footer-logo"></i>
+    <div class="line" style="width: 150px;"></div>
+  </div>
+  <div class="credits">System by <a href="#">Samuel</a></div>
+
 </div>
 
 <div class="fab-tutorial" onclick="go('tutorial.html')">
-  📚
+  <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
 </div>
 
 <script>
+lucide.createIcons();
+
 function go(page){
   window.location.href = page;
 }
