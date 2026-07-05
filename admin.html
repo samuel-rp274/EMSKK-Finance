@@ -446,21 +446,11 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 const LOGIN_KEY = "ems_admin_login";
 
 let allSalaryData = [];
-let renderLock = false;
 const CACHE_KEY_SALARY = "salary_cache_v1";
 const CACHE_TTL = 1000 * 60 * 3;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
-}
-
-function safeRender(){
-  if(renderLock) return;
-  renderLock = true;
-  requestAnimationFrame(() => {
-    safeRender();
-    renderLock = false;
-  });
 }
 
 async function checkLogin(){
@@ -494,7 +484,7 @@ async function loadData(){
       allSalaryData = parsed.data || [];
       requestAnimationFrame(() => {
         populateWeeks();
-        safeRender();
+        renderTable();
       });
       setTimeout(refreshFromServer, 2000);
       return;
@@ -508,7 +498,10 @@ async function loadData(){
   } catch(e){
     allSalaryData = [];
   }
-  requestAnimationFrame(() => { populateWeeks(); safeRender(); });
+  requestAnimationFrame(() => { 
+    populateWeeks(); 
+    renderTable(); 
+  });
 }
 
 async function refreshFromServer(){
@@ -517,7 +510,10 @@ async function refreshFromServer(){
     const fresh = await res.json();
     allSalaryData = fresh;
     localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: fresh, time: Date.now() }));
-    requestAnimationFrame(() => { populateWeeks(); safeRender(); });
+    requestAnimationFrame(() => { 
+      populateWeeks(); 
+      renderTable(); 
+    });
   } catch(e){
     console.log("sync gagal, pakai cache");
   }
@@ -525,6 +521,9 @@ async function refreshFromServer(){
 
 function populateWeeks(){
   const select = document.getElementById("weekSelect");
+
+  const previousSelectedValue = select.value;
+  
   select.innerHTML = "";
   const weeks = {};
   allSalaryData.forEach(i => { if (!i.week) return; weeks[i.week] = true; });
@@ -546,8 +545,13 @@ function populateWeeks(){
     select.addEventListener("change", renderTable);
     select.dataset.bound = "1";
   }
+
   if (select.options.length > 0) {
-    select.selectedIndex = defaultIndex;
+    if (previousSelectedValue && weekKeys.includes(previousSelectedValue)) {
+      select.value = previousSelectedValue;
+    } else {
+      select.selectedIndex = defaultIndex;
+    }
     select.dispatchEvent(new Event("change"));
   }
 }
