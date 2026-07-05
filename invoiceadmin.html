@@ -561,26 +561,31 @@ async function refreshFromServer(){
 
 function populateWeeks(){
   const select = document.getElementById("weekSelect");
+  
+  const previousSelectedValue = select.value;
+  
   select.innerHTML = "";
   const weeks = {};
 
   allInvoices.forEach(i => {
     const date = parseDateSafe(i["Tanggal Invoice"]);
-	date.setHours(0,0,0,0);
-	const start = new Date(date);
-	start.setHours(0,0,0,0);
-	start.setDate(start.getDate() - date.getDay());
+    date.setHours(0,0,0,0);
+    const start = new Date(date);
+    start.setHours(0,0,0,0);
+    start.setDate(start.getDate() - date.getDay());
 
     const end = new Date(start);
     end.setDate(start.getDate() + 6);
     end.setHours(23,59,59,999);
 
     const formatDate = (d) => d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0");
-	const key = formatDate(start) + "|" + formatDate(end);
+    const key = formatDate(start) + "|" + formatDate(end);
     if(!weeks[key]) weeks[key] = { start, end };
   });
 
-  Object.keys(weeks).forEach(key=>{
+  const keys = Object.keys(weeks);
+
+  keys.forEach(key=>{
     const opt = document.createElement("option");
     opt.value = key;
     const [s,e] = key.split("|");
@@ -596,7 +601,11 @@ function populateWeeks(){
   requestAnimationFrame(() => {
     setTimeout(() => {
       if (select.options.length > 0) {
-        select.selectedIndex = select.options.length - 1;
+        if (previousSelectedValue && keys.includes(previousSelectedValue)) {
+          select.value = previousSelectedValue;
+        } else {
+          select.selectedIndex = select.options.length - 1;
+        }
         select.dispatchEvent(new Event("change"));
       }
     }, 0);
