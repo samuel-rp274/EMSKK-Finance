@@ -636,6 +636,9 @@ function parseKeyDate(str){
 
 function populateWeeks(){
   const select = document.getElementById("weekSelect");
+  
+  const previousSelectedValue = select.value;
+  
   select.innerHTML = "";
   const weeks = {};
 
@@ -665,18 +668,22 @@ function populateWeeks(){
     select.appendChild(opt);
   });
 
-  const now = new Date();
-  now.setHours(0,0,0,0);
-  let currentWeek = keys.find(k => {
-    const [startStr, endStr] = k.split("|");
-    const start = parseKeyDate(startStr);
-    const end = parseKeyDate(endStr);
-    end.setHours(23,59,59,999);
-    return now >= start && now <= end;
-  });
+  if (previousSelectedValue && keys.includes(previousSelectedValue)) {
+    select.value = previousSelectedValue;
+  } else {
+    const now = new Date();
+    now.setHours(0,0,0,0);
+    let currentWeek = keys.find(k => {
+      const [startStr, endStr] = k.split("|");
+      const start = parseKeyDate(startStr);
+      const end = parseKeyDate(endStr);
+      end.setHours(23,59,59,999);
+      return now >= start && now <= end;
+    });
 
-  if(!currentWeek){ currentWeek = keys[keys.length - 1]; }
-  select.value = currentWeek;
+    if(!currentWeek){ currentWeek = keys[keys.length - 1]; }
+    select.value = currentWeek;
+  }
 
   select.onchange = () => { if(ratesReady){ requestAnimationFrame(() => renderAttendanceTable()); } };
   if(ratesReady && allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
