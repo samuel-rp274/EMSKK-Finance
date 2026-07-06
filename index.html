@@ -10,9 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
-
 <style>
-
 * {
   margin: 0;
   padding: 0;
@@ -209,6 +207,7 @@ h1 span.gradient {
   background: currentColor;
   transform: translateX(10px);
 }
+
 .card:hover .arrow-btn i {
   color: #030712 !important;
 }
@@ -304,10 +303,10 @@ h1 span.gradient {
   animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
 }
 
-.card:nth-child(1) { animation-delay: 0.1s; }
-.card:nth-child(2) { animation-delay: 0.2s; }
-.card:nth-child(3) { animation-delay: 0.3s; }
-.card:nth-child(4) { animation-delay: 0.4s; }
+.card:nth-child(1) { animation-delay: 0.11s; }
+.card:nth-child(2) { animation-delay: 0.22s; }
+.card:nth-child(3) { animation-delay: 0.33s; }
+.card:nth-child(4) { animation-delay: 0.44s; }
 </style>
 </head>
 <body>
@@ -317,15 +316,12 @@ h1 span.gradient {
 <div class="container">
   <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
   <div class="subtitle">Finance Dashboard Navigation Hub</div>
-
   <div class="divider">
     <div class="line"></div>
     <i data-lucide="sparkles" class="star"></i>
     <div class="line"></div>
   </div>
-
   <div class="menu-stack">
-
     <div class="card attendance" onclick="go('attendance.html')">
       <div class="icon-wrapper">
         <i data-lucide="clock"></i>
@@ -338,7 +334,6 @@ h1 span.gradient {
         <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
       </div>
     </div>
-
     <div class="card attendance-overview" onclick="go('attendancelog.html')">
       <div class="icon-wrapper">
         <i data-lucide="bar-chart-3"></i>
@@ -351,7 +346,6 @@ h1 span.gradient {
         <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
       </div>
     </div>
-
     <div class="card invoice-input" onclick="go('invoice.html')">
       <div class="icon-wrapper">
         <i data-lucide="credit-card"></i>
@@ -364,7 +358,6 @@ h1 span.gradient {
         <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
       </div>
     </div>
-
     <div class="card invoice-overview" onclick="go('invoicelog.html')">
       <div class="icon-wrapper">
         <i data-lucide="trending-up"></i>
@@ -377,29 +370,24 @@ h1 span.gradient {
         <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
       </div>
     </div>
-
   </div>
-
   <div class="footer-divider">
     <div class="line" style="width: 150px;"></div>
     <i data-lucide="aperture" class="footer-logo"></i>
     <div class="line" style="width: 150px;"></div>
   </div>
   <div class="credits">System by <a href="#">Samuel</a></div>
-
 </div>
 
 <div class="fab-tutorial" onclick="go('tutorial.html')">
   <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
 </div>
-
 <script>
 lucide.createIcons();
 
 function go(page){
   window.location.href = page;
 }
-
 </script>
 </body>
 </html>
