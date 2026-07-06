@@ -51,27 +51,11 @@ body {
   text-align: center;
 }
 
-.logo-container {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 54px;
-  height: 54px;
-  background: linear-gradient(135deg, #a855f7, #3b82f6);
-  border-radius: 50%;
-  margin-bottom: 20px;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-}
-.logo-icon {
-  color: white;
-  width: 28px;
-  height: 28px;
-}
-
 h1 {
   font-size: 38px;
   font-weight: 700;
   letter-spacing: 1px;
+  margin-top: 20px;
   margin-bottom: 8px;
   text-transform: uppercase;
 }
@@ -195,13 +179,34 @@ h1 span.gradient {
   transform: translateY(-3px);
   background: rgba(15, 23, 42, 0.6);
 }
-.card.attendance:hover { border-color: rgba(239, 68, 68, 0.3); box-shadow: 0 8px 25px rgba(239, 68, 68, 0.08); }
-.card.attendance-overview:hover { border-color: rgba(245, 158, 11, 0.3); box-shadow: 0 8px 25px rgba(245, 158, 11, 0.08); }
-.card.invoice-input:hover { border-color: rgba(16, 185, 129, 0.3); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.08); }
-.card.invoice-overview:hover { border-color: rgba(59, 130, 246, 0.3); box-shadow: 0 8px 25px rgba(59, 130, 246, 0.08); }
+
+.card.attendance:hover { 
+  border-color: rgba(239, 68, 68, 0.4); 
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15), 
+              inset 0 0 15px rgba(239, 68, 68, 0.05); 
+}
+
+.card.attendance-overview:hover { 
+  border-color: rgba(245, 158, 11, 0.4); 
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15), 
+              inset 0 0 15px rgba(245, 158, 11, 0.05); 
+}
+
+.card.invoice-input:hover { 
+  border-color: rgba(16, 185, 129, 0.4); 
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15), 
+              inset 0 0 15px rgba(16, 185, 129, 0.05); 
+}
+
+.card.invoice-overview:hover { 
+  border-color: rgba(59, 130, 246, 0.4); 
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15), 
+              inset 0 0 15px rgba(59, 130, 246, 0.05); 
+}
 
 .card:hover .arrow-btn {
   background: currentColor;
+  transform: translateX(10px);
 }
 .card:hover .arrow-btn i {
   color: #030712 !important;
@@ -249,7 +254,15 @@ h1 span.gradient {
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
   transition: 0.2s ease;
   z-index: 9998;
+  animation: pulse 2s infinite;
 }
+
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
+}
+
 .fab-tutorial:hover {
   transform: scale(1.08);
   background: rgba(255, 255, 255, 0.1);
@@ -273,6 +286,27 @@ h1 span.gradient {
   opacity: 1;
   transform: translateX(0);
 }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  opacity: 0; 
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.card:nth-child(1) { animation-delay: 0.1s; }
+.card:nth-child(2) { animation-delay: 0.2s; }
+.card:nth-child(3) { animation-delay: 0.3s; }
+.card:nth-child(4) { animation-delay: 0.4s; }
 </style>
 </head>
 
@@ -282,11 +316,6 @@ h1 span.gradient {
 <div class="blob bottom-right"></div>
 
 <div class="container">
-
-  <div class="logo-container">
-    <i data-lucide="aperture" class="logo-icon"></i>
-  </div>
-  
   <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
   <div class="subtitle">Finance Dashboard Navigation Hub</div>
 
