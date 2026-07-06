@@ -90,6 +90,7 @@ body.bg-darken {
   z-index: 0;
   pointer-events: none;
 }
+
 .blob.top-left { background: #ef4444; top: -150px; left: -150px; }
 .blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
 
@@ -118,6 +119,7 @@ h1 {
   text-transform: uppercase;
   transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 h1 span.white { color: #ffffff; }
 h1 span.gradient {
   background: linear-gradient(to right, #38bdf8, #c084fc);
@@ -148,16 +150,19 @@ h1 span.gradient {
   box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
 .enter-btn i {
   width: 18px;
   height: 18px;
   transition: transform 0.3s ease;
 }
+
 .enter-btn:hover {
   transform: translateY(-3px);
   box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
   background: linear-gradient(135deg, #b55fe6, #4f92ff);
 }
+
 .enter-btn:hover i { transform: translateX(6px); }
 .enter-btn:active { transform: scale(0.98); }
 
@@ -176,11 +181,13 @@ h1 span.gradient {
   gap: 16px;
   margin-bottom: 36px;
 }
+
 .line {
   height: 1px;
   width: 100px;
   background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
 }
+
 .star {
   color: #a855f7;
   width: 14px;
@@ -210,6 +217,7 @@ h1 span.gradient {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
 }
+
 .card::before {
   content: "";
   position: absolute;
@@ -220,6 +228,7 @@ h1 span.gradient {
   border-radius: 4px;
   transition: all 0.3s ease;
 }
+
 .card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
 .card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
 .card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
@@ -253,6 +262,7 @@ h1 span.gradient {
   justify-content: center;
   transition: all 0.3s ease;
 }
+
 .card.attendance .arrow-btn { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
 .card.attendance-overview .arrow-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
 .card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
@@ -346,9 +356,7 @@ h1 span.gradient {
 .container.show-menu .card:nth-child(4) { animation-delay: 0.5s; }
 </style>
 </head>
-
 <body>
-
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
