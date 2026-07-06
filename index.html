@@ -10,6 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
+
 <style>
 * {
   margin: 0;
@@ -19,15 +20,25 @@
 }
 
 body {
-  background: #030712; 
+  background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
+              url('image.png') no-repeat center center fixed;
+  background-size: cover;
   color: white;
   min-height: 100vh;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center; 
   padding: 60px 20px;
   overflow-x: hidden;
   position: relative;
+  transition: background 1s ease;
+}
+
+body.bg-darken {
+  background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
+              url('image.png') no-repeat center center fixed;
+  background-size: cover;
+  align-items: flex-start;
 }
 
 .blob {
@@ -40,23 +51,33 @@ body {
   z-index: 0;
   pointer-events: none;
 }
-.blob.top-left { background: #3b82f6; top: -150px; left: -150px; }
-.blob.bottom-right { background: #22c55e; bottom: -150px; right: -150px; }
+.blob.top-left { background: #ef4444; top: -150px; left: -150px; }
+.blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
 
 .container {
   width: 100%;
   max-width: 640px;
   z-index: 2;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.landing-wrapper {
+  text-align: center;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  opacity: 1;
+  transform: translateY(0);
 }
 
 h1 {
-  font-size: 38px;
+  font-size: 48px;
   font-weight: 700;
-  letter-spacing: 1px;
-  margin-top: 20px;
-  margin-bottom: 8px;
+  letter-spacing: 2px;
+  margin-bottom: 12px;
   text-transform: uppercase;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 h1 span.white { color: #ffffff; }
 h1 span.gradient {
@@ -66,10 +87,47 @@ h1 span.gradient {
 }
 
 .subtitle {
-  color: #94a3b8;
-  font-size: 14px;
-  margin-bottom: 24px;
+  color: #cbd5e1;
+  font-size: 16px;
+  margin-bottom: 40px;
   letter-spacing: 0.5px;
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  background: linear-gradient(135deg, #a855f7, #3b82f6);
+  color: white;
+  padding: 14px 32px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.enter-btn i {
+  width: 18px;
+  height: 18px;
+  transition: transform 0.3s ease;
+}
+.enter-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
+  background: linear-gradient(135deg, #b55fe6, #4f92ff);
+}
+.enter-btn:hover i { transform: translateX(6px); }
+.enter-btn:active { transform: scale(0.98); }
+
+.mainmenu-wrapper {
+  width: 100%;
+  display: none;
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .divider {
@@ -99,10 +157,10 @@ h1 span.gradient {
 }
 
 .card {
-  background: rgba(15, 23, 42, 0.4);
+  background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
   border-radius: 20px;
   padding: 24px 28px;
   display: flex;
@@ -113,7 +171,6 @@ h1 span.gradient {
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
 }
-
 .card::before {
   content: "";
   position: absolute;
@@ -124,7 +181,6 @@ h1 span.gradient {
   border-radius: 4px;
   transition: all 0.3s ease;
 }
-
 .card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
 .card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
 .card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
@@ -144,20 +200,9 @@ h1 span.gradient {
 .card.invoice-input .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
 .card.invoice-overview .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2); }
 
-.card-content {
-  flex-grow: 1;
-}
-.card-title {
-  font-size: 17px;
-  font-weight: 600;
-  margin-bottom: 4px;
-  color: #ffffff;
-}
-.card-desc {
-  font-size: 13px;
-  color: #94a3b8;
-  line-height: 1.4;
-}
+.card-content { flex-grow: 1; }
+.card-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: #ffffff; }
+.card-desc { font-size: 13px; color: #94a3b8; line-height: 1.4; }
 
 .arrow-btn {
   width: 36px;
@@ -174,66 +219,20 @@ h1 span.gradient {
 .card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
 .card.invoice-overview .arrow-btn { color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
 
-.card:hover {
-  transform: translateY(-3px);
-}
+.card:hover { transform: translateY(-3px); background: rgba(15, 23, 42, 0.75); }
+.card.attendance:hover { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15); }
+.card.attendance-overview:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15); }
+.card.invoice-input:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15); }
+.card.invoice-overview:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15); }
 
-.card.attendance:hover { 
-  border-color: rgba(239, 68, 68, 0.4); 
-  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15), 
-              inset 0 0 15px rgba(239, 68, 68, 0.05); 
-}
-
-.card.attendance-overview:hover { 
-  border-color: rgba(245, 158, 11, 0.4); 
-  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15), 
-              inset 0 0 15px rgba(245, 158, 11, 0.05); 
-}
-
-.card.invoice-input:hover { 
-  border-color: rgba(16, 185, 129, 0.4); 
-  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15), 
-              inset 0 0 15px rgba(16, 185, 129, 0.05); 
-}
-
-.card.invoice-overview:hover { 
-  border-color: rgba(59, 130, 246, 0.4); 
-  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15), 
-              inset 0 0 15px rgba(59, 130, 246, 0.05); 
-}
-
-.card:hover .arrow-btn {
-  background: currentColor;
-  transform: translateX(10px);
-}
-
-.card:hover .arrow-btn i {
-  color: #030712 !important;
-}
-
+.card:hover .arrow-btn { background: currentColor; transform: translateX(10px); }
+.card:hover .arrow-btn i { color: #030712 !important; }
 .card:active { transform: scale(0.99); }
 
-.footer-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 16px;
-}
-.footer-logo {
-  color: #94a3b8;
-  width: 16px;
-  height: 16px;
-  opacity: 0.5;
-}
-.credits {
-  font-size: 12px;
-  color: #64748b;
-}
-.credits a {
-  color: #3b82f6;
-  text-decoration: none;
-}
+.footer-divider { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
+.footer-logo { color: #94a3b8; width: 16px; height: 16px; opacity: 0.5; }
+.credits { font-size: 12px; color: #64748b; }
+.credits a { color: #3b82f6; text-decoration: none; }
 
 .fab-tutorial {
   position: fixed;
@@ -253,116 +252,149 @@ h1 span.gradient {
   box-shadow: 0 10px 25px rgba(0,0,0,0.4);
   transition: 0.2s ease;
   z-index: 9998;
-  animation: pulse 2s infinite;
+  opacity: 0;
+  pointer-events: none;
 }
+.fab-tutorial.show { opacity: 1; pointer-events: auto; animation: pulse 2s infinite; }
 
 @keyframes pulse {
   0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
   70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
   100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
-
-.fab-tutorial:hover {
-  transform: scale(1.08);
-  background: rgba(255, 255, 255, 0.1);
-}
+.fab-tutorial:hover { transform: scale(1.08); background: rgba(255, 255, 255, 0.1); }
 .fab-tutorial::after {
-  content: "Tutorial";
-  position: absolute;
-  right: 70px;
-  background: #111827;
-  color: white;
-  padding: 6px 10px;
-  font-size: 12px;
-  border-radius: 8px;
-  opacity: 0;
-  transform: translateX(10px);
-  transition: 0.2s ease;
-  pointer-events: none;
-  white-space: nowrap;
+  content: "Tutorial"; position: absolute; right: 70px; background: #111827; color: white;
+  padding: 6px 10px; font-size: 12px; border-radius: 8px; opacity: 0; transform: translateX(10px);
+  transition: 0.2s ease; pointer-events: none; white-space: nowrap;
 }
-.fab-tutorial:hover::after {
-  opacity: 1;
-  transform: translateX(0);
+.fab-tutorial:hover::after { opacity: 1; transform: translateX(0); }
+
+.container.show-menu .landing-wrapper {
+  opacity: 0;
+  transform: translateY(-50px);
+  display: none;
 }
 
+.container.show-menu h1 {
+  font-size: 38px;
+  margin-top: 10px;
+  margin-bottom: 8px;
+}
+
+.container.show-menu .subtitle {
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+
+.container.show-menu .mainmenu-wrapper {
+  display: block;
+  animation: slideUpIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes slideUpIn {
+  from { opacity: 0; transform: translateY(50px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.container.show-menu .card {
+  opacity: 0;
+  animation: slideUpIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+.container.show-menu .card:nth-child(1) { animation-delay: 0.2s; }
+.container.show-menu .card:nth-child(2) { animation-delay: 0.3s; }
+.container.show-menu .card:nth-child(3) { animation-delay: 0.4s; }
+.container.show-menu .card:nth-child(4) { animation-delay: 0.5s; }
 </style>
 </head>
+
 <body>
+
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
-<div class="container">
+<div class="container" id="portalContainer">
+  
   <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
   <div class="subtitle">Finance Dashboard Navigation Hub</div>
-  <div class="divider">
-    <div class="line"></div>
-    <i data-lucide="sparkles" class="star"></i>
-    <div class="line"></div>
+
+  <div class="landing-wrapper" id="landingWrapper">
+    <button class="enter-btn" onclick="activatePortal()">
+      Enter Portal
+      <i data-lucide="arrow-right"></i>
+    </button>
   </div>
-  <div class="menu-stack">
-    <div class="card attendance" onclick="go('attendance.html')">
-      <div class="icon-wrapper">
-        <i data-lucide="clock"></i>
+
+  <div class="mainmenu-wrapper">
+    <div class="divider">
+      <div class="line"></div>
+      <i data-lucide="sparkles" class="star"></i>
+      <div class="line"></div>
+    </div>
+
+    <div class="menu-stack">
+      <div class="card attendance" onclick="go('attendance.html')">
+        <div class="icon-wrapper"><i data-lucide="clock"></i></div>
+        <div class="card-content">
+          <div class="card-title">Attendance</div>
+          <div class="card-desc">Realtime on-duty tracking system</div>
+        </div>
+        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
       </div>
-      <div class="card-content">
-        <div class="card-title">Attendance</div>
-        <div class="card-desc">Realtime on-duty tracking system</div>
+
+      <div class="card attendance-overview" onclick="go('attendancelog.html')">
+        <div class="icon-wrapper"><i data-lucide="bar-chart-3"></i></div>
+        <div class="card-content">
+          <div class="card-title">Attendance Overview</div>
+          <div class="card-desc">Weekly working hours & duty summary</div>
+        </div>
+        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
       </div>
-      <div class="arrow-btn">
-        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+
+      <div class="card invoice-input" onclick="go('invoice.html')">
+        <div class="icon-wrapper"><i data-lucide="credit-card"></i></div>
+        <div class="card-content">
+          <div class="card-title">Invoice Input</div>
+          <div class="card-desc">Create and upload invoices records</div>
+        </div>
+        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+      </div>
+
+      <div class="card invoice-overview" onclick="go('invoicelog.html')">
+        <div class="icon-wrapper"><i data-lucide="trending-up"></i></div>
+        <div class="card-content">
+          <div class="card-title">Invoice Overview</div>
+          <div class="card-desc">Weekly invoice submission summary</div>
+        </div>
+        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
       </div>
     </div>
-    <div class="card attendance-overview" onclick="go('attendancelog.html')">
-      <div class="icon-wrapper">
-        <i data-lucide="bar-chart-3"></i>
-      </div>
-      <div class="card-content">
-        <div class="card-title">Attendance Overview</div>
-        <div class="card-desc">Weekly working hours & duty summary</div>
-      </div>
-      <div class="arrow-btn">
-        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
-      </div>
+
+    <div class="footer-divider">
+      <div class="line" style="width: 150px;"></div>
+      <i data-lucide="aperture" class="footer-logo"></i>
+      <div class="line" style="width: 150px;"></div>
     </div>
-    <div class="card invoice-input" onclick="go('invoice.html')">
-      <div class="icon-wrapper">
-        <i data-lucide="credit-card"></i>
-      </div>
-      <div class="card-content">
-        <div class="card-title">Invoice Input</div>
-        <div class="card-desc">Create and upload invoices records</div>
-      </div>
-      <div class="arrow-btn">
-        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
-      </div>
-    </div>
-    <div class="card invoice-overview" onclick="go('invoicelog.html')">
-      <div class="icon-wrapper">
-        <i data-lucide="trending-up"></i>
-      </div>
-      <div class="card-content">
-        <div class="card-title">Invoice Overview</div>
-        <div class="card-desc">Weekly invoice submission summary</div>
-      </div>
-      <div class="arrow-btn">
-        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
-      </div>
-    </div>
+    <div class="credits">System by <a href="#">Samuel</a></div>
   </div>
-  <div class="footer-divider">
-    <div class="line" style="width: 150px;"></div>
-    <i data-lucide="aperture" class="footer-logo"></i>
-    <div class="line" style="width: 150px;"></div>
-  </div>
-  <div class="credits">System by <a href="#">Samuel</a></div>
+
 </div>
 
-<div class="fab-tutorial" onclick="go('tutorial.html')">
+<div class="fab-tutorial" id="fabTutorial" onclick="go('tutorial.html')">
   <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
 </div>
+
 <script>
 lucide.createIcons();
+
+function activatePortal() {
+  document.body.classList.add('bg-darken');
+  
+  const container = document.getElementById('portalContainer');
+  container.classList.add('show-menu');
+  
+  document.getElementById('fabTutorial').classList.add('show');
+}
 
 function go(page){
   window.location.href = page;
