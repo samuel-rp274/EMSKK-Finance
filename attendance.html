@@ -374,7 +374,7 @@ const API="https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXm
 let emsData={},ts;
 let currentUser=null;
 const CACHE_KEY_EMS = "ems_cache_v1";
-const CACHE_TTL = 1000 * 60 * 15;
+const CACHE_TTL = 1000 * 60 * 8;
 
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
@@ -401,6 +401,59 @@ function setStatus(type,text){
 }
 
 async function loadEMS(){
+  const cached = localStorage.getItem(CACHE_KEY_EMS);
+
+  if(cached){
+    let parsed = null;
+    try {
+      parsed = JSON.parse(cached);
+    } catch(e){
+      console.warn("Cache EMS rusak, dihapus");
+      localStorage.removeItem(CACHE_KEY_EMS);
+    }
+
+    if(parsed && parsed.data && Array.isArray(parsed.data) && parsed.data.length){
+      buildEMSDropdown(parsed.data);
+      
+      if(isCacheValid(parsed.time)){
+        refreshEMSFromServer();
+        return;
+      }
+    }
+  }
+
+  await refreshEMSFromServer();
+}
+
+async function refreshEMSFromServer(){
+  try {
+    const res = await fetch(API + "?action=getEMS");
+    const data = await res.json();
+    const safeData = Array.isArray(data) ? data : [];
+
+    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
+      data: safeData,
+      time: Date.now()
+    }));
+
+    buildEMSDropdown(safeData);
+  } catch(err){
+    console.error("EMS gagal sinkronisasi dari server:", err);
+    const fallback = localStorage.getItem(CACHE_KEY_EMS);
+    if(fallback && !ts){ 
+      try {
+        const parsed = JSON.parse(fallback);
+        buildEMSDropdown(parsed.data || []);
+      } catch(e){
+        buildEMSDropdown([]);
+      }
+    }
+  }
+}
+
+function buildEMSDropdown(emsList){
+  const currentSelection = ts ? ts.getValue() : localStorage.getItem("ems_name");
+
   if(ts){
     ts.destroy();
     ts = null;
@@ -408,90 +461,70 @@ async function loadEMS(){
 
   const select = document.getElementById("nama");
   select.innerHTML = `<option value="">Cari Nama EMS...</option>`;
-
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  let emsList = null;
-
-  if(cached){
-    try {
-      const parsed = JSON.parse(cached);
-
-      if(parsed?.data && Array.isArray(parsed.data) && parsed.data.length){
-        emsList = parsed.data;
-      }
-    } catch(e){
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-  }
-
-  if(!emsList){
-    try {
-      const res = await fetch(API + "?action=getEMS");
-      const data = await res.json();
-
-      emsList = Array.isArray(data) ? data : [];
-
-      localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-        data: emsList,
-        time: Date.now()
-      }));
-
-    } catch(err){
-      console.error("EMS gagal load:", err);
-      emsList = [];
-    }
-  }
+  emsData = {}; 
 
   emsList
-    .filter(u => u && u.nama)
+    .filter(u => u && u.nama && u.nama.trim().toUpperCase() !== "NAMA")
     .sort((a,b)=>a.nama.localeCompare(b.nama))
     .forEach(u=>{
-      emsData[u.nama] = u;
+      const namaTrimmed = u.nama.trim();
+      emsData[namaTrimmed] = u;
 
       const opt = document.createElement("option");
-      opt.value = u.nama;
-      opt.textContent = u.nama;
+      opt.value = namaTrimmed;
+      opt.textContent = namaTrimmed;
       select.appendChild(opt);
     });
 
   ts = new TomSelect("#nama",{
     create:false,
-    highlight:true
+    highlight:true,
+    dropdownParent: "body"
   });
 
   ts.on("change",(v)=>{
     currentUser = v;
+    if(v) localStorage.setItem("ems_name", v);
 
     if(!v){
-      jabatan.value="";
-      divisi.value="";
+      document.getElementById("jabatan").value="";
+      document.getElementById("divisi").value="";
       setStatus("off","OFF DUTY");
       return;
     }
 
-    jabatan.value = emsData[v]?.jabatan || "";
-    divisi.value = emsData[v]?.divisi || "";
+    document.getElementById("jabatan").value = emsData[v]?.jabatan || "";
+    document.getElementById("divisi").value = emsData[v]?.divisi || "";
 
     checkSession(v);
   });
 
-  restoreSession();  
+  if(currentSelection && emsData[currentSelection]){
+    ts.setValue(currentSelection);
+    currentUser = currentSelection;
+    checkSession(currentSelection);
+  } else {
+    restoreSession();
+  }
 }
 
 async function checkSession(nama){
-  const res=await fetch(API+"?action=getActiveSession&nama="+nama);
-  const data=await res.json();
+  try {
+    const res=await fetch(API+"?action=getActiveSession&nama="+encodeURIComponent(nama));
+    const data=await res.json();
 
-  if(data.active){
-    setStatus("on","ON DUTY ACTIVE");
-    startTimer(data.startTime);
-    document.querySelector(".start").disabled=true;
-    document.querySelector(".finish").disabled=false;
-  }else{
-    setStatus("off","OFF DUTY");
-    document.querySelector(".start").disabled=false;
-    document.querySelector(".finish").disabled=true;
+    if(data.active){
+      setStatus("on","ON DUTY ACTIVE");
+      startTimer(data.startTime);
+      document.querySelector(".start").disabled=true;
+      document.querySelector(".finish").disabled=false;
+    }else{
+      setStatus("off","OFF DUTY");
+      document.querySelector(".start").disabled=false;
+      document.querySelector(".finish").disabled=true;
+    }
+  } catch(e) {
+    console.error("Gagal memeriksa sesi aktif:", e);
   }
 }
 
@@ -560,34 +593,32 @@ async function finishDuty(){
 
   setStatus("loading","FINISHING...");
 
-  const res=await fetch(API+"?action=finishDuty&nama="+currentUser);
-  const data=await res.json();
-  
-  clearInterval(timer);
-  timer = null;
-  
-  setStatus("off",data.message);
+  try {
+    const res=await fetch(API+"?action=finishDuty&nama="+encodeURIComponent(currentUser));
+    const data=await res.json();
+    
+    clearInterval(timer);
+    timer = null;
+    
+    setStatus("off",data.message);
 
-  document.querySelector(".start").disabled=false;
-  document.querySelector(".finish").disabled=true;
+    document.querySelector(".start").disabled=false;
+    document.querySelector(".finish").disabled=true;
+  } catch(e) {
+    setStatus("on","FAILED TO SIGN OUT");
+  }
 }
 
 function restoreSession(){
   const saved=localStorage.getItem("ems_name");
-  if(saved){
+  if(saved && ts && emsData[saved]){
     ts.setValue(saved);
     currentUser=saved;
     checkSession(saved);
   }
 }
 
-document.addEventListener("change",(e)=>{
-  if(e.target.id==="nama"){
-    localStorage.setItem("ems_name",e.target.value);
-  }
-});
-
-loadEMS();
+document.addEventListener("DOMContentLoaded", loadEMS);
 </script>
 </body>
 </html>
