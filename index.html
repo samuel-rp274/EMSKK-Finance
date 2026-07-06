@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Portal</title>
 
-<link class="favicon" rel="icon" href="logo.png" type="image/png">
+<link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -44,39 +44,39 @@ body.bg-darken {
 @media (max-width: 768px) and (orientation: portrait) {
   body {
     background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-                url('imagepotrait.png') no-repeat center center fixed;
+                url('imagerpotrait.png') no-repeat center center fixed;
     background-size: cover;
   }
   
   body.bg-darken {
     background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
-                url('imagepotrait.png') no-repeat center center fixed;
+                url('imageportrait.png') no-repeat center center fixed;
     background-size: cover;
   }
   
   h1 {
-    font-size: 36px !important;
+    font-size: 36px;
   }
   .container.show-menu h1 {
-    font-size: 28px !important;
+    font-size: 28px;
   }
   .subtitle {
-    font-size: 14px !important;
-    margin-bottom: 30px !important;
+    font-size: 14px;
+    margin-bottom: 30px;
   }
   .card {
-    padding: 20px 22px !important;
-    gap: 16px !important;
+    padding: 20px 22px;
+    gap: 16px;
   }
   .icon-wrapper {
-    width: 48px !important;
-    height: 48px !important;
+    width: 48px;
+    height: 48px;
   }
   .card-title {
-    font-size: 16px !important;
+    font-size: 16px;
   }
   .card-desc {
-    font-size: 12px !important;
+    font-size: 12px;
   }
 }
 
@@ -435,7 +435,7 @@ h1 span.gradient {
 lucide.createIcons();
 
 async function cacheBackgroundImage() {
-  const assetsToCache = ['imagelandscape.png', 'imagepotrait.png'];
+  const assetsToCache = ['imagelandscape.png', 'imageportrait.png'];
   
   if ('caches' in window) {
     try {
