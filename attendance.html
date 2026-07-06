@@ -3,18 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMSKK Attendance</title>
+<title>EMSKK Portal</title>
 
 <link rel="icon" href="logo.png" type="image/png">
-<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
+
 * {
   margin: 0;
   padding: 0;
@@ -22,22 +20,15 @@
   font-family: 'Inter', sans-serif;
 }
 
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  overflow-x: hidden;
-}
-
 body {
-  background: #030712;
-  color: #fff;
+  background: #030712; 
+  color: white;
   min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 100px 20px 40px 20px;
-  overscroll-behavior: none;
+  padding: 60px 20px;
+  overflow-x: hidden;
   position: relative;
 }
 
@@ -51,97 +42,23 @@ body {
   z-index: 0;
   pointer-events: none;
 }
-.blob.one { background: #3b82f6; top: -150px; left: -150px; }
-.blob.two { background: #22c55e; bottom: -150px; right: -150px; }
-
-.topnav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  z-index: 999;
-}
-
-.topnav a {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
-}
-
-.topnav a:hover {
-  color: #38bdf8;
-}
-
-.topnav .title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
+.blob.top-left { background: #3b82f6; top: -150px; left: -150px; }
+.blob.bottom-right { background: #22c55e; bottom: -150px; right: -150px; }
 
 .container {
   width: 100%;
-  max-width: 600px;
+  max-width: 640px;
   z-index: 2;
   text-align: center;
 }
 
-.card {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 36px;
-  width: 100%;
-  position: relative;
-  text-align: left;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 15%;
-  left: 0;
-  width: 3px;
-  height: 70%;
-  border-radius: 4px;
-  background: #ef4444;
-  box-shadow: 0 0 15px #ef4444;
-}
-
-.card-header-icon {
-  width: 56px;
-  height: 56px;
-  background: rgba(239, 68, 68, 0.15);
-  color: #ef4444;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.2);
-}
-
 h1 {
-  font-size: 30px;
+  font-size: 38px;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
+  letter-spacing: 1px;
+  margin-top: 20px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
 }
 h1 span.white { color: #ffffff; }
 h1 span.gradient {
@@ -152,471 +69,337 @@ h1 span.gradient {
 
 .subtitle {
   color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 24px;
+  letter-spacing: 0.5px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 36px;
+}
+.line {
+  height: 1px;
+  width: 100px;
+  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
+}
+.star {
+  color: #a855f7;
+  width: 14px;
+  height: 14px;
+  opacity: 0.7;
+}
+
+.menu-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 48px;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  text-align: left;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 0;
+  width: 3px;
+  height: 64%;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+.card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
+.card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
+.card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
+.card.invoice-overview::before { background: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
+
+.icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.card.attendance .icon-wrapper { background: rgba(239, 68, 68, 0.15); color: #ef4444; box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.2); }
+.card.attendance-overview .icon-wrapper { background: rgba(245, 158, 11, 0.15); color: #f59e0b; box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2); }
+.card.invoice-input .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
+.card.invoice-overview .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2); }
+
+.card-content {
+  flex-grow: 1;
+}
+.card-title {
+  font-size: 17px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #ffffff;
+}
+.card-desc {
   font-size: 13px;
-  margin-bottom: 28px;
+  color: #94a3b8;
   line-height: 1.4;
 }
 
-.clock-box {
-  text-align: center;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.02);
-  border-radius: 16px;
-  margin-bottom: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+.arrow-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
 }
+.card.attendance .arrow-btn { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
+.card.attendance-overview .arrow-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
+.card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
+.card.invoice-overview .arrow-btn { color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
 
-.clock-time {
-  font-size: 42px;
-  color: #38bdf8;
-  font-weight: 800;
-  letter-spacing: 1px;
-}
-
-.clock-date {
-  font-size: 13px;
-  color: #64748b;
-  margin-top: 4px;
-  font-weight: 500;
-}
-
-.form-group {
-  margin-bottom: 18px;
-}
-
-label {
-  font-size: 13px;
-  color: #94a3b8;
-  font-weight: 600;
-  display: block;
-  margin-bottom: 8px;
-  letter-spacing: 0.3px;
-}
-
-input {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(15, 23, 42, 0.6);
-  color: white;
-  outline: none;
-  font-size: 14px;
-  transition: all 0.25s;
-}
-
-input[readonly] {
-  color: #94a3b8;
-  background: rgba(15, 23, 42, 0.3);
-  cursor: not-allowed;
-}
-
-button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 12px;
-  border: none;
-  border-radius: 14px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-button:hover {
+.card:hover {
   transform: translateY(-3px);
+  background: rgba(15, 23, 42, 0.6);
 }
 
-button:disabled {
-  opacity: 0.3;
-  cursor: not-allowed;
-  transform: none !important;
+.card.attendance:hover { 
+  border-color: rgba(239, 68, 68, 0.4); 
+  box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15), 
+              inset 0 0 15px rgba(239, 68, 68, 0.05); 
 }
 
-.start {
-  background: #10b981;
-  color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
-}
-.start:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+.card.attendance-overview:hover { 
+  border-color: rgba(245, 158, 11, 0.4); 
+  box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15), 
+              inset 0 0 15px rgba(245, 158, 11, 0.05); 
 }
 
-.finish {
-  background: #ef4444;
-  color: white;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
-}
-.finish:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+.card.invoice-input:hover { 
+  border-color: rgba(16, 185, 129, 0.4); 
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15), 
+              inset 0 0 15px rgba(16, 185, 129, 0.05); 
 }
 
-.status {
-  text-align: center;
-  margin-top: 20px;
-  padding: 12px;
-  border-radius: 14px;
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  transition: all 0.3s;
+.card.invoice-overview:hover { 
+  border-color: rgba(59, 130, 246, 0.4); 
+  box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15), 
+              inset 0 0 15px rgba(59, 130, 246, 0.05); 
 }
 
-.ts-wrapper.single .ts-control {
-  background: rgba(15, 23, 42, 0.6) !important;
-  color: white !important;
-  border: 1px solid rgba(255, 255, 255, 0.04) !important;
-  border-radius: 14px !important;
-  padding: 14px 16px !important;
-  font-size: 14px !important;
+.card:hover .arrow-btn {
+  background: currentColor;
+  transform: translateX(10px);
+}
+.card:hover .arrow-btn i {
+  color: #030712 !important;
 }
 
-.ts-wrapper.single.focus .ts-control {
-  border-color: rgba(56, 189, 248, 0.4) !important;
-  box-shadow: 0 0 10px rgba(56, 189, 248, 0.1) !important;
+.card:active { transform: scale(0.99); }
+
+.footer-divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.footer-logo {
+  color: #94a3b8;
+  width: 16px;
+  height: 16px;
+  opacity: 0.5;
+}
+.credits {
+  font-size: 12px;
+  color: #64748b;
+}
+.credits a {
+  color: #3b82f6;
+  text-decoration: none;
 }
 
-.ts-control input { color: white !important; font-size: 14px !important; }
-.ts-control { color: white !important; }
-.ts-control input::placeholder { color: #64748b !important; }
-
-.ts-dropdown {
-  background: #0f172a !important;
-  border: 1px solid rgba(255, 255, 255, 0.08) !important;
-  color: white !important;
-  border-radius: 14px !important;
-  margin-top: 6px !important;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
-  overflow: hidden !important;
-}
-
-.ts-dropdown .option {
-  padding: 12px 16px !important;
-  font-size: 14px !important;
+.fab-tutorial {
+  position: fixed;
+  bottom: 25px;
+  right: 25px;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+  transition: 0.2s ease;
+  z-index: 9998;
+  animation: pulse 2s infinite;
 }
 
-.ts-dropdown .active {
-  background: rgba(56, 189, 248, 0.15) !important;
-  color: #38bdf8 !important;
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
+  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
 }
 
-.badge-off { color: #94a3b8; }
-.badge-on { 
-  color: #10b981; 
-  background: rgba(16, 185, 129, 0.06) !important; 
-  border-color: rgba(16, 185, 129, 0.2) !important; 
+.fab-tutorial:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.1);
 }
-.badge-loading { 
-  color: #f59e0b; 
-  background: rgba(245, 158, 11, 0.06) !important; 
-  border-color: rgba(245, 158, 11, 0.2) !important; 
+.fab-tutorial::after {
+  content: "Tutorial";
+  position: absolute;
+  right: 70px;
+  background: #111827;
+  color: white;
+  padding: 6px 10px;
+  font-size: 12px;
+  border-radius: 8px;
+  opacity: 0;
+  transform: translateX(10px);
+  transition: 0.2s ease;
+  pointer-events: none;
+  white-space: nowrap;
 }
+.fab-tutorial:hover::after {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.card {
+  opacity: 0; 
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.card:nth-child(1) { animation-delay: 0.11s; }
+.card:nth-child(2) { animation-delay: 0.22s; }
+.card:nth-child(3) { animation-delay: 0.33s; }
+.card:nth-child(4) { animation-delay: 0.44s; }
 </style>
 </head>
-
 <body>
-
-<div class="topnav">
-  <a href="index.html"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Home</a>
-  <div class="title">EMSKK SYSTEM</div>
-</div>
-
-<div class="blob one"></div>
-<div class="blob two"></div>
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
 
 <div class="container">
-  <div class="card">
+  <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
+  <div class="subtitle">Finance Dashboard Navigation Hub</div>
 
-    <div class="card-header-icon">
-      <i data-lucide="clock"></i>
+  <div class="divider">
+    <div class="line"></div>
+    <i data-lucide="sparkles" class="star"></i>
+    <div class="line"></div>
+  </div>
+
+  <div class="menu-stack">
+
+    <div class="card attendance" onclick="go('attendance.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="clock"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Attendance</div>
+        <div class="card-desc">Realtime on-duty tracking system</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <h1><span class="white">EMSKK</span> <span class="gradient">ATTENDANCE</span></h1>
-    <div class="subtitle">Realtime on-duty tracking system</div>
-
-    <div class="clock-box">
-      <div class="clock-time" id="clock-time">00:00:00</div>
-      <div class="clock-date" id="clock-date">loading...</div>
+    <div class="card attendance-overview" onclick="go('attendancelog.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="bar-chart-3"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Attendance Overview</div>
+        <div class="card-desc">Weekly working hours & duty summary</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Nama EMS</label>
-      <select id="nama">
-        <option value="">Cari Nama EMS...</option>
-      </select>
+    <div class="card invoice-input" onclick="go('invoice.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="credit-card"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Invoice Input</div>
+        <div class="card-desc">Create and upload invoices records</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
 
-    <div class="form-group">
-      <label>Jabatan</label>
-      <input id="jabatan" readonly>
+    <div class="card invoice-overview" onclick="go('invoicelog.html')">
+      <div class="icon-wrapper">
+        <i data-lucide="trending-up"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">Invoice Overview</div>
+        <div class="card-desc">Weekly invoice submission summary</div>
+      </div>
+      <div class="arrow-btn">
+        <i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label>Divisi</label>
-      <input id="divisi" readonly>
-    </div>
-
-    <button class="start" onclick="startDuty()">START DUTY</button>
-    <button class="finish" onclick="finishDuty()">FINISH DUTY</button>
-
-    <div id="status" class="status badge-off">OFF DUTY</div>
 
   </div>
+
+  <div class="footer-divider">
+    <div class="line" style="width: 150px;"></div>
+    <i data-lucide="aperture" class="footer-logo"></i>
+    <div class="line" style="width: 150px;"></div>
+  </div>
+  <div class="credits">System by <a href="#">Samuel</a></div>
+
+</div>
+
+<div class="fab-tutorial" onclick="go('tutorial.html')">
+  <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
+</div>
+
 <script>
 lucide.createIcons();
-const API="https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-let emsData={},ts;
-let currentUser=null;
-const CACHE_KEY_EMS = "ems_cache_v1";
-const CACHE_TTL = 1000 * 60 * 8;
 
-function isCacheValid(time){
-  return (Date.now() - time) < CACHE_TTL;
+function go(page){
+  window.location.href = page;
 }
 
-setInterval(()=>{
-  const now = new Date(
-   new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
-  );
-  document.getElementById("clock-time").innerText=
-    now.toLocaleTimeString("id-ID",{hour12:false});
-  document.getElementById("clock-date").innerText=
-    now.toLocaleDateString("id-ID",{weekday:"long",year:"numeric",month:"long",day:"numeric"});
-},1000);
-
-function setStatus(type,text){
-  const el=document.getElementById("status");
-  el.className="status";
-  el.innerText=text;
-
-  if(type==="on") el.classList.add("badge-on");
-  else if(type==="loading") el.classList.add("badge-loading","loading");
-  else el.classList.add("badge-off");
-}
-
-async function loadEMS(){
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  if(cached){
-    let parsed = null;
-    try {
-      parsed = JSON.parse(cached);
-    } catch(e){
-      console.warn("Cache EMS rusak, dihapus");
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-
-    if(parsed && parsed.data && Array.isArray(parsed.data) && parsed.data.length){
-      buildEMSDropdown(parsed.data);
-      
-      if(isCacheValid(parsed.time)){
-        refreshEMSFromServer();
-        return;
-      }
-    }
-  }
-
-  await refreshEMSFromServer();
-}
-
-async function refreshEMSFromServer(){
-  try {
-    const res = await fetch(API + "?action=getEMS");
-    const data = await res.json();
-    const safeData = Array.isArray(data) ? data : [];
-
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safeData,
-      time: Date.now()
-    }));
-
-    buildEMSDropdown(safeData);
-  } catch(err){
-    console.error("EMS gagal sinkronisasi dari server:", err);
-    const fallback = localStorage.getItem(CACHE_KEY_EMS);
-    if(fallback && !ts){ 
-      try {
-        const parsed = JSON.parse(fallback);
-        buildEMSDropdown(parsed.data || []);
-      } catch(e){
-        buildEMSDropdown([]);
-      }
-    }
-  }
-}
-
-function buildEMSDropdown(emsList){
-  const currentSelection = ts ? ts.getValue() : localStorage.getItem("ems_name");
-
-  if(ts){
-    ts.destroy();
-    ts = null;
-  }
-
-  const select = document.getElementById("nama");
-  select.innerHTML = `<option value="">Cari Nama EMS...</option>`;
-  emsData = {}; 
-
-  emsList
-    .filter(u => u && u.nama && u.nama.trim().toUpperCase() !== "NAMA")
-    .sort((a,b)=>a.nama.localeCompare(b.nama))
-    .forEach(u=>{
-      const namaTrimmed = u.nama.trim();
-      emsData[namaTrimmed] = u;
-
-      const opt = document.createElement("option");
-      opt.value = namaTrimmed;
-      opt.textContent = namaTrimmed;
-      select.appendChild(opt);
-    });
-
-  ts = new TomSelect("#nama",{
-    create:false,
-    highlight:true,
-    dropdownParent: "body"
-  });
-
-  ts.on("change",(v)=>{
-    currentUser = v;
-    if(v) localStorage.setItem("ems_name", v);
-
-    if(!v){
-      document.getElementById("jabatan").value="";
-      document.getElementById("divisi").value="";
-      setStatus("off","OFF DUTY");
-      return;
-    }
-
-    document.getElementById("jabatan").value = emsData[v]?.jabatan || "";
-    document.getElementById("divisi").value = emsData[v]?.divisi || "";
-
-    checkSession(v);
-  });
-
-  if(currentSelection && emsData[currentSelection]){
-    ts.setValue(currentSelection);
-    currentUser = currentSelection;
-    checkSession(currentSelection);
-  } else {
-    restoreSession();
-  }
-}
-
-async function checkSession(nama){
-  try {
-    const res=await fetch(API+"?action=getActiveSession&nama="+encodeURIComponent(nama));
-    const data=await res.json();
-
-    if(data.active){
-      setStatus("on","ON DUTY ACTIVE");
-      startTimer(data.startTime);
-      document.querySelector(".start").disabled=true;
-      document.querySelector(".finish").disabled=false;
-    }else{
-      setStatus("off","OFF DUTY");
-      document.querySelector(".start").disabled=false;
-      document.querySelector(".finish").disabled=true;
-    }
-  } catch(e) {
-    console.error("Gagal memeriksa sesi aktif:", e);
-  }
-}
-
-let timer;
-function startTimer(start){
-  clearInterval(timer);
-
-  timer=setInterval(()=>{
-    const now = new Date(
-	 new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" })
-	);
-	const diff = new Date(now).getTime() - new Date(start).getTime();
-
-    const totalSeconds=Math.floor(diff/1000);
-
-    const hours=Math.floor(totalSeconds/3600);
-    const minutes=Math.floor((totalSeconds%3600)/60);
-    const seconds=totalSeconds%60;
-
-    const format =
-      String(hours).padStart(2,"0") + ":" +
-      String(minutes).padStart(2,"0") + ":" +
-      String(seconds).padStart(2,"0");
-
-    setStatus("on",`ON DUTY • ${format}`);
-  },1000);
-}
-
-async function startDuty(){
-  if(!currentUser) return;
-
-  setStatus("loading","STARTING...");
-
-  const data = emsData[currentUser];
-  if(!data) return;
-
-  try {
-    const res = await fetch(
-      API +
-      "?action=startDuty" +
-      "&nama=" + encodeURIComponent(currentUser) +
-      "&jabatan=" + encodeURIComponent(data.jabatan || "") +
-      "&divisi=" + encodeURIComponent(data.divisi || "")
-    );
-
-    const result = await res.json();
-
-    if(!result.success){
-      setStatus("off", result.message || "FAILED START DUTY");
-      return;
-    }
-
-    document.querySelector(".start").disabled = true;
-    document.querySelector(".finish").disabled = false;
-
-    await checkSession(currentUser);
-
-  } catch (err) {
-    console.error(err);
-    setStatus("off","NETWORK ERROR / API FAILED");
-  }
-}
-
-async function finishDuty(){
-  if(!currentUser) return;
-
-  setStatus("loading","FINISHING...");
-
-  try {
-    const res=await fetch(API+"?action=finishDuty&nama="+encodeURIComponent(currentUser));
-    const data=await res.json();
-    
-    clearInterval(timer);
-    timer = null;
-    
-    setStatus("off",data.message);
-
-    document.querySelector(".start").disabled=false;
-    document.querySelector(".finish").disabled=true;
-  } catch(e) {
-    setStatus("on","FAILED TO SIGN OUT");
-  }
-}
-
-function restoreSession(){
-  const saved=localStorage.getItem("ems_name");
-  if(saved && ts && emsData[saved]){
-    ts.setValue(saved);
-    currentUser=saved;
-    checkSession(saved);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", loadEMS);
 </script>
 </body>
 </html>
