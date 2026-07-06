@@ -385,37 +385,57 @@ const lainSection = document.getElementById("lainSection");
 
 const tanggalInvoice = document.getElementById("tanggalInvoice");
 
+const hargaOperasi = document.getElementById("hargaOperasi");
+const qtyOperasi = document.getElementById("qtyOperasi");
+const hargaSurat = document.getElementById("hargaSurat");
+const qtySurat = document.getElementById("qtySurat");
+const hargaLain = document.getElementById("hargaLain");
+const qtyLain = document.getElementById("qtyLain");
+const qty = document.getElementById("qty");
+const jenisOperasi = document.getElementById("jenisOperasi");
+const jenisSurat = document.getElementById("jenisSurat");
+const deskripsiLain = document.getElementById("deskripsiLain");
+
 invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 
-function loadPriceList(){
+async function loadPriceList(){
   const cached = localStorage.getItem(CACHE_KEY_PRICE);
 
   if(cached){
     try {
       const parsed = JSON.parse(cached);
-
-      if(parsed && isCacheValid(parsed.time) && parsed.data?.length){
+      if(parsed && parsed.data?.length){
         injectPrice(parsed.data);
-        return;
+        if(isCacheValid(parsed.time)){
+          refreshPriceFromServer();
+          return;
+        }
       }
     } catch(e){
       localStorage.removeItem(CACHE_KEY_PRICE);
     }
   }
+  await refreshPriceFromServer();
+}
 
-  fetch(SCRIPT_URL + "?action=getPriceList")
-    .then(res => res.json())
-    .then(data => {
-      const safe = data || [];
-      localStorage.setItem(CACHE_KEY_PRICE, JSON.stringify({
-        data: safe,
-        time: Date.now()
-      }));
-      injectPrice(safe);
-    });
+async function refreshPriceFromServer(){
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getPriceList");
+    const data = await res.json();
+    const safe = data || [];
+    
+    localStorage.setItem(CACHE_KEY_PRICE, JSON.stringify({
+      data: safe,
+      time: Date.now()
+    }));
+    injectPrice(safe);
+  } catch(e) {
+    console.error("Gagal refresh price list dari server:", e);
+  }
 }
 
 function injectPrice(data){
+    const currentSelection = invoiceType.value;
     invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 
     data.forEach(item => {
@@ -427,6 +447,7 @@ function injectPrice(data){
     });
 
     injectSpecialOptions();
+    if(currentSelection) invoiceType.value = currentSelection;
 }
 
 function injectSpecialOptions() {
@@ -446,7 +467,6 @@ function injectSpecialOptions() {
 
 (function(){
     const now = getWIBDate();
-
     const start = new Date(now);
     start.setHours(0,0,0,0);
 
@@ -468,38 +488,45 @@ function injectSpecialOptions() {
     tanggalInvoice.max = formatDate(end);
 })();
 
-function loadEMS(){
+async function loadEMS(){
   const cached = localStorage.getItem(CACHE_KEY_EMS);
 
   if(cached){
     try {
       const parsed = JSON.parse(cached);
-
-      if(parsed && isCacheValid(parsed.time)){
+      if(parsed && parsed.data?.length){
         buildEMS(parsed.data);
-        return;
+        if(isCacheValid(parsed.time)){
+          refreshEMSFromServer();
+          return;
+        }
       }
     } catch(e){
       localStorage.removeItem(CACHE_KEY_EMS);
     }
   }
+  await refreshEMSFromServer();
+}
 
-  fetch(SCRIPT_URL + "?action=getEMS")
-    .then(res => res.json())
-    .then(data => {
-      const safe = data || [];
-      localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-        data: safe,
-        time: Date.now()
-      }));
-      buildEMS(safe);
-    })
-    .catch(err => {
-      console.error("EMS error:", err);
-    });
+async function refreshEMSFromServer(){
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getEMS");
+    const data = await res.json();
+    const safe = data || [];
+    
+    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
+      data: safe,
+      time: Date.now()
+    }));
+    buildEMS(safe);
+  } catch(e) {
+    console.error("Gagal refresh EMS dari server:", e);
+  }
 }
 
 function buildEMS(data){
+  const savedSelection = window.tomSelectNama ? window.tomSelectNama.getValue() : localStorage.getItem("ems_name");
+
   if(window.tomSelectNama){
     window.tomSelectNama.destroy();
     window.tomSelectNama = null;
@@ -533,16 +560,10 @@ function buildEMS(data){
         divisi.value = emsData[v]?.divisi || "";
     });
 
-    const saved = localStorage.getItem("ems_name");
-    if (saved && emsData[saved]) {
-        tomSelectNama.setValue(saved);
+    if (savedSelection && emsData[savedSelection]) {
+        tomSelectNama.setValue(savedSelection);
     }
 }
-
-nama.addEventListener("change", () => {
-    jabatan.value = emsData[nama.value]?.jabatan || "";
-    divisi.value = emsData[nama.value]?.divisi || "";
-});
 
 document.getElementById("bukti").addEventListener("keydown", function(e){
     if(e.key === "Enter") e.preventDefault();
@@ -619,7 +640,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     const payload = {
         nama: nama.value,
         jabatan: jabatan.value,
-	    divisi: divisi.value,
+        divisi: divisi.value,
         tanggalInvoice: document.getElementById("tanggalInvoice").value,
         jenisInvoice: invoiceType.options[invoiceType.selectedIndex].text,
         jenisOperasi: document.getElementById("jenisOperasi")?.value || "",
@@ -636,13 +657,14 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     status.innerHTML = "⏳ Mengirim...";
     try{
         const yakin = confirm(`Nama: ${nama.value}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
-        if(!yakin) return;
+        if(!yakin) { status.innerHTML = ""; return; }
+        
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
         status.innerHTML = "✅ Invoice berhasil disimpan";
 
-		setTimeout(() => {
-		status.textContent = "";
-		}, 3000);
+        setTimeout(() => {
+            status.textContent = "";
+        }, 3000);
 		
         const namaTerpilih = nama.value;
 
@@ -669,9 +691,11 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
         document.getElementById("total").innerText = "$KK 0";
 
-        tomSelectNama.setValue(namaTerpilih);
+        if(window.tomSelectNama) {
+            window.tomSelectNama.setValue(namaTerpilih);
+        }
         jabatan.value = emsData[namaTerpilih]?.jabatan || "";
-		divisi.value = emsData[namaTerpilih]?.divisi || "";
+        divisi.value = emsData[namaTerpilih]?.divisi || "";
 		
     } catch(err){
         console.error(err);
@@ -679,8 +703,10 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     }
 });
 
-loadEMS();
-loadPriceList();
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadEMS();
+    await loadPriceList();
+});
 </script>
 </body>
 </html>
