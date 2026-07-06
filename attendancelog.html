@@ -430,7 +430,6 @@ function buildEMS(data){
   if(saved){
     setTimeout(()=>{
       ts.setValue(saved);
-      render(saved);
     },100);
   }
 }
@@ -534,24 +533,24 @@ function getWeekRange(){
 }
 
 function render(selectedName){	
-	const name = (selectedName || ts?.getValue() || "").toString().trim();
+    const name = (selectedName || ts?.getValue() || "").toString().trim();
 	
     if(!name){
-    document.getElementById("tbody").innerHTML =
-    `<tr><td colspan="4" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
-    return;
-	}
+        document.getElementById("tbody").innerHTML =
+        `<tr><td colspan="4" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
+        return;
+    }
 	
-	const normalize = (s) =>
-	  (s || "")
-		.toLowerCase()
-		.replace(/[^a-z0-9 ]/g,'')
-		.replace(/\s+/g,' ')
-		.trim();
+    const normalize = (s) =>
+      (s || "")
+        .toLowerCase()
+        .replace(/[^a-z0-9 ]/g,'')
+        .replace(/\s+/g,' ')
+        .trim();
 	
-	const filtered = allData.filter(i =>
-	  normalize(i["Nama"]) === normalize(name)
-	);
+    const filtered = allData.filter(i =>
+      normalize(i["Nama"]) === normalize(name)
+    );
 	
     const {start,end} = getWeekRange();
 
@@ -566,52 +565,48 @@ function render(selectedName){
     });
 
     const hours = Math.floor(total / 3600);
-	const minutes = Math.floor((total % 3600) / 60);
+    const minutes = Math.floor((total % 3600) / 60);
 
-	document.getElementById("weekHours").innerText =
-	`${hours}h ${minutes}m`;
+    document.getElementById("weekHours").innerText = `${hours}h ${minutes}m`;
 		
-	const now = new Date();
-	const month = filtered.filter(i=>{
-		const t = safeDate(i["Start"]);
-		return t.getMonth() === now.getMonth() &&
-			   t.getFullYear() === now.getFullYear();
-	});
+    const now = new Date();
+    const month = filtered.filter(i=>{
+        const t = safeDate(i["Start"]);
+        return t.getMonth() === now.getMonth() &&
+               t.getFullYear() === now.getFullYear();
+    });
 	
-	let monthTotal = 0;
-	month.forEach(i=>{
-		monthTotal += parseDuration(i["Durasi"]);
-	});
+    let monthTotal = 0;
+    month.forEach(i=>{
+        monthTotal += parseDuration(i["Durasi"]);
+    });
 
-	const mHours = Math.floor(monthTotal / 3600);
-	const mMinutes = Math.floor((monthTotal % 3600) / 60);
+    const mHours = Math.floor(monthTotal / 3600);
+    const mMinutes = Math.floor((monthTotal % 3600) / 60);
 
-	document.getElementById("monthHours").innerText =
-	`${mHours}h ${mMinutes}m`;
+    document.getElementById("monthHours").innerText = `${mHours}h ${mMinutes}m`;
 	
-	const lastDuty = filtered.length
-		? [...filtered]
-			.filter(i => i["Finish"])
-			.sort((a,b)=>
-				safeDate(b["Finish"]) - safeDate(a["Finish"])
-        )[0]
-    : null;
+    const lastDuty = filtered.length
+        ? [...filtered]
+            .filter(i => i["Finish"])
+            .sort((a,b)=> safeDate(b["Finish"]) - safeDate(a["Finish"]))[0]
+        : null;
 	
-	document.getElementById("topDuty").innerText =
-	lastDuty && lastDuty["Finish"]
-		? lastDuty["Finish"].replace("T", " ")
-		: "-";
+    document.getElementById("topDuty").innerText =
+    lastDuty && lastDuty["Finish"]
+        ? lastDuty["Finish"].replace("T", " ")
+        : "-";
 	
     document.getElementById("tbody").innerHTML =
-	week.length ? week.map(i=>`	
-	    <tr>
+    week.length ? week.map(i=>`	
+        <tr>
             <td>${i["Nama"]}</td>
             <td>${i["Start"]}</td>
             <td>${i["Finish"]}</td>
             <td>${i["Durasi"]}</td>
         </tr>
-	`).join("") : `
-	<tr><td colspan="4" class="empty">Tidak ada data minggu ini</td></tr>`;
+    `).join("") : `
+    <tr><td colspan="4" class="empty">Tidak ada data minggu ini</td></tr>`;
 }
 
 document.addEventListener("DOMContentLoaded", async ()=>{
