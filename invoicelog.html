@@ -358,6 +358,7 @@ const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-D
 
 let allInvoices = [];
 let tomSelectInstance = null;
+const CACHE_KEY_EMS = "ems_cache_v1";
 const CACHE_KEY_INV = "invoice_cache_v1";
 const CACHE_TTL = 1000 * 60 * 8;
 
@@ -366,14 +367,61 @@ function isCacheValid(time){
 }
 
 async function loadEMS(){
-    const res = await fetch(SCRIPT_URL+"?action=getEMS");
-    const data = await res.json();
-    const select = document.getElementById("searchEMS");
+  const cached = localStorage.getItem(CACHE_KEY_EMS);
 
-    data.forEach(item=>{
+  if(cached){
+    let parsed = null;
+    try {
+      parsed = JSON.parse(cached);
+    } catch(e){
+      console.warn("Cache EMS rusak, dihapus");
+      localStorage.removeItem(CACHE_KEY_EMS);
+    }
+
+    if(parsed && isCacheValid(parsed.time)){
+      buildEMS(parsed.data || []);
+      return;
+    }
+  }
+
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getEMS");
+    const data = await res.json();
+    const safeData = data || [];
+
+    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
+      data: safeData,
+      time: Date.now()
+    }));
+
+    buildEMS(safeData);
+  } catch(e){
+    console.error("Gagal fetch EMS:", e);
+    const fallback = localStorage.getItem(CACHE_KEY_EMS);
+    if(fallback){
+      try {
+        const parsed = JSON.parse(fallback);
+        buildEMS(parsed.data || []);
+      } catch(err){
+        buildEMS([]);
+      }
+    } else {
+      buildEMS([]);
+    }
+  }
+}
+
+function buildEMS(data){
+    const select = document.getElementById("searchEMS");
+    select.innerHTML = "";
+
+    data
+      .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
+      .sort((a,b)=>a.nama.localeCompare(b.nama))
+      .forEach(item=>{
         const opt = document.createElement("option");
-        opt.value = item.nama;
-        opt.textContent = item.nama;
+        opt.value = item.nama.trim();
+        opt.textContent = item.nama.trim();
         select.appendChild(opt);
     });
 
@@ -381,22 +429,19 @@ async function loadEMS(){
         create:false,
         sortField:{field:"text",direction:"asc"},
         placeholder:"Cari nama EMS...",
-		dropdownParent: "body",
+        dropdownParent: "body",
         onChange: function(value){
           localStorage.setItem("ems_name", value);
-          requestAnimationFrame(() => renderTable());
+          renderTable();
         }
     });
 
     const saved = localStorage.getItem("ems_name");
-
     if (saved) {
       setTimeout(() => {
         tomSelectInstance.setValue(saved);
-        requestAnimationFrame(() => renderTable());
       }, 100);
     }
-    loadData();
 }
 
 async function loadData(){
@@ -463,13 +508,17 @@ function getWeekRange(date){
 }
 
 function safeDate(val){
-  return new Date(String(val || "").split(" ")[0]);
+  if(!val) return new Date(0);
+  const str = String(val).split("T")[0].split(" ")[0];
+  const parts = str.split("-");
+  if(parts.length === 3){
+    return new Date(parts[0], parts[1] - 1, parts[2]);
+  }
+  return new Date(val);
 }
 
 function renderTable(){
-    if(!allInvoices || allInvoices.length === 0) return;
-	
-	const name = (tomSelectInstance?.getValue() || "").toLowerCase().trim();
+    const name = (tomSelectInstance?.getValue() || "").toLowerCase().trim();
 
     if(!name){
         document.getElementById("tbody").innerHTML =
@@ -478,18 +527,21 @@ function renderTable(){
     }
 
     const filtered = allInvoices.filter(i =>
-	 (i["Nama"] || "").toLowerCase().trim() === name
-	);
-	
+     (i["Nama"] || "").toLowerCase().trim() === name
+    );
+    
     if(filtered.length===0){
+        document.getElementById("jumlahInvoice").innerText = "0";
+        document.getElementById("totalGaji").innerText = "$KK 0";
+        document.getElementById("uploadTerakhir").innerText = "-";
         document.getElementById("tbody").innerHTML =
         `<tr><td colspan="5" class="empty">Belum ada invoice</td></tr>`;
         return;
     }
-	
-	const today = new Date();
-	const { start, end } = getWeekRange(today);
-	
+    
+    const today = new Date();
+    const { start, end } = getWeekRange(today);
+    
     const weekInvoices = filtered.filter(i => {
         const t = safeDate(i["Tanggal Invoice"]);
         return t >= start && t <= end;
@@ -501,31 +553,40 @@ function renderTable(){
     "$KK " + weekInvoices
         .reduce((a,b)=>a+(Number(b["Total"])||0),0)
         .toLocaleString("id-ID");
-	
-	const last = filtered
-	 .filter(i => i["Tanggal Invoice"])
-	 .sort((a, b) =>
-	  safeDate(b["Tanggal Invoice"]) - safeDate(a["Tanggal Invoice"])
-	 )[0];
-	
-	document.getElementById("uploadTerakhir").innerText =
-	last
-	? last["Tanggal Invoice"] + " - " + last["Jenis Invoice"]
-	: "-";
-	
-	document.getElementById("tbody").innerHTML = weekInvoices.map(i=>`
+    
+    const last = filtered
+     .filter(i => i["Tanggal Invoice"])
+     .sort((a, b) => safeDate(b["Tanggal Invoice"]) - safeDate(a["Tanggal Invoice"]))[0];
+    
+    if(last && last["Tanggal Invoice"]){
+        const dateObj = safeDate(last["Tanggal Invoice"]);
+        const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : last["Tanggal Invoice"];
+        document.getElementById("uploadTerakhir").innerText = formattedDate + " - " + (last["Jenis Invoice"] || "");
+    } else {
+        document.getElementById("uploadTerakhir").innerText = "-";
+    }
+    
+    document.getElementById("tbody").innerHTML = weekInvoices.length ? weekInvoices.map(i=>{
+        const dateObj = safeDate(i["Tanggal Invoice"]);
+        const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : i["Tanggal Invoice"];
+        return `
         <tr>
-			<td>${safeDate(i["Tanggal Invoice"]).toLocaleDateString("id-ID")}</td>
-			<td>${i["Jenis Invoice"]}</td>
-            <td>${i["Qty"]}</td>
-            <td>$KK ${Number(i["Total"]).toLocaleString("id-ID")}</td>
-            <td><a href="${i["Bukti"]}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
+            <td>${formattedDate}</td>
+            <td>${i["Jenis Invoice"] || ""}</td>
+            <td>${i["Qty"] || 0}</td>
+            <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
+            <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
         </tr>
-    `).join("");
+        `;
+    }).join("") : `<tr><td colspan="5" class="empty">Tidak ada invoice minggu ini</td></tr>`;
     
     lucide.createIcons();
 }
-document.addEventListener("DOMContentLoaded",loadEMS);
+
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadEMS();
+    await loadData();
+});
 </script>
 </body>
 </html>
