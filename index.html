@@ -44,7 +44,7 @@ body.bg-darken {
 @media (max-width: 768px) and (orientation: portrait) {
   body {
     background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-                url('imagerpotrait.png') no-repeat center center fixed;
+                url('imageportrait.png') no-repeat center center fixed;
     background-size: cover;
   }
   
@@ -320,9 +320,12 @@ h1 span.gradient {
 .fab-tutorial:hover::after { opacity: 1; transform: translateX(0); }
 
 .container.show-menu .landing-wrapper {
-  opacity: 0;
+opacity: 0;
   transform: translateY(-50px);
-  display: none;
+  pointer-events: none; 
+  max-height: 0;
+  margin: 0;
+  overflow: hidden;
 }
 
 .container.show-menu h1 {
