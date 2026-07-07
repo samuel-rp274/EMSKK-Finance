@@ -602,7 +602,7 @@ async function renderTable(){
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
         <td>
-          <input type="checkbox" onchange="markPaid('${x.nama}','${x.week}', this.checked)" ${x.paid === "PAID" ? "checked" : ""}>
+          <input type="checkbox" onchange="markPaid('${x.nama}','${x.week}', this.checked, this)" ${x.paid === "PAID" ? "checked" : ""}>
         </td>
       </tr>
     `;
@@ -620,7 +620,9 @@ window.addEventListener("load", () => {
   }
 });
 
-function markPaid(nama, week, checked){
+function markPaid(nama, week, checked, element){
+  if(element) element.disabled = true; 
+
   fetch(SCRIPT_URL + "?action=updatePaidStatus&nama=" + encodeURIComponent(nama) + "&week=" + encodeURIComponent(week) + "&status=" + (checked ? "PAID" : "UNPAID"))
   .then(() => {
     const cached = localStorage.getItem(CACHE_KEY_SALARY);
@@ -628,13 +630,22 @@ function markPaid(nama, week, checked){
       let parsed = null;
       try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_SALARY); }
       if(parsed?.data){
-        parsed.data = parsed.data.map(i => (i.nama === nama && i.week === week) ? { ...i, paid: checked ? "PAID" : "UNPAID" } : i);
+        parsed.data = parsed.data.map(i => 
+          (i.nama.toLowerCase().trim() === nama.toLowerCase().trim() && i.week === week) 
+            ? { ...i, paid: checked ? "PAID" : "UNPAID" } 
+            : i
+        );
       }
       parsed.time = Date.now();
       localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify(parsed));
       allSalaryData = parsed.data;
     }
     requestAnimationFrame(renderTable);
+  })
+  .catch((err) => {
+    console.error("Gagal memperbarui status:", err);
+    alert("Koneksi bermasalah. Gagal mengubah status pembayaran.");
+    if(element) element.disabled = false; 
   });
 }
 </script>
