@@ -8,7 +8,7 @@
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
@@ -275,6 +275,14 @@ tr:nth-child(1) .rank { color: #f59e0b; font-size: 16px; }
 tr:nth-child(2) .rank { color: #cbd5e1; }
 tr:nth-child(3) .rank { color: #b45309; }
 
+.spinning svg {
+  animation: spin 1s linear infinite !important;
+}
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 .footer-divider {
   display: flex;
   align-items: center;
@@ -329,7 +337,8 @@ tr:nth-child(3) .rank { color: #b45309; }
 
     <select id="periodSelect" onchange="render()"></select>
 
-    <button onclick="loadData()"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Refresh</button>
+    <!-- id dipasang ke tombol utama agar aman dari pembaruan lucide icon -->
+    <button id="refreshBtn" onclick="loadData(true)"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Refresh</button>
     <button onclick="exportTXT()"><i data-lucide="download" style="width:14px; height:14px;"></i> Export TXT</button>
   </div>
 
@@ -418,30 +427,46 @@ function formatHours(h){
   return `${Math.floor(m/60)}h ${m%60}m`;
 }
 
-async function loadData(){
-  const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
-  allData = await res.json() || [];
+async function loadData(isClick = false){
+  const refreshBtn = document.getElementById("refreshBtn");
+  
+  if(refreshBtn && isClick) {
+    refreshBtn.classList.add("spinning");
+  }
 
-  const res2 = await fetch(SCRIPT_URL + "?action=getEMSList");
-  const raw = await res2.json() || [];
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
+    allData = await res.json() || [];
 
-  masterData = raw
-    .map(x => {
-      if (!x) return "";
-      if (typeof x === "string") return x;
-      if (x.nama) return x.nama;
-      return "";
-    })
-    .map(n => String(n).trim())
-    .filter(n =>
-      n &&
-      n !== "undefined" &&
-      n !== "-" &&
-      !/^\d+(\.\d+)?$/.test(n)
-    );
+    const res2 = await fetch(SCRIPT_URL + "?action=getEMSList");
+    const raw = await res2.json() || [];
 
-  buildPeriods();
-  render();
+    masterData = raw
+      .map(x => {
+        if (!x) return "";
+        if (typeof x === "string") return x;
+        if (x.nama) return x.nama;
+        return "";
+      })
+      .map(n => String(n).trim())
+      .filter(n =>
+        n &&
+        n !== "undefined" &&
+        n !== "-" &&
+        n.toLowerCase() !== "nama" &&
+        !/^\d+(\.\d+)?$/.test(n)
+      );
+
+    buildPeriods();
+    render();
+  } catch (error) {
+    console.error("Gagal memuat data:", error);
+    alert("Gagal memuat data dari server. Periksa koneksi internet Anda.");
+  } finally {
+    if(refreshBtn) {
+      refreshBtn.classList.remove("spinning");
+    }
+  }
 }
 
 function buildPeriods(){
@@ -477,12 +502,20 @@ function buildPeriods(){
   if(periods.length){
     selectedPeriod = periods[0];
     sel.value = selectedPeriod;
+  } else {
+    selectedPeriod = "";
   }
 }
 
 function render(){
-  selectedPeriod = document.getElementById("periodSelect").value;
-
+  const selElement = document.getElementById("periodSelect");
+  if (!selElement || !selElement.value) {
+    document.getElementById("tableBody").innerHTML = `<tr><td colspan="3">Tidak ada data untuk ditampilkan</td></tr>`;
+    document.getElementById("neverDutyTable").innerHTML = `<tr><td colspan="2">Tidak ada data</td></tr>`;
+    return;
+  }
+  
+  selectedPeriod = selElement.value;
   const map = {};
 
   allData.forEach(r => {
@@ -506,7 +539,7 @@ function render(){
     const h = getDurationHours(r.Start, r.Finish);
     const n = String(r.Nama || "").trim();
 
-    if (!n) return;
+    if (!n || n.toLowerCase() === "nama" || n === "-") return;
 
     if (!map[n]) map[n] = 0;
     map[n] += h;
@@ -516,46 +549,59 @@ function render(){
   lastSorted = sorted;
 
   const tb = document.getElementById("tableBody");
-  tb.innerHTML = "";
+  let tableHtml = "";
 
-  sorted.forEach((x, i) => {
-    let trophy = i + 1;
-    if(i === 0) trophy = "🥇";
-    if(i === 1) trophy = "🥈";
-    if(i === 2) trophy = "🥉";
+  if(sorted.length === 0) {
+    tableHtml = `<tr><td colspan="3">Tidak ada aktivitas duty pada periode ini</td></tr>`;
+  } else {
+    sorted.forEach((x, i) => {
+      let trophy = i + 1;
+      if(i === 0) trophy = "🥇";
+      if(i === 1) trophy = "🥈";
+      if(i === 2) trophy = "🥉";
 
-    tb.innerHTML += `
-      <tr>
-        <td class="rank">${trophy}</td>
-        <td>${x[0]}</td>
-        <td>${formatHours(x[1])}</td>
-      </tr>
-    `;
-  });
+      tableHtml += `
+        <tr>
+          <td class="rank">${trophy}</td>
+          <td>${x[0]}</td>
+          <td>${formatHours(x[1])}</td>
+        </tr>
+      `;
+    });
+  }
+  tb.innerHTML = tableHtml;
 
   const dutySet = new Set(
     sorted.map(x => x[0].trim().toLowerCase())
   );
 
   const never = masterData
-    .filter(n => n && n.trim())
-    .filter(n => !/^\d+(\.\d+)?$/.test(n))
-    .filter(n => n.toLowerCase() !== "nama")
-    .filter(n => !dutySet.has(n.trim().toLowerCase()));
+    .filter(n => !dutySet.has(n.toLowerCase()));
 
   const tb2 = document.getElementById("neverDutyTable");
-  tb2.innerHTML = "";
-
+  let neverHtml = "";
   lastNever = never;
 
-  never.forEach((u, i) => {
-    tb2.innerHTML += `
-      <tr>
-        <td>${i + 1}</td>
-        <td>${u}</td>
-      </tr>
-    `;
-  });
+  if(never.length === 0) {
+    neverHtml = `<tr><td colspan="2">Semua anggota sudah pernah melakukan duty!</td></tr>`;
+  } else {
+    never.forEach((u, i) => {
+      neverHtml += `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${u}</td>
+        </tr>
+      `;
+    });
+  }
+  tb2.innerHTML = neverHtml;
+
+  if (window.lucide) {
+    lucide.createIcons({
+      attrs: { class: 'lucide-icon' },
+      nameAttr: 'data-lucide'
+    });
+  }
 }
 
 function setMode(m){
@@ -567,22 +613,32 @@ function setMode(m){
 }
 
 function exportTXT(){
-  let text = "";
+  if (!selectedPeriod) {
+    alert("Tidak ada data periode yang bisa diekspor.");
+    return;
+  }
 
+  let text = "";
   text += "EMSKK DUTY RANKING\n";
   text += "Period: " + selectedPeriod + "\n\n";
-
   text += "=== RANKING ===\n";
 
-  lastSorted.forEach((x, i) => {
-    text += `${i+1}. ${x[0]} - ${formatHours(x[1])}\n`;
-  });
+  if (lastSorted.length === 0) {
+    text += "(Tidak ada data)\n";
+  } else {
+    lastSorted.forEach((x, i) => {
+      text += `${i+1}. ${x[0]} - ${formatHours(x[1])}\n`;
+    });
+  }
 
   text += "\n=== BELUM PERNAH DUTY ===\n";
-
-  lastNever.forEach((n, i) => {
-    text += `${i+1}. ${n}\n`;
-  });
+  if (lastNever.length === 0) {
+    text += "(Semua anggota sudah pernah duty)\n";
+  } else {
+    lastNever.forEach((n, i) => {
+      text += `${i+1}. ${n}\n`;
+    });
+  }
 
   const blob = new Blob([text], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
