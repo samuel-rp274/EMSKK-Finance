@@ -315,6 +315,16 @@ button:disabled {
   background: rgba(245, 158, 11, 0.06) !important; 
   border-color: rgba(245, 158, 11, 0.2) !important; 
 }
+
+.loading {
+  animation: pulse 1.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
+}
 </style>
 </head>
 
@@ -377,6 +387,11 @@ const CACHE_TTL = 1000 * 60 * 8;
 function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
 }
+
+const preventClose = (e) => { 
+  e.preventDefault(); 
+  e.returnValue = 'Proses sedang berjalan, jangan tutup halaman ini!'; 
+};
 
 setInterval(()=>{
   const now = new Date(
@@ -554,10 +569,25 @@ function startTimer(start){
 async function startDuty(){
   if(!currentUser) return;
 
+  const startBtn = document.querySelector(".start");
+  const finishBtn = document.querySelector(".finish");
+
+  startBtn.disabled = true;
+  finishBtn.disabled = true;
+  const originalText = startBtn.innerText;
+  startBtn.innerText = "PROCESSING...";
+
+  window.addEventListener('beforeunload', preventClose);
   setStatus("loading","STARTING...");
 
   const data = emsData[currentUser];
-  if(!data) return;
+  if(!data) {
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+    startBtn.innerText = originalText;
+    window.removeEventListener('beforeunload', preventClose);
+    return;
+  }
 
   try {
     const res = await fetch(
@@ -572,38 +602,65 @@ async function startDuty(){
 
     if(!result.success){
       setStatus("off", result.message || "FAILED START DUTY");
+      startBtn.disabled = false;
+      finishBtn.disabled = true;
       return;
     }
-
-    document.querySelector(".start").disabled = true;
-    document.querySelector(".finish").disabled = false;
 
     await checkSession(currentUser);
 
   } catch (err) {
     console.error(err);
     setStatus("off","NETWORK ERROR / API FAILED");
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+  } finally {
+
+    startBtn.innerText = originalText;
+    window.removeEventListener('beforeunload', preventClose);
   }
 }
 
 async function finishDuty(){
   if(!currentUser) return;
 
-  setStatus("loading","FINISHING...");
+  const startBtn = document.querySelector(".start");
+  const finishBtn = document.querySelector(".finish");
 
-  try {
-    const res=await fetch(API+"?action=finishDuty&nama="+encodeURIComponent(currentUser));
-    const data=await res.json();
-    
+  startBtn.disabled = true;
+  finishBtn.disabled = true;
+  const originalText = finishBtn.innerText;
+  finishBtn.innerText = "PROCESSING...";
+
+  if (timer) {
     clearInterval(timer);
     timer = null;
-    
-    setStatus("off",data.message);
+  }
 
-    document.querySelector(".start").disabled=false;
-    document.querySelector(".finish").disabled=true;
+  const preventClose = (e) => { e.preventDefault(); e.returnValue = ''; };
+  window.addEventListener('beforeunload', preventClose);
+
+  setStatus("loading", "FINISHING...");
+
+  try {
+    const res = await fetch(API + "?action=finishDuty&nama=" + encodeURIComponent(currentUser));
+    const data = await res.json();
+    
+    setStatus("off", data.message || "DUTY FINISHED");
+
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+
   } catch(e) {
-    setStatus("on","FAILED TO SIGN OUT");
+    console.error(e);
+
+    setStatus("off", "OFF DUTY");
+    startBtn.disabled = false;
+    finishBtn.disabled = true;
+  } finally {
+
+    finishBtn.innerText = originalText;
+    window.removeEventListener('beforeunload', preventClose);
   }
 }
 
