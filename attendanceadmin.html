@@ -873,18 +873,12 @@ function saveEdit(){
 }
 
 function updateStatusLocal(rowIndex, status){
-  const button = document.querySelector(`button[onclick*="'${rowIndex}'"]`);
-  if(!button) return;
-
-  const sessionBox = button.closest(".session-item");
-  if(!sessionBox) return;
-
-  const badge = sessionBox.querySelector(".status-badge");
+  const row = document.querySelector(`[data-row='${rowIndex}']`); if(!row) return;
+  const badge = row.querySelector(".status-badge");
   if(badge){
     badge.innerText = status;
     badge.style.background = status === "VALID" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)";
     badge.style.color = status === "VALID" ? "#10b981" : "#f59e0b";
-    badge.style.borderColor = status === "VALID" ? "rgba(16, 185, 129, 0.3)" : "rgba(245, 158, 11, 0.3)";
   }
 }
 
@@ -904,6 +898,9 @@ window.addEventListener("load", () => {
     loadRates().then(() => { loadAttendanceData(); });
   }
 });
+
 </script>
+
 </body>
+
 </html>
