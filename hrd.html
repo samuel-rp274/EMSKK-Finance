@@ -8,7 +8,7 @@
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
@@ -194,9 +194,16 @@ button {
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
 }
 
-button:hover {
+button:hover:not(:disabled) {
   transform: translateY(-1px);
   background: #059669;
+}
+
+button:disabled {
+  background: #334155;
+  color: #64748b;
+  cursor: not-allowed;
+  box-shadow: none;
 }
 
 .info {
@@ -323,10 +330,13 @@ tr:nth-child(3) .rank { color: #b45309; }
   <div class="topbar">
     <input type="date" id="startDate">
     <input type="date" id="endDate">
-    <button onclick="generate()"><i data-lucide="activity" style="width:14px; height:14px;"></i> Generate</button>
+    <button id="btnGenerate" onclick="generate()" disabled>
+      <i data-lucide="refresh-cw" class="animate-spin" id="btnIcon" style="width:14px; height:14px;"></i> 
+      <span id="btnText">Isi tanggal terlebih dahulu</span>
+    </button>
   </div>
 
-  <div class="info" id="infoText">Silakan masukkan rentang tanggal di atas.</div>
+  <div class="info" id="infoText">Mengambil data dari server, mohon tunggu...</div>
 
   <div class="table-wrap">
     <table>
@@ -368,21 +378,39 @@ function parseDate(str){
 }
 
 function getDurationHours(s,f){
-  const a=parseDate(s);
-  const b=parseDate(f);
-  if(!a||!b) return 0;
-  return (b-a)/(1000*60*60);
+  const a = parseDate(s);
+  const b = parseDate(f);
+  if(!a || !b || isNaN(a) || isNaN(b)) return 0;
+  return (b - a) / (1000 * 60 * 60);
 }
 
 async function loadData(){
-  const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
-  allData = await res.json() || [];
+  const btn = document.getElementById("btnGenerate");
+  const btnText = document.getElementById("btnText");
+  const infoText = document.getElementById("infoText");
+  
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
+    allData = await res.json() || [];
+
+    btn.disabled = false;
+    btnText.innerText = "Generate";
+    infoText.innerText = "Silakan masukkan rentang tanggal di atas.";
+
+    const iconContainer = document.getElementById("btnIcon");
+    iconContainer.setAttribute("data-lucide", "activity");
+    lucide.createIcons();
+    
+  } catch (error) {
+    console.error("Gagal memuat data:", error);
+    infoText.innerText = "Gagal memuat data dari server. Silakan refresh halaman.";
+    btnText.innerText = "Error";
+  }
 }
 
 loadData();
 
 function generate(){
-
   const startVal = document.getElementById("startDate").value;
   const endVal = document.getElementById("endDate").value;
 
@@ -401,7 +429,7 @@ function generate(){
 
   const map = {};
 
-  allData.forEach(r=>{
+  allData.forEach(r => {
     if(!r.Start || r.Status !== "VALID") return;
 
     const d = parseDate(r.Start);
@@ -413,12 +441,10 @@ function generate(){
     if(!name) return;
 
     const h = getDurationHours(r.Start, r.Finish);
-
     map[name] = (map[name] || 0) + h;
   });
 
-  const sorted = Object.entries(map).sort((a,b)=>b[1]-a[1]);
-
+  const sorted = Object.entries(map).sort((a,b) => b[1] - a[1]);
   const tb = document.getElementById("tableBody");
   tb.innerHTML = "";
 
@@ -428,17 +454,20 @@ function generate(){
     return;
   }
 
-  sorted.forEach((x,i)=>{
+  sorted.forEach((x, i) => {
     let trophy = i + 1;
     if(i === 0) trophy = "🥇";
     if(i === 1) trophy = "🥈";
     if(i === 2) trophy = "🥉";
 
+    const totalHours = Math.floor(x[1]);
+    const totalMinutes = Math.round((x[1] % 1) * 60);
+
     tb.innerHTML += `
       <tr>
         <td class="rank">${trophy}</td>
         <td>${x[0]}</td>
-        <td>${Math.floor(x[1])}h ${(x[1]*60)%60|0}m</td>
+        <td>${totalHours}h ${totalMinutes}m</td>
       </tr>
     `;
   });
