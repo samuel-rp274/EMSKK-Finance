@@ -9,8 +9,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
-<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 <script src="https://unpkg.com/lucide@latest"></script>
 
 <style>
@@ -702,7 +700,7 @@ async function renderTable(){
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
                 <td><a href="${inv["Bukti"]}" target="_blank" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a></td>
                 <td>
-                  <select onchange="updateStatus(${inv["RowIndex"]}, this.value)">
+                  <select onchange="updateStatus(${inv["RowIndex"]}, this.value, this)">
                     <option value="PENDING" ${inv.Status==="PENDING"?'selected':''}>⏳ PENDING</option>
                     <option value="VALID" ${inv.Status==="VALID"?'selected':''}>🟢 VALID</option>
                     <option value="INVALID" ${inv.Status==="INVALID"?'selected':''}>❌ INVALID</option>
@@ -725,24 +723,51 @@ function toggleDetail(idx){
   if(row) row.classList.toggle("hidden");
 }
 
-function updateStatus(rowIndex, status){
+function updateStatus(rowIndex, status, element){
+  if(element) element.disabled = true;
+
   fetch(`${SCRIPT_URL}?action=updateStatus&rowIndex=${rowIndex}&status=${status}`)
     .then(res => res.json())
     .then(data => {
-      if(!data.success) return;
+      if(!data.success) {
+        alert("Gagal memperbarui status di server.");
+        if(element) element.disabled = false;
+        return;
+      }
+      
       let cached = localStorage.getItem(CACHE_KEY_INV);
       if(!cached) return;
 
-      try { cached = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_INV); return; }
+      try { 
+        cached = JSON.parse(cached); 
+      } catch(e){ 
+        localStorage.removeItem(CACHE_KEY_INV); 
+        return; 
+      }
 
-      cached.data = cached.data.map(i => String(i.RowIndex) === String(rowIndex) ? { ...i, Status: status } : i);
+      cached.data = cached.data.map(i => {
+        if (String(i.RowIndex) === String(rowIndex)) {
+          const divisi = String(i.Divisi || "").trim().toUpperCase();
+          const potonganRate = potonganCache[divisi] || 0;
+          const totalBruto = Number(i.Total || 0);
+          
+          const hitungGajiBersih = status === "VALID" ? (totalBruto - (totalBruto * potonganRate)) : 0;
+          
+          return { ...i, Status: status, GajiBersih: hitungGajiBersih };
+        }
+        return i;
+      });
+
       cached.time = Date.now();
       localStorage.setItem(CACHE_KEY_INV, JSON.stringify(cached));
       allInvoices = cached.data;
 
       requestAnimationFrame(() => { renderTable(); });
     })
-    .catch(err => { alert("Gagal update status"); });
+    .catch(err => { 
+      alert("Gagal update status akibat gangguan jaringan."); 
+      if(element) element.disabled = false;
+    });
 }
 
 window.addEventListener("load", () => {
