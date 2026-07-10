@@ -333,6 +333,7 @@ table a:hover {
     <table>
       <thead>
         <tr>
+          <th>No</th>
           <th>Tanggal</th>
           <th>Invoice</th>
           <th>Qty</th>
@@ -342,7 +343,7 @@ table a:hover {
       </thead>
       <tbody id="tbody">
         <tr>
-          <td colspan="5" class="empty">Pilih EMS terlebih dahulu</td>
+          <td colspan="6" class="empty">Pilih EMS terlebih dahulu</td>
         </tr>
       </tbody>
     </table>
@@ -522,7 +523,7 @@ function renderTable(){
 
     if(!name){
         document.getElementById("tbody").innerHTML =
-        `<tr><td colspan="5" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
+        `<tr><td colspan="6" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
         return;
     }
 
@@ -535,7 +536,7 @@ function renderTable(){
         document.getElementById("totalGaji").innerText = "$KK 0";
         document.getElementById("uploadTerakhir").innerText = "-";
         document.getElementById("tbody").innerHTML =
-        `<tr><td colspan="5" class="empty">Belum ada invoice</td></tr>`;
+        `<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>`;
         return;
     }
     
@@ -565,12 +566,13 @@ function renderTable(){
     } else {
         document.getElementById("uploadTerakhir").innerText = "-";
     }
-    
-    document.getElementById("tbody").innerHTML = weekInvoices.length ? weekInvoices.map(i=>{
+
+    document.getElementById("tbody").innerHTML = weekInvoices.length ? weekInvoices.map((i, idx)=>{
         const dateObj = safeDate(i["Tanggal Invoice"]);
         const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : i["Tanggal Invoice"];
         return `
         <tr>
+            <td>${idx + 1}</td>
             <td>${formattedDate}</td>
             <td>${i["Jenis Invoice"] || ""}</td>
             <td>${i["Qty"] || 0}</td>
@@ -578,7 +580,7 @@ function renderTable(){
             <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
         </tr>
         `;
-    }).join("") : `<tr><td colspan="5" class="empty">Tidak ada invoice minggu ini</td></tr>`;
+    }).join("") : `<tr><td colspan="6" class="empty">Tidak ada invoice minggu ini</td></tr>`;
     
     lucide.createIcons();
 }
