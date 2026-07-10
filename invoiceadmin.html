@@ -689,12 +689,21 @@ async function renderTable(){
         <div class="table-responsive" style="margin-top:0;">
           <table>
             <thead>
-              <tr><th>Tanggal</th><th>Invoice</th><th>Qty</th><th>Total</th><th>Link Bukti</th><th>Status</th></tr>
+              <tr>
+                <th>No</th>
+                <th>Tanggal</th>
+                <th>Invoice</th>
+                <th>Qty</th>
+                <th>Total</th>
+                <th>Link Bukti</th>
+                <th>Status</th>
+              </tr>
             </thead>
             <tbody>
-              ${v.invoices.map((inv,i)=>`
+              ${v.invoices.map((inv, i)=>`
               <tr>
-                <td style="font-family:monospace;">${inv["Tanggal Invoice"]}</td>
+                <td style="font-weight:600; color:var(--muted);">${i + 1}</td>
+                <td style="font-family:monospace; white-space: nowrap;">${inv["Tanggal Invoice"]}</td>
                 <td>${inv["Jenis Invoice"]}</td>
                 <td>${inv["Qty"]}</td>
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
