@@ -115,7 +115,6 @@ body {
   font-weight: 500;
 }
 
-/* Base Card Style */
 .card {
   background: rgba(15, 23, 42, 0.4);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -261,67 +260,7 @@ body {
     <p>Panduan penggunaan Attendance & Invoice System</p>
   </div>
 
-  <div class="card attendance">
-    <h2><i data-lucide="clock" style="width:20px; height:20px;"></i> 1. Attendance</h2>
-    <ul>
-      <li>Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)</li>
-      <li>Klik <span class="highlight">START DUTY</span> → ON DUTY (cukup 1x klik)</li>
-      <li>Klik <span class="highlight">FINISH DUTY</span> → OFF DUTY (cukup 1x klik)</li>
-      <li>Data durasi duty otomatis tersimpan</li>
-    </ul>
-
-    <div class="note">
-      <div class="note-title"><i data-lucide="lightbulb" style="width:16px; height:16px;"></i> Catatan</div>
-      <ul>
-        <li>Sistem menggunakan zona waktu WIB (UTC+7), durasi kerja dihitung otomatis dari START → FINISH</li>
-        <li>Apabila melamun diharapkan OFF DUTY</li>
-        <li>Setelah ON DUTY, browser boleh ditutup, dan timer akan tetap berjalan</li>
-        <li>Jika terlambat ON DUTY atau lupa OFF DUTY silakan hubungi FINANCE</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card attendance-overview">
-    <h2><i data-lucide="bar-chart-3" style="width:20px; height:20px;"></i> 2. Attendance Overview</h2>
-    <ul>
-      <li>Filter berdasarkan Nama EMS</li>
-      <li>Total jam kerja minggu ini</li>
-      <li>Total jam kerja bulan ini</li>
-      <li>Waktu duty terakhir</li>
-      <li>Detail start & finish</li>
-    </ul>
-  </div>
-
-  <div class="card invoice-input">
-    <h2><i data-lucide="credit-card" style="width:20px; height:20px;"></i> 3. Invoice Input</h2>
-    <ul>
-      <li>Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)</li>
-      <li>Isi invoice</li>
-      <li>Pilih jenis invoice</li>
-      <li>Isi harga & qty (Khusus Operasi, Surat, Lain-lain)</li>
-      <li>Upload link bukti invoice</li>
-      <li>Simpan invoice</li>
-    </ul>
-
-    <div class="note">
-      <div class="note-title"><i data-lucide="lightbulb" style="width:16px; height:16px;"></i> Catatan</div>
-      <ul>
-        <li>Link bukti wajib berupa link dari Discord</li>
-        <li>Format harga tanpa titik (contoh: 200000)</li>
-        <li>Kesalahan input invoice silakan hubungi FINANCE</li>
-      </ul>
-    </div>
-  </div>
-
-  <div class="card invoice-overview">
-    <h2><i data-lucide="trending-up" style="width:20px; height:20px;"></i> 4. Invoice Overview</h2>
-    <ul>
-      <li>Filter berdasarkan Nama EMS</li>
-      <li>Lihat total minggu ini</li>
-      <li>Lihat jumlah invoice</li>
-      <li>Lihat upload terakhir</li>
-    </ul>
-  </div>
+  <div id="tutorial-cards-container"></div>
 
   <div class="footer-divider">
     <div class="footer-line"></div>
@@ -333,7 +272,109 @@ body {
 </div>
 
 <script>
-  lucide.createIcons();
+const tutorialData = [
+  {
+    key: "attendance",
+    icon: "clock",
+    title: "1. Attendance",
+    steps: [
+      "Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)",
+      "Klik <span class='highlight'>START DUTY</span> → ON DUTY (cukup 1x klik)",
+      "Klik <span class='highlight'>FINISH DUTY</span> → OFF DUTY (cukup 1x klik)",
+      "Data durasi duty otomatis tersimpan"
+    ],
+    note: {
+      title: "Catatan",
+      items: [
+        "Sistem menggunakan zona waktu WIB (UTC+7), durasi kerja dihitung otomatis dari START → FINISH",
+        "Apabila melamun diharapkan OFF DUTY",
+        "Setelah ON DUTY, browser boleh ditutup, dan timer akan tetap berjalan",
+        "Jika terlambat ON DUTY atau lupa OFF DUTY silakan hubungi FINANCE"
+      ]
+    }
+  },
+  {
+    key: "attendance-overview",
+    icon: "bar-chart-3",
+    title: "2. Attendance Overview",
+    steps: [
+      "Filter berdasarkan Nama EMS",
+      "Total jam kerja minggu ini",
+      "Total jam kerja bulan ini",
+      "Waktu duty terakhir",
+      "Detail start & finish"
+    ],
+    note: null
+  },
+  {
+    key: "invoice-input",
+    icon: "credit-card",
+    title: "3. Invoice Input",
+    steps: [
+      "Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)",
+      "Isi invoice",
+      "Pilih jenis invoice",
+      "Isi harga & qty (Khusus Operasi, Surat, Lain-lain)",
+      "Upload link bukti invoice",
+      "Simpan invoice"
+    ],
+    note: {
+      title: "Catatan",
+      items: [
+        "Link bukti wajib berupa link attachment resmi Discord (domain cdn atau media)",
+        "Format harga tanpa titik (contoh: 200000)",
+        "Kesalahan input invoice silakan hubungi FINANCE"
+      ]
+    }
+  },
+  {
+    key: "invoice-overview",
+    icon: "trending-up",
+    title: "4. Invoice Overview",
+    steps: [
+      "Filter berdasarkan Nama EMS",
+      "Lihat total minggu ini",
+      "Lihat jumlah invoice",
+      "Lihat upload terakhir"
+    ],
+    note: null
+  }
+];
+
+function renderTutorialCards() {
+  const container = document.getElementById("tutorial-cards-container");
+  
+  const cardsHtml = tutorialData.map(card => {
+    const stepsHtml = card.steps.map(step => `<li>${step}</li>`).join("");
+    
+    let noteHtml = "";
+    if (card.note) {
+      const noteItemsHtml = card.note.items.map(item => `<li>${item}</li>`).join("");
+      noteHtml = `
+        <div class="note">
+          <div class="note-title"><i data-lucide="lightbulb" style="width:16px; height:16px;"></i> ${card.note.title}</div>
+          <ul>${noteItemsHtml}</ul>
+        </div>
+      `;
+    }
+    
+    return `
+      <div class="card ${card.key}">
+        <h2><i data-lucide="${card.icon}" style="width:20px; height:20px;"></i> ${card.title}</h2>
+        <ul>${stepsHtml}</ul>
+        ${noteHtml}
+      </div>
+    `;
+  }).join("");
+
+  container.innerHTML = cardsHtml;
+  
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+}
+
+document.addEventListener("DOMContentLoaded", renderTutorialCards);
 </script>
 </body>
 </html>
