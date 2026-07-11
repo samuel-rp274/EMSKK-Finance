@@ -472,11 +472,11 @@ async function loadData(){
             data: allInvoices,
             time: Date.now()
         }));
+        requestAnimationFrame(() => renderTable());
     } catch(e){
         console.error("Gagal fetch invoice:", e);
-        allInvoices = [];
+        handleFetchError();
     }
-    requestAnimationFrame(() => renderTable());
 }
 
 async function refreshFromServer(){
@@ -491,7 +491,51 @@ async function refreshFromServer(){
         requestAnimationFrame(() => renderTable());
     } catch(e){
         console.log("sync gagal, pakai cache");
+        handleFetchError();
     }
+}
+
+function handleFetchError() {
+    const fallback = localStorage.getItem(CACHE_KEY_INV);
+    if(fallback) {
+        try {
+            const parsed = JSON.parse(fallback);
+            allInvoices = parsed.data || [];
+            requestAnimationFrame(() => renderTable());
+            
+            showStatusMessage("⚠️ Gagal sinkronisasi dengan server. Menampilkan data cadangan terakhir (Offline).", "#f59e0b");
+            return;
+        } catch(err) {
+        }
+    }
+    
+    allInvoices = [];
+    document.getElementById("tbody").innerHTML = `
+        <tr>
+            <td colspan="6" class="empty" style="color: #ef4444; padding: 40px !important;">
+                <i data-lucide="alert-triangle" style="width: 24px; height: 24px; margin: 0 auto 10px auto; display: block;"></i>
+                Gagal memuat data dari server. Silakan periksa koneksi internet Anda atau hubungi admin.
+            </td>
+        </tr>
+    `;
+    if(window.lucide) lucide.createIcons();
+}
+
+function showStatusMessage(msg, color) {
+    let oldMsg = document.getElementById("error-status-msg");
+    if(oldMsg) oldMsg.remove();
+    
+    const div = document.createElement("div");
+    div.id = "error-status-msg";
+    div.style.color = color;
+    div.style.textAlign = "center";
+    div.style.fontSize = "13px";
+    div.style.fontWeight = "600";
+    div.style.marginTop = "15px";
+    div.innerText = msg;
+    
+    const container = document.querySelector(".card");
+    if(container) container.appendChild(div);
 }
 
 function getWeekRange(date){
