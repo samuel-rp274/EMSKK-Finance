@@ -291,6 +291,8 @@ button:disabled {
   margin-top: 6px !important;
   box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
   overflow: hidden !important;
+  position: absolute !important;
+  z-index: 1000 !important;
 }
 
 .ts-dropdown .option {
@@ -492,7 +494,6 @@ function buildEMSDropdown(emsList){
   ts = new TomSelect("#nama",{
     create:false,
     highlight:true,
-    dropdownParent: "body"
   });
 
   ts.on("change",(v)=>{
