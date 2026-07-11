@@ -464,9 +464,20 @@ async function loadData(){
       data: allData,
       time: Date.now()
     }));
+
   } catch(e){
     console.error("Gagal fetch server:", e);
-    allData = [];
+    const fallback = localStorage.getItem(CACHE_KEY_ATT);
+    if(fallback){
+      try {
+        const parsed = JSON.parse(fallback);
+        allData = parsed.data || [];
+      } catch(err) {
+        allData = [];
+      }
+    } else {
+      allData = [];
+    }
   }
   render();
 }
