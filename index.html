@@ -20,7 +20,7 @@
 
 body {
   background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-              url('imagelandscape.png') no-repeat center center fixed;
+              url('imagelandscape.webp') no-repeat center center fixed;
   background-size: cover;
   color: white;
   min-height: 100vh;
@@ -35,7 +35,7 @@ body {
 
 body.bg-darken {
   background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
-              url('imagelandscape.png') no-repeat center center fixed;
+              url('imagelandscape.webp') no-repeat center center fixed;
   background-size: cover;
   align-items: flex-start;
 }
@@ -43,13 +43,13 @@ body.bg-darken {
 @media (max-width: 768px) and (orientation: portrait) {
   body {
     background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-                url('imageportrait.png') no-repeat center center fixed;
+                url('imageportrait.webp') no-repeat center center fixed;
     background-size: cover;
   }
   
   body.bg-darken {
     background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
-                url('imageportrait.png') no-repeat center center fixed;
+                url('imageportrait.webp') no-repeat center center fixed;
     background-size: cover;
   }
   
@@ -437,7 +437,7 @@ opacity: 0;
 lucide.createIcons();
 
 async function cacheBackgroundImage() {
-  const assetsToCache = ['imagelandscape.png', 'imageportrait.png'];
+  const assetsToCache = ['imagelandscape.webp', 'imageportrait.webp'];
   
   if ('caches' in window) {
     try {
