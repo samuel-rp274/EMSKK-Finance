@@ -465,6 +465,9 @@ async function loadData(){
       time: Date.now()
     }));
 
+    const oldMsg = document.getElementById("attendance-error-msg");
+    if(oldMsg) oldMsg.remove();
+
   } catch(e){
     console.error("Gagal fetch server:", e);
     const fallback = localStorage.getItem(CACHE_KEY_ATT);
@@ -472,11 +475,16 @@ async function loadData(){
       try {
         const parsed = JSON.parse(fallback);
         allData = parsed.data || [];
+        showAttendanceStatusMessage("⚠️ Gagal terhubung ke server. Menampilkan data cadangan terakhir (Offline).", "#f59e0b");
       } catch(err) {
         allData = [];
       }
     } else {
       allData = [];
+    }
+
+    if(allData.length === 0) {
+      showAttendanceTableError();
     }
   }
   render();
@@ -493,12 +501,54 @@ async function refreshFromServer(){
     }));
 
     allData = fresh;
+
+    const oldMsg = document.getElementById("attendance-error-msg");
+    if(oldMsg) oldMsg.remove();
+
     requestAnimationFrame(() => {
         render();
     });
   } catch(e){
     console.log("sync gagal, pakai cache");
+    showAttendanceStatusMessage("⚠️ Gagal sinkronisasi data terbaru. Menampilkan data offline.", "#f59e0b");
   }
+}
+
+function showAttendanceStatusMessage(msg, color) {
+  let oldMsg = document.getElementById("attendance-error-msg");
+  if(oldMsg) oldMsg.remove();
+  
+  const div = document.createElement("div");
+  div.id = "attendance-error-msg";
+  div.style.color = color;
+  div.style.textAlign = "center";
+  div.style.fontSize = "13px";
+  div.style.fontWeight = "600";
+  div.style.marginTop = "15px";
+  div.innerText = msg;
+  
+  const container = document.querySelector(".card");
+  if(container) container.appendChild(div);
+}
+
+function showAttendanceTableError() {
+  const tbody = document.getElementById("tbody");
+  if(tbody) {
+    tbody.innerHTML = `
+      <tr>
+        <td colspan="5" class="empty" style="color: #ef4444; padding: 40px !important; text-align: center;">
+          <i data-lucide="alert-triangle" style="width: 24px; height: 24px; margin: 0 auto 10px auto; display: block;"></i>
+          Gagal memuat data absensi dari server. Silakan periksa koneksi internet Anda atau hubungi admin.
+        </td>
+      </tr>
+    `;
+  }
+  
+  if(document.getElementById("weekHours")) document.getElementById("weekHours").innerText = "-";
+  if(document.getElementById("monthHours")) document.getElementById("monthHours").innerText = "-";
+  if(document.getElementById("topDuty")) document.getElementById("topDuty").innerText = "-";
+  
+  if(window.lucide) lucide.createIcons();
 }
 
 function parseDuration(str){
