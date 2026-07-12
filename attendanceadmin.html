@@ -575,7 +575,7 @@ async function loadAttendanceData(){
     }
   }
 
-  const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
+  const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogMonthly");
   allAttendance = await res.json();
   localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: allAttendance, time: Date.now() }));
   if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
@@ -583,7 +583,7 @@ async function loadAttendanceData(){
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
+    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogMonthly");
     const fresh = await res.json();
     allAttendance = fresh;
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: fresh, time: Date.now() }));
