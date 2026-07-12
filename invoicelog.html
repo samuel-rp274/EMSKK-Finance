@@ -465,7 +465,7 @@ async function loadData(){
     }
 
     try {
-        const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
         const data = await res.json();
         allInvoices = data || [];
         localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
@@ -481,7 +481,7 @@ async function loadData(){
 
 async function refreshFromServer(){
     try{
-        const res = await fetch(SCRIPT_URL+"?action=getInvoices");
+        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
         const fresh = await res.json();
         allInvoices = fresh;
         localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
