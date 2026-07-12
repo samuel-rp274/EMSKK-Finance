@@ -390,7 +390,7 @@ async function loadData(){
   const infoText = document.getElementById("infoText");
   
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
+    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
     allData = await res.json() || [];
 
     btn.disabled = false;
