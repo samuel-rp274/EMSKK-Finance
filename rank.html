@@ -435,7 +435,7 @@ async function loadData(isClick = false){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
+    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
     allData = await res.json() || [];
 
     const res2 = await fetch(SCRIPT_URL + "?action=getEMSList");
