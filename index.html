@@ -360,21 +360,14 @@ opacity: 0;
 .container.show-menu .card:nth-child(4) { animation-delay: 0.5s; }
 </style>
 </head>
-<body>
+<body class="bg-darken">
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
-<div class="container" id="portalContainer">
+<div class="container show-menu" id="portalContainer">
   
   <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
   <div class="subtitle">Finance Dashboard Navigation Hub</div>
-
-  <div class="landing-wrapper" id="landingWrapper">
-    <button class="enter-btn" onclick="activatePortal()">
-      Enter Portal
-      <i data-lucide="arrow-right"></i>
-    </button>
-  </div>
 
   <div class="mainmenu-wrapper">
     <div class="divider">
@@ -465,14 +458,9 @@ async function cacheBackgroundImage() {
 
 window.addEventListener('load', cacheBackgroundImage);
 
-function activatePortal() {
-  document.body.classList.add('bg-darken');
-  
-  const container = document.getElementById('portalContainer');
-  container.classList.add('show-menu');
-  
+window.addEventListener('DOMContentLoaded', () => {
   document.getElementById('fabTutorial').classList.add('show');
-}
+});
 
 function go(page){
   window.location.href = page;
