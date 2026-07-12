@@ -456,7 +456,7 @@ async function loadData(){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLog");
+    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
     const data = await res.json();
     allData = data || [];
 
