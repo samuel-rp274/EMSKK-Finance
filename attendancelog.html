@@ -492,7 +492,7 @@ async function loadData(){
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLog");
+    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogAll");
     const fresh = await res.json();
 
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
