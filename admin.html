@@ -6,6 +6,8 @@
 <title>EMSKK Admin Dashboard</title>
 
 <link rel="icon" href="logo.png" type="image/png">
+<link rel="manifest" href="/manifest.json">
+<meta name="theme-color" content="#030712">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -442,6 +444,12 @@ input[type="checkbox"] {
 </div>
 
 <script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch(console.error);
+  });
+}
+
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 const LOGIN_KEY = "ems_admin_login";
 
