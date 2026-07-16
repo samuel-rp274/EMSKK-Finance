@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Struktur Kepengurusan</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+body {
+  background: #030712;
+  color: #f8fafc;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 100px 20px 60px 20px;
+  position: relative;
+}
+
+.blob { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: 0; pointer-events: none; }
+.blob.top-left { background: #2563eb; top: -150px; left: -150px; }
+.blob.bottom-right { background: #10b981; bottom: -150px; right: -150px; }
+
+.topnav {
+  position: fixed; top:0; left:0; width:100%; padding:16px 24px;
+  display:flex; justify-content:space-between; align-items:center;
+  background: rgba(15,23,42,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 999;
+}
+.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; transition: color 0.2s; }
+.topnav a:hover { color:#38bdf8; }
+.topnav .title { font-size:12px; font-weight:700; color:#64748b; letter-spacing:1.5px; text-transform:uppercase; }
+
+.container { width:100%; max-width: 1180px; margin: 0 auto; z-index:2; position:relative; }
+
+.card-main {
+  background: rgba(15,23,42,0.4); border:1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 36px; width:100%; position:relative; margin-bottom: 28px;
+}
+.card-main::before {
+  content:""; position:absolute; top:10%; left:0; width:3px; height:80%; border-radius:4px;
+  background:#38bdf8; box-shadow: 0 0 15px #38bdf8;
+}
+.card-header-icon {
+  width:56px; height:56px; background: rgba(56,189,248,0.15); color:#38bdf8;
+  border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+  box-shadow: inset 0 0 12px rgba(56,189,248,0.2);
+}
+h2 { font-size:28px; font-weight:700; letter-spacing:0.5px; margin-bottom:6px; }
+h2 span.white { color:#ffffff; }
+h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
+.subtitle { color:#94a3b8; font-size:14px; margin-bottom: 20px; }
+
+.info-text { color:#64748b; font-size:12px; margin-top: 16px; }
+
+.section-block {
+  background: rgba(15,23,42,0.4); border:1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 32px; width:100%; position:relative; margin-bottom: 24px; overflow:hidden;
+}
+.section-block.accent-blue::before { background:#38bdf8; box-shadow:0 0 15px #38bdf8; }
+.section-block.accent-green::before { background:#10b981; box-shadow:0 0 15px #10b981; }
+.section-block::before { content:""; position:absolute; top:8%; left:0; width:3px; height:84%; border-radius:4px; }
+
+.section-title { display:flex; align-items:center; gap:10px; font-size:18px; font-weight:700; margin-bottom: 6px; }
+.section-title i { width:20px; height:20px; }
+.section-sub { color:#64748b; font-size:12px; margin-bottom: 28px; }
+
+.org-tree, .org-tree ul { list-style:none; margin:0; padding:0; display:flex; justify-content:center; }
+.org-tree { flex-wrap: wrap; }
+.org-tree ul { padding-top: 56px; position:relative; }
+.org-tree li { position:relative; padding: 0 14px; display:flex; flex-direction:column; align-items:center; }
+
+.org-tree ul li::before {
+  content:""; position:absolute; top:-56px; left:50%; width:0; height:56px;
+  border-left:1px solid rgba(255,255,255,0.18);
+}
+
+.org-tree ul li::after {
+  content:""; position:absolute; top:-56px; left:0; right:0; height:0;
+  border-top:1px solid rgba(255,255,255,0.18);
+}
+.org-tree ul li:first-child::after { left:50%; }
+.org-tree ul li:last-child::after { right:50%; }
+.org-tree ul li:only-child::after { display:none; }
+
+.node-box {
+  background: rgba(15,23,42,0.7); border:1px solid rgba(255,255,255,0.08); border-radius:16px;
+  padding: 14px 18px; min-width: 130px; backdrop-filter: blur(10px);
+}
+.node-box.vacant { border-style: dashed; border-color: rgba(255,255,255,0.15); opacity: 0.6; }
+.node-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#38bdf8; margin-bottom:10px; text-align:center; }
+.node-people { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width: 320px; }
+
+.mini-person { display:flex; flex-direction:column; align-items:center; width:92px; }
+.mini-avatar {
+  width:42px; height:42px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:12px; font-weight:700; color:white; background:#334155; flex-shrink:0;
+}
+.mini-avatar img { width:100%; height:100%; object-fit:cover; }
+.mini-name { font-size:10px; color:#cbd5e1; margin-top:5px; text-align:center; line-height:1.3; max-width:92px; word-break:break-word; }
+.vacant-text { font-size:11px; color:#64748b; text-align:center; padding: 6px 4px; }
+
+.tier { margin-bottom: 30px; }
+.tier:last-child { margin-bottom: 0; }
+.tier-header { display:flex; align-items:center; gap:10px; margin-bottom: 14px; }
+.tier-header .dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.tier-header h3 { font-size:14px; font-weight:700; letter-spacing:0.3px; }
+.tier-header .count { font-size:11px; color:#64748b; font-weight:600; background: rgba(255,255,255,0.05); padding:2px 8px; border-radius: 20px; }
+
+.divisi-wrap {
+  border: 1px solid rgba(255,255,255,0.06); border-radius: 18px; padding: 20px; margin-bottom: 18px;
+  background: rgba(15,23,42,0.25);
+}
+.divisi-title { display:flex; align-items:center; gap:8px; font-size:13px; font-weight:700; margin-bottom:16px; text-transform:uppercase; letter-spacing:0.5px; }
+.divisi-sub-label { font-size:11px; color:#64748b; font-weight:600; margin: 14px 0 10px 0; text-transform:uppercase; letter-spacing:0.5px; }
+.divisi-sub-label:first-of-type { margin-top:0; }
+
+.person-grid { display:flex; flex-wrap:wrap; gap:14px; }
+
+.person-card {
+  background: rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.05); border-radius:14px;
+  padding: 14px; width: 108px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  transition: all 0.2s ease;
+}
+.person-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); background: rgba(15,23,42,0.7); }
+.person-card.hidden { display:none; }
+.person-avatar {
+  width:56px; height:56px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:16px; font-weight:700; color:white; background:#334155; margin-bottom:10px; flex-shrink:0;
+}
+.person-avatar img { width:100%; height:100%; object-fit:cover; }
+.person-name { font-size:11.5px; font-weight:600; color:#f1f5f9; line-height:1.3; margin-bottom: 3px; }
+.person-title { font-size:10px; color:#64748b; line-height:1.3; }
+
+.empty-note { color:#475569; font-size:12px; font-style:italic; padding: 8px 0; }
+
+.loading-state { display:flex; flex-direction:column; align-items:center; gap:14px; padding: 60px 0; color:#64748b; font-size:13px; }
+.loading-state i { width:28px; height:28px; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.footer-divider { display:flex; align-items:center; justify-content:center; gap:16px; margin-top: 40px; margin-bottom:16px; }
+.footer-line { height:1px; width:120px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); }
+.footer-logo { color:#64748b; width:16px; height:16px; opacity:0.3; }
+.credits { text-align:center; font-size:11px; color:#475569; letter-spacing:0.5px; }
+.credits a { color:#3b82f6; text-decoration:none; }
+
+@media (max-width: 640px) {
+  .org-tree { transform-origin: top center; }
+  .card-main, .section-block { padding: 22px; }
+  h2 { font-size: 22px; }
+}
+</style>
+</head>
+<body>
+
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
+
+<div class="topnav">
+  <a href="index.html"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> Home</a>
+  <div class="title">EMSKK SYSTEM</div>
+</div>
+
+<div class="container">
+
+  <div class="card-main">
+    <div class="card-header-icon"><i data-lucide="network"></i></div>
+    <h2><span class="white">STRUKTUR</span> <span class="gradient">KEPENGURUSAN</span></h2>
+    <div class="subtitle">EMS Kota Kita — data personel realtime dari sistem</div>
+    <div class="info-text" id="infoText">Mengambil data dari server, mohon tunggu...</div>
+  </div>
+
+  <div id="loadingState" class="loading-state">
+    <i data-lucide="loader-circle"></i>
+    Memuat struktur kepengurusan...
+  </div>
+
+  <div id="contentWrap" style="display:none;">
+
+    <div class="section-block accent-blue">
+      <div class="section-title"><i data-lucide="shield" style="color:#38bdf8;"></i> Kepengurusan</div>
+      <div class="section-sub">Garis komando manajemen &amp; administrasi</div>
+      <div id="kepengurusanTree"></div>
+    </div>
+
+    <div class="section-block accent-green">
+      <div class="section-title"><i data-lucide="stethoscope" style="color:#10b981;"></i> Jabatan Non-Kepengurusan</div>
+      <div class="section-sub">Jenjang karier medis: Probation → Trainee → Co. Ass → Dokter Umum → Dokter Spesialis</div>
+      <div id="nonKepengurusanTiers"></div>
+    </div>
+
+  </div>
+
+  <div class="footer-divider">
+    <div class="footer-line"></div>
+    <i data-lucide="aperture" class="footer-logo"></i>
+    <div class="footer-line"></div>
+  </div>
+  <div class="credits">SYSTEM BY <a href="#">SAMUEL</a></div>
+
+</div>
+
+<script>
+lucide.createIcons();
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
+const PHOTO_BASE = "assets/photos/";
+
+const DEFAULT_AVATAR_COLOR = "#334155";
+
+function escapeHtml(str){
+  return String(str || "").replace(/[&<>"']/g, m => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[m]));
+}
+
+function initials(name){
+  const clean = String(name || "").replace(/^dr\.\s*/i, '').replace(/,.*$/, '').trim();
+  const parts = clean.split(/\s+/).filter(Boolean);
+  if (parts.length === 0) return "?";
+  if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+  return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+}
+
+function colorFor(name){
+  return DEFAULT_AVATAR_COLOR;
+}
+
+function avatarHtml(nama, size){
+  const bg = colorFor(nama);
+  const label = initials(nama);
+  return `<div class="__avatar" data-nama="${escapeHtml(nama)}" style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${bg};">${label}</div>`;
+}
+
+function personCardHtml(p, size){
+  const cardClass = size === 'mini' ? 'mini' : 'full';
+  if (cardClass === 'mini') {
+    return `
+    <div class="mini-person" data-name="${escapeHtml(p.nama.toLowerCase())}">
+      <div class="mini-avatar">${photoOrFallback(p, 'mini')}</div>
+      <div class="mini-name" title="${escapeHtml(p.nama)}">${escapeHtml(p.nama)}</div>
+    </div>`;
+  }
+  return `
+  <div class="person-card" data-name="${escapeHtml(p.nama.toLowerCase())}">
+    <div class="person-avatar">${photoOrFallback(p, 'full')}</div>
+    <div class="person-name">${escapeHtml(p.nama)}</div>
+    <div class="person-title">${escapeHtml(p.title)}</div>
+  </div>`;
+}
+
+function photoOrFallback(p, size){
+  const bg = colorFor(p.nama);
+  const label = initials(p.nama);
+  if (p.photo) {
+    return `<img src="${PHOTO_BASE}${escapeHtml(p.photo)}" alt="${escapeHtml(p.nama)}"
+              onerror="this.outerHTML='<div style=&quot;width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${bg};font-weight:700;&quot;>${label}</div>'">`;
+  }
+  return `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:${bg};font-weight:700;">${label}</div>`;
+}
+
+function groupPeople(people){
+  const g = {
+    ceo: [], direktur: [], wakdirPersonalia: [], wakdirOperasional: [],
+    hrd: [], finance: [], komdis: [],
+    dokterSpesialis: [],
+    divisi: {
+      LAB: { label: "Divisi Laboratorium", color: "#38bdf8", dokter: [], asisten: [] },
+      OPLAS: { label: "Divisi Operasi Plastik", color: "#a855f7", dokter: [], asisten: [] },
+      OBGYN: { label: "Divisi Obstetri & Ginekologi", color: "#ec4899", dokter: [], asisten: [] }
+    },
+    dokterUmum: [], coAss: [], trainee: [], probation: []
+  };
+
+  people.forEach(p => {
+    const section = p.section;
+    const title = p.title;
+    const divisi = p.divisi;
+
+    if (section === "PETINGGI & PENGURUS") {
+      if (title === "CEO") g.ceo.push(p);
+      else if (title === "DIREKTUR") g.direktur.push(p);
+      else if (title === "WAKDIR Personalia") g.wakdirPersonalia.push(p);
+      else if (title === "WAKDIR Operasional") g.wakdirOperasional.push(p);
+      else if (title === "HRD") g.hrd.push(p);
+      else if (title === "FINANCE") g.finance.push(p);
+      else if (title === "KOMDIS") g.komdis.push(p);
+    } else if (section === "DOKTER SPESIALIS") {
+      g.dokterSpesialis.push(p);
+    } else if (section === "DOKTER") {
+      if (divisi === "LAB") g.divisi.LAB.dokter.push(p);
+      else if (divisi === "OPLAS") g.divisi.OPLAS.dokter.push(p);
+      else if (divisi === "OBGYN") g.divisi.OBGYN.dokter.push(p);
+      else g.dokterUmum.push(p);
+    } else if (section === "Co. Ass") {
+      if (divisi === "LAB") g.divisi.LAB.asisten.push(p);
+      else if (divisi === "OPLAS") g.divisi.OPLAS.asisten.push(p);
+      else if (divisi === "OBGYN") g.divisi.OBGYN.asisten.push(p);
+      else g.coAss.push(p);
+    } else if (section === "Trainee") {
+      g.trainee.push(p);
+    } else if (section === "Probation") {
+      g.probation.push(p);
+    }
+  });
+
+  return g;
+}
+
+function nodeBox(label, people, opts){
+  opts = opts || {};
+  if (!people || people.length === 0) {
+    return `<div class="node-box vacant">
+      <div class="node-label">${escapeHtml(label)}</div>
+      <div class="vacant-text">Belum terisi</div>
+    </div>`;
+  }
+  const peopleHtml = people.map(p => personCardHtml(p, 'mini')).join('');
+  return `<div class="node-box">
+    <div class="node-label">${escapeHtml(label)}</div>
+    <div class="node-people">${peopleHtml}</div>
+  </div>`;
+}
+
+function renderKepengurusan(g){
+  const html = `
+  <ul class="org-tree">
+    <li>
+      ${nodeBox('CEO', g.ceo)}
+      <ul>
+        <li>
+          ${nodeBox('Direktur', g.direktur)}
+          <ul>
+            <li>
+              ${nodeBox('Wakil Direktur Personalia', g.wakdirPersonalia)}
+              <ul>
+                <li>${nodeBox('HRD', g.hrd)}</li>
+                <li>${nodeBox('Finance', g.finance)}</li>
+              </ul>
+            </li>
+            <li>
+              ${nodeBox('Wakil Direktur Operasional', g.wakdirOperasional)}
+              <ul>
+                <li>${nodeBox('Komdis', g.komdis)}</li>
+              </ul>
+            </li>
+            <li>
+              ${nodeBox('Sekretaris', [])}
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </li>
+  </ul>`;
+  document.getElementById('kepengurusanTree').innerHTML = html;
+}
+
+function tierHeader(color, title, count){
+  return `<div class="tier-header">
+    <div class="dot" style="background:${color}; box-shadow:0 0 8px ${color};"></div>
+    <h3>${escapeHtml(title)}</h3>
+    <div class="count">${count} orang</div>
+  </div>`;
+}
+
+function personGrid(people){
+  if (!people || people.length === 0) return `<div class="empty-note">Belum ada personel</div>`;
+  return `<div class="person-grid">${people.map(p => personCardHtml(p, 'full')).join('')}</div>`;
+}
+
+function renderNonKepengurusan(g){
+  let html = '';
+
+  html += `<div class="tier">
+    ${tierHeader('#facc15', 'Dokter Spesialis', g.dokterSpesialis.length)}
+    ${personGrid(g.dokterSpesialis)}
+  </div>`;
+
+  html += `<div class="tier">`;
+  ['LAB','OPLAS','OBGYN'].forEach(key => {
+    const d = g.divisi[key];
+    const total = d.dokter.length + d.asisten.length;
+    html += `<div class="divisi-wrap">
+      <div class="divisi-title" style="color:${d.color};">
+        <i data-lucide="git-branch" style="width:14px;height:14px;"></i>
+        ${escapeHtml(d.label)} <span style="color:#64748b; font-weight:500; margin-left:4px;">(${total} orang)</span>
+      </div>
+      <div class="divisi-sub-label">Dokter</div>
+      ${personGrid(d.dokter)}
+      <div class="divisi-sub-label">Asisten</div>
+      ${personGrid(d.asisten)}
+    </div>`;
+  });
+  html += `</div>`;
+
+  html += `<div class="tier">
+    ${tierHeader('#38bdf8', 'Dokter Umum', g.dokterUmum.length)}
+    ${personGrid(g.dokterUmum)}
+  </div>`;
+
+  html += `<div class="tier">
+    ${tierHeader('#38bdf8', 'Co. Ass', g.coAss.length)}
+    ${personGrid(g.coAss)}
+  </div>`;
+
+  html += `<div class="tier">
+    ${tierHeader('#94a3b8', 'Trainee', g.trainee.length)}
+    ${personGrid(g.trainee)}
+  </div>`;
+
+  html += `<div class="tier">
+    ${tierHeader('#64748b', 'Probation', g.probation.length)}
+    ${personGrid(g.probation)}
+  </div>`;
+
+  document.getElementById('nonKepengurusanTiers').innerHTML = html;
+}
+
+async function loadOrgChart(){
+  const infoText = document.getElementById('infoText');
+  const loadingState = document.getElementById('loadingState');
+  const contentWrap = document.getElementById('contentWrap');
+
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getOrgChart");
+    const json = await res.json();
+
+    if (!json.success) {
+      throw new Error(json.message || "Gagal memuat data");
+    }
+
+    const people = json.data || [];
+    const g = groupPeople(people);
+
+    renderKepengurusan(g);
+    renderNonKepengurusan(g);
+
+    loadingState.style.display = 'none';
+    contentWrap.style.display = 'block';
+    infoText.innerText = `Total ${people.length} personel — terakhir dimuat ${new Date().toLocaleTimeString('id-ID')}`;
+
+    lucide.createIcons();
+  } catch (err) {
+    console.error(err);
+    loadingState.innerHTML = `
+      <i data-lucide="alert-triangle" style="animation:none; color:#ef4444;"></i>
+      Gagal memuat data struktur. Silakan refresh halaman.`;
+    lucide.createIcons();
+  }
+}
+
+loadOrgChart();
+</script>
+</body>
+</html>
