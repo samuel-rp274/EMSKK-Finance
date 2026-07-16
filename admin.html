@@ -280,6 +280,15 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.02);
   color: white;
 }
+tr.row-unpaid td {
+  background: rgba(239, 68, 68, 0.07);
+}
+tr.row-unpaid td:first-child {
+  border-left: 3px solid var(--primary);
+}
+tr.row-unpaid:hover td {
+  background: rgba(239, 68, 68, 0.12);
+}
 .empty {
   text-align: center;
   color: var(--muted);
@@ -603,8 +612,9 @@ async function renderTable(){
     const duty = Number(x.duty) || 0;
     const invoice = Number(x.invoice) || 0;
     const total = duty + invoice;
+    const rowClass = x.paid === "PAID" ? "" : "row-unpaid";
     return `
-      <tr>
+      <tr class="${rowClass}">
         <td style="font-weight:600; color:#ffffff;">${x.nama}</td>
         <td>$KK ${duty.toLocaleString("id-ID")}</td>
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
