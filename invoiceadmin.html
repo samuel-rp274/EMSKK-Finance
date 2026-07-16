@@ -275,6 +275,15 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.02);
   color: white;
 }
+tr.row-pending td {
+  background: rgba(239, 68, 68, 0.07);
+}
+tr.row-pending td:first-child {
+  border-left: 3px solid var(--primary);
+}
+tr.row-pending:hover td {
+  background: rgba(239, 68, 68, 0.12);
+}
 .empty {
   text-align: center;
   color: var(--muted);
@@ -675,8 +684,10 @@ async function renderTable(){
     return a[0].localeCompare(b[0]);
   });
 
-  tbody.innerHTML = sortedPayroll.map(([n,v], idx)=>`
-    <tr>
+  tbody.innerHTML = sortedPayroll.map(([n,v], idx)=>{
+    const hasPending = v.invoices.some(i => i.Status === "PENDING");
+    return `
+    <tr class="${hasPending ? "row-pending" : ""}">
       <td style="font-weight:600; color:#ffffff;">${n}</td>
       <td>${v.divisi}</td>
       <td>$KK ${v.total.toLocaleString("id-ID")}</td>
@@ -721,7 +732,8 @@ async function renderTable(){
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
   
   if(window.lucide) { lucide.createIcons(); }
 }
