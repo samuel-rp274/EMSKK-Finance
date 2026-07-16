@@ -277,6 +277,15 @@ tr:hover td {
   background: rgba(255, 255, 255, 0.02);
   color: white;
 }
+tr.row-pending td {
+  background: rgba(239, 68, 68, 0.07);
+}
+tr.row-pending td:first-child {
+  border-left: 3px solid var(--primary);
+}
+tr.row-pending:hover td {
+  background: rgba(239, 68, 68, 0.12);
+}
 .empty {
   text-align: center;
   color: var(--muted);
@@ -773,8 +782,9 @@ function renderAttendanceTable(){
   tbody.innerHTML = sortedPayroll.map((v, idx) => {
     const validHours = v.validMinutes / 60;
     const rateHour = validHours > 0 ? (v.gaji / validHours) : 0;
+    const hasPending = v.sessions.some(s => normalize(s.Status) === "PENDING");
     return `
-      <tr data-row="${v.sessions[0]?.RowIndex}">
+      <tr data-row="${v.sessions[0]?.RowIndex}" class="${hasPending ? "row-pending" : ""}">
         <td style="font-weight:600; color:#ffffff;">${v.nama}</td>
         <td>${v.jabatan}</td>
         <td>${v.divisi}</td>
@@ -956,9 +966,6 @@ window.addEventListener("load", () => {
     loadRates().then(() => { loadAttendanceData(); });
   }
 });
-
 </script>
-
 </body>
-
 </html>
