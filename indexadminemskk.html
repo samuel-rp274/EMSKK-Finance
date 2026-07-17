@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Access - EMSKK Portal</title>
+
+<link rel="icon" href="logo.png" type="image/png">
+<meta name="theme-color" content="#030712">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', sans-serif;
+}
+
+body {
+  background: #030712;
+  color: white;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  overflow-x: hidden;
+  position: relative;
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 28px; }
+  .subtitle { font-size: 13px; }
+  .card { padding: 20px 22px; gap: 16px; }
+  .icon-wrapper { width: 48px; height: 48px; }
+  .card-title { font-size: 16px; }
+  .card-desc { font-size: 12px; }
+}
+
+.blob {
+  position: fixed;
+  width: 500px;
+  height: 500px;
+  border-radius: 50%;
+  filter: blur(120px);
+  opacity: 0.12;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.blob.top-left { background: #ef4444; top: -150px; left: -150px; }
+.blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  z-index: 2;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.35);
+  padding: 7px 16px;
+  border-radius: 999px;
+  margin-bottom: 20px;
+}
+
+.badge i { width: 13px; height: 13px; }
+
+h1 {
+  font-size: 40px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+
+h1 span.white { color: #ffffff; }
+h1 span.accent { color: #ef4444; }
+
+.subtitle {
+  color: #94a3b8;
+  font-size: 14px;
+  margin-bottom: 36px;
+  letter-spacing: 0.3px;
+}
+
+.menu-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 40px;
+}
+
+.card {
+  background: #0b1120;
+  border: 1px solid #27272a;
+  border-radius: 16px;
+  padding: 22px 26px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  cursor: pointer;
+  position: relative;
+  text-decoration: none;
+  color: inherit;
+  transition: all 0.25s ease;
+  text-align: left;
+}
+
+.card::before {
+  content: "";
+  position: absolute;
+  top: 18%;
+  left: 0;
+  width: 3px;
+  height: 64%;
+  border-radius: 4px;
+  background: #ef4444;
+}
+
+.icon-wrapper {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+}
+
+.card-content { flex-grow: 1; }
+.card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #f3f4f6; }
+.card-desc { font-size: 13px; color: #9ca3af; line-height: 1.4; }
+
+.arrow-btn {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.25s ease;
+  flex-shrink: 0;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  border-color: #ef4444;
+  background: #111827;
+}
+
+.card:hover .arrow-btn { background: #ef4444; color: #030712; transform: translateX(6px); }
+.card:active { transform: scale(0.99); }
+
+.back-wrap {
+  width: 100%;
+  padding-top: 24px;
+  border-top: 1px solid #1f2937;
+  display: flex;
+  justify-content: center;
+}
+
+.back-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #9ca3af;
+  text-decoration: none;
+  padding: 10px 20px;
+  border-radius: 999px;
+  border: 1px solid #374151;
+  transition: all 0.2s ease;
+}
+
+.back-link i { width: 15px; height: 15px; }
+
+.back-link:hover {
+  color: #e5e7eb;
+  border-color: #6b7280;
+  background: rgba(255, 255, 255, 0.03);
+}
+</style>
+</head>
+<body>
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
+
+<div class="container">
+
+  <div class="badge">
+    <i data-lucide="shield-alert"></i>
+    Internal / Admin Access
+  </div>
+
+  <h1><span class="white">ADMIN</span> <span class="accent">PANEL</span></h1>
+  <div class="subtitle">EMSKK Portal - Internal Navigation</div>
+
+  <div class="menu-stack">
+    <a href="admin.html" class="card">
+      <div class="icon-wrapper"><i data-lucide="settings"></i></div>
+      <div class="card-content">
+        <div class="card-title">Admin</div>
+        <div class="card-desc">Panel kontrol utama sistem EMSKK</div>
+      </div>
+      <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+    </a>
+
+    <a href="photoupload.html" class="card">
+      <div class="icon-wrapper"><i data-lucide="image-plus"></i></div>
+      <div class="card-content">
+        <div class="card-title">Upload Foto</div>
+        <div class="card-desc">Unggah dan atur foto personel</div>
+      </div>
+      <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+    </a>
+
+    <a href="hrd.html" class="card">
+      <div class="icon-wrapper"><i data-lucide="lock"></i></div>
+      <div class="card-content">
+        <div class="card-title">HRD</div>
+        <div class="card-desc">Data personalia dan SDM</div>
+      </div>
+      <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+    </a>
+
+    <a href="rank.html" class="card">
+      <div class="icon-wrapper"><i data-lucide="bar-chart-3"></i></div>
+      <div class="card-content">
+        <div class="card-title">Rank</div>
+        <div class="card-desc">Lihat ranking dan performa</div>
+      </div>
+      <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+    </a>
+  </div>
+
+  <div class="back-wrap">
+    <a href="index.html" class="back-link">
+      <i data-lucide="arrow-left"></i>
+      Kembali ke Index
+    </a>
+  </div>
+
+</div>
+
+<script>
+lucide.createIcons();
+</script>
+</body>
+</html>
