@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMSKK Struktur Kepengurusan</title>
+<title>EMSKK Organizational Structure</title>
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -31,7 +31,7 @@ body {
   background: rgba(15,23,42,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 999;
 }
-.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; transition: color 0.2s; }
+.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:flex; align-items:center; gap:6px; transition: color 0.2s; }
 .topnav a:hover { color:#38bdf8; }
 .topnav .title { font-size:12px; font-weight:700; color:#64748b; letter-spacing:1.5px; text-transform:uppercase; }
 
@@ -78,12 +78,12 @@ h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -web
 
 .org-tree ul li::before {
   content:""; position:absolute; top:-56px; left:50%; width:0; height:56px;
-  border-left:1px solid rgba(255,255,255,0.18);
+  border-left:2px solid rgba(56, 189, 248, 0.4);
 }
 
 .org-tree ul li::after {
   content:""; position:absolute; top:-56px; left:0; right:0; height:0;
-  border-top:1px solid rgba(255,255,255,0.18);
+  border-top:2px solid rgba(56, 189, 248, 0.4);
 }
 .org-tree ul li:first-child::after { left:50%; }
 .org-tree ul li:last-child::after { right:50%; }
@@ -94,16 +94,16 @@ h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -web
   padding: 14px 18px; min-width: 130px; backdrop-filter: blur(10px);
 }
 .node-box.vacant { border-style: dashed; border-color: rgba(255,255,255,0.15); opacity: 0.6; }
-.node-label { font-size:10px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#38bdf8; margin-bottom:10px; text-align:center; }
-.node-people { display:flex; flex-wrap:wrap; gap:12px; justify-content:center; max-width: 320px; }
+.node-label { font-size:15px; font-weight:700; letter-spacing:1px; text-transform:uppercase; color:#38bdf8; margin-bottom:10px; text-align:center; }
+.node-people { display:flex; flex-wrap:wrap; gap:16px; justify-content:center; max-width: 440px; }
 
-.mini-person { display:flex; flex-direction:column; align-items:center; width:92px; }
+.mini-person { display:flex; flex-direction:column; align-items:center; width:112px; }
 .mini-avatar {
-  width:42px; height:42px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
-  font-size:12px; font-weight:700; color:white; background:#334155; flex-shrink:0;
+  width:75px; height:75px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:700; color:white; background:#334155; flex-shrink:0;
 }
 .mini-avatar img { width:100%; height:100%; object-fit:cover; }
-.mini-name { font-size:10px; color:#cbd5e1; margin-top:5px; text-align:center; line-height:1.3; max-width:92px; word-break:break-word; }
+.mini-name { font-size:12px; color:#cbd5e1; margin-top:8px; text-align:center; line-height:1.3; max-width:112px; word-break:break-word; }
 .vacant-text { font-size:11px; color:#64748b; text-align:center; padding: 6px 4px; }
 
 .tier { margin-bottom: 30px; }
@@ -121,34 +121,28 @@ h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -web
 .divisi-sub-label { font-size:11px; color:#64748b; font-weight:600; margin: 14px 0 10px 0; text-transform:uppercase; letter-spacing:0.5px; }
 .divisi-sub-label:first-of-type { margin-top:0; }
 
-.person-grid { display:flex; flex-wrap:wrap; gap:14px; }
+.person-grid { display:flex; flex-wrap:wrap; gap:16px; }
 
 .person-card {
-  background: rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.05); border-radius:14px;
-  padding: 14px; width: 108px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  background: rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.05); border-radius:16px;
+  padding: 16px; width: 132px; display:flex; flex-direction:column; align-items:center; text-align:center;
   transition: all 0.2s ease;
 }
 .person-card:hover { transform: translateY(-2px); border-color: rgba(255,255,255,0.15); background: rgba(15,23,42,0.7); }
 .person-card.hidden { display:none; }
 .person-avatar {
-  width:56px; height:56px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
-  font-size:16px; font-weight:700; color:white; background:#334155; margin-bottom:10px; flex-shrink:0;
+  width:75px; height:75px; border-radius:50%; overflow:hidden; display:flex; align-items:center; justify-content:center;
+  font-size:26px; font-weight:700; color:white; background:#334155; margin-bottom:12px; flex-shrink:0;
 }
 .person-avatar img { width:100%; height:100%; object-fit:cover; }
-.person-name { font-size:11.5px; font-weight:600; color:#f1f5f9; line-height:1.3; margin-bottom: 3px; }
-.person-title { font-size:10px; color:#64748b; line-height:1.3; }
+.person-name { font-size:13px; font-weight:600; color:#f1f5f9; line-height:1.3; margin-bottom: 4px; }
+.person-title { font-size:11px; color:#64748b; line-height:1.3; }
 
 .empty-note { color:#475569; font-size:12px; font-style:italic; padding: 8px 0; }
 
 .loading-state { display:flex; flex-direction:column; align-items:center; gap:14px; padding: 60px 0; color:#64748b; font-size:13px; }
 .loading-state i { width:28px; height:28px; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
-
-.footer-divider { display:flex; align-items:center; justify-content:center; gap:16px; margin-top: 40px; margin-bottom:16px; }
-.footer-line { height:1px; width:120px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); }
-.footer-logo { color:#64748b; width:16px; height:16px; opacity:0.3; }
-.credits { text-align:center; font-size:11px; color:#475569; letter-spacing:0.5px; }
-.credits a { color:#3b82f6; text-decoration:none; }
 
 @media (max-width: 640px) {
   .org-tree { transform-origin: top center; }
@@ -171,38 +165,31 @@ h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -web
 
   <div class="card-main">
     <div class="card-header-icon"><i data-lucide="network"></i></div>
-    <h2><span class="white">STRUKTUR</span> <span class="gradient">KEPENGURUSAN</span></h2>
-    <div class="subtitle">EMS Kota Kita — data personel realtime dari sistem</div>
-    <div class="info-text" id="infoText">Mengambil data dari server, mohon tunggu...</div>
+    <h2><span class="white">EMSKK</span> <span class="gradient">ORGANIZATIONAL STRUCTURE</span></h2>
+    <div class="subtitle">EMS Kota Kita — realtime data from system</div>
+    <div class="info-text" id="infoText">Fetching data from server, please wait...</div>
   </div>
 
   <div id="loadingState" class="loading-state">
     <i data-lucide="loader-circle"></i>
-    Memuat struktur kepengurusan...
+    loading the organizational structure...
   </div>
 
   <div id="contentWrap" style="display:none;">
 
     <div class="section-block accent-blue">
-      <div class="section-title"><i data-lucide="shield" style="color:#38bdf8;"></i> Kepengurusan</div>
-      <div class="section-sub">Garis komando manajemen &amp; administrasi</div>
+      <div class="section-title"><i data-lucide="shield" style="color:#38bdf8;"></i> Petinggi &amp; Pengurus</div>
+      <div class="section-sub">management &amp; administration</div>
       <div id="kepengurusanTree"></div>
     </div>
 
     <div class="section-block accent-green">
       <div class="section-title"><i data-lucide="stethoscope" style="color:#10b981;"></i> Jabatan Non-Kepengurusan</div>
-      <div class="section-sub">Jenjang karier medis: Probation → Trainee → Co. Ass → Dokter Umum → Dokter Spesialis</div>
+      <div class="section-sub">Probation → Trainee → Co. Ass → Dokter Umum → Dokter Spesialis</div>
       <div id="nonKepengurusanTiers"></div>
     </div>
 
   </div>
-
-  <div class="footer-divider">
-    <div class="footer-line"></div>
-    <i data-lucide="aperture" class="footer-logo"></i>
-    <div class="footer-line"></div>
-  </div>
-  <div class="credits">SYSTEM BY <a href="#">SAMUEL</a></div>
 
 </div>
 
@@ -210,9 +197,9 @@ h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -web
 lucide.createIcons();
 
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-const PHOTO_BASE = "assets/photos/";
+const PHOTO_BASE = "assets/photos/"; 
 
-const DEFAULT_AVATAR_COLOR = "#334155";
+const DEFAULT_AVATAR_COLOR = "#334155"; 
 
 function escapeHtml(str){
   return String(str || "").replace(/[&<>"']/g, m => ({
@@ -443,14 +430,14 @@ async function loadOrgChart(){
 
     loadingState.style.display = 'none';
     contentWrap.style.display = 'block';
-    infoText.innerText = `Total ${people.length} personel — terakhir dimuat ${new Date().toLocaleTimeString('id-ID')}`;
+    infoText.innerText = `${people.length} member — last data from ${new Date().toLocaleTimeString('id-ID')}`;
 
     lucide.createIcons();
   } catch (err) {
     console.error(err);
     loadingState.innerHTML = `
       <i data-lucide="alert-triangle" style="animation:none; color:#ef4444;"></i>
-      Gagal memuat data struktur. Silakan refresh halaman.`;
+      Failed to load structure data. Please refresh the page.`;
     lucide.createIcons();
   }
 }
