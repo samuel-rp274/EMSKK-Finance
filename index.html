@@ -203,6 +203,12 @@ h1 span.gradient {
   margin-bottom: 48px;
 }
 
+@property --border-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
 .card {
   background: rgba(15, 23, 42, 0.65);
   border: 1px solid rgba(255, 255, 255, 0.05);
@@ -217,6 +223,7 @@ h1 span.gradient {
   position: relative;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   text-align: left;
+  z-index: 0;
 }
 
 .card::before {
@@ -228,6 +235,45 @@ h1 span.gradient {
   height: 64%;
   border-radius: 4px;
   transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.card::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  border-radius: 20px;
+  padding: 2px;
+  background: conic-gradient(from var(--border-angle), var(--dna-c1), var(--dna-c2), var(--dna-c1), var(--dna-c2), var(--dna-c1));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 1;
+}
+
+.card:hover::after {
+  opacity: 1;
+  animation: dna-rotate 2.4s linear infinite;
+}
+
+@keyframes dna-rotate {
+  to { --border-angle: 360deg; }
+}
+
+.card.attendance { --dna-c1: #ef4444; --dna-c2: #7f1d1d; }
+.card.attendance-overview { --dna-c1: #f59e0b; --dna-c2: #78350f; }
+.card.invoice-input { --dna-c1: #10b981; --dna-c2: #064e3b; }
+.card.invoice-overview { --dna-c1: #3b82f6; --dna-c2: #1e3a8a; }
+.card.org-structure { --dna-c1: #a855f7; --dna-c2: #581c87; }
+
+.card-content,
+.icon-wrapper,
+.arrow-btn {
+  position: relative;
+  z-index: 2;
 }
 
 .card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
