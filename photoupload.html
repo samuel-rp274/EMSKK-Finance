@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Upload Foto</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+body {
+  background: #030712; color: #f8fafc; min-height: 100vh; overflow-x: hidden;
+  padding: 100px 20px 60px 20px; position: relative;
+}
+.blob { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: 0; pointer-events: none; }
+.blob.top-left { background: #a855f7; top: -150px; left: -150px; }
+.blob.bottom-right { background: #3b82f6; bottom: -150px; right: -150px; }
+
+.topnav {
+  position: fixed; top:0; left:0; width:100%; padding:16px 24px;
+  display:flex; justify-content:space-between; align-items:center;
+  background: rgba(15,23,42,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 999;
+}
+.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+.topnav a:hover { color:#38bdf8; }
+.topnav .title { font-size:12px; font-weight:700; color:#64748b; letter-spacing:1.5px; text-transform:uppercase; }
+.topnav .nav-links { display:flex; align-items:center; gap:14px; }
+.topnav .nav-sep { color:#334155; font-size:13px; font-weight:600; }
+
+.container { width:100%; max-width: 560px; margin: 0 auto; z-index:2; position:relative; }
+
+.card-main {
+  background: rgba(15,23,42,0.4); border:1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 36px; width:100%; position:relative; margin-bottom: 20px;
+}
+.card-main::before {
+  content:""; position:absolute; top:10%; left:0; width:3px; height:80%; border-radius:4px;
+  background:#a855f7; box-shadow: 0 0 15px #a855f7;
+}
+.card-header-icon {
+  width:56px; height:56px; background: rgba(168,85,247,0.15); color:#c084fc;
+  border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+}
+h2 { font-size:24px; font-weight:700; margin-bottom:6px; }
+h2 span.gradient { background: linear-gradient(to right, #38bdf8, #c084fc); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
+.subtitle { color:#94a3b8; font-size:13px; margin-bottom: 28px; }
+
+.field { margin-bottom: 20px; }
+.field label { display:block; font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+
+select, input[type="text"] {
+  width:100%; background: rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; padding:12px 14px; color:white; font-size:14px; outline:none;
+}
+select:focus, input[type="text"]:focus { border-color: #a855f7; }
+
+.dropzone {
+  border:2px dashed rgba(255,255,255,0.12); border-radius:16px; padding: 28px;
+  text-align:center; cursor:pointer; transition: all 0.2s;
+}
+.dropzone:hover { border-color: rgba(168,85,247,0.4); background: rgba(168,85,247,0.03); }
+.dropzone i { width:28px; height:28px; color:#64748b; margin-bottom:10px; }
+.dropzone p { color:#64748b; font-size:13px; }
+.dropzone input { display:none; }
+
+.preview-wrap { display:none; align-items:center; gap:16px; margin-top: 14px; }
+.preview-wrap.active { display:flex; }
+.preview-img { width:72px; height:72px; border-radius:50%; object-fit:cover; border:1px solid rgba(255,255,255,0.1); }
+.preview-info { font-size:12px; color:#94a3b8; }
+.preview-info b { color:#e2e8f0; }
+
+.crop-wrap { display:none; margin-top: 14px; }
+.crop-wrap.active { display:block; }
+.crop-stage {
+  width: 280px; height: 280px; margin: 0 auto; border-radius: 16px; overflow: hidden;
+  position: relative; background: #000; cursor: grab; touch-action: none;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+.crop-stage.dragging { cursor: grabbing; }
+.crop-stage img {
+  position: absolute; left:0; top:0; max-width:none; max-height:none; user-select:none; -webkit-user-drag:none;
+}
+.crop-controls { display:flex; align-items:center; gap:10px; margin-top: 14px; }
+.crop-controls i { width:16px; height:16px; color:#64748b; flex-shrink:0; }
+.crop-controls input[type="range"] { flex:1; accent-color: #a855f7; }
+.crop-actions { display:flex; gap:10px; margin-top: 14px; }
+.btn-secondary {
+  flex:1; padding:10px; border-radius:12px; border:1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+  color:#cbd5e1; font-size:13px; font-weight:600; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.06); }
+.btn-secondary i { width:14px; height:14px; }
+.btn-confirm {
+  flex:1; padding:10px; border-radius:12px; border:none; background: linear-gradient(to right, #a855f7, #3b82f6);
+  color:white; font-size:13px; font-weight:700; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:6px;
+}
+.btn-confirm i { width:14px; height:14px; }
+.crop-hint { text-align:center; font-size:11px; color:#64748b; margin-top:10px; }
+
+.btn-submit {
+  width:100%; padding:14px; border:none; border-radius:14px; cursor:pointer;
+  background: linear-gradient(to right, #a855f7, #3b82f6); color:white; font-size:14px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px; transition: opacity 0.2s;
+}
+.btn-submit:hover { opacity: 0.9; }
+.btn-submit:disabled { opacity: 0.5; cursor:not-allowed; }
+.btn-submit i { width:16px; height:16px; }
+
+.status-box {
+  margin-top: 18px; padding: 14px 16px; border-radius:12px; font-size:13px; display:none; gap:10px; align-items:flex-start;
+}
+.status-box.show { display:flex; }
+.status-box.success { background: rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.3); color:#6ee7b7; }
+.status-box.error { background: rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; }
+.status-box i { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+
+.footer-divider { display:flex; align-items:center; justify-content:center; gap:16px; margin-top: 30px; }
+.footer-line { height:1px; width:100px; background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent); }
+.footer-logo { color:#64748b; width:16px; height:16px; opacity:0.3; }
+</style>
+</head>
+<body>
+
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
+
+<div class="topnav">
+  <div class="nav-links">
+    <a href="index.html"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> User Menu</a>
+    <span class="nav-sep">||</span>
+    <a href="indexadminemskk.html"><i data-lucide="shield" style="width:16px;height:16px;"></i> Admin Menu</a>
+  </div>
+  <div class="title">EMSKK SYSTEM</div>
+</div>
+
+<div class="container">
+  <div class="card-main">
+    <div class="card-header-icon"><i data-lucide="image-plus"></i></div>
+    <h2><span class="gradient">Upload Foto</span></h2>
+    <div class="subtitle">Foto otomatis di-resize &amp; dikompres, langsung tersimpan ke repo dan Sheet</div>
+
+    <div class="field">
+      <label>Pilih Nama</label>
+      <select id="namaSelect">
+        <option value="">Memuat daftar nama...</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label>Nama File (otomatis, boleh diubah)</label>
+      <input type="text" id="filenameInput" placeholder="contoh: erza-everdeen.jpg">
+      <div id="filenameHint" style="font-size:11px; color:#64748b; margin-top:6px;"></div>
+    </div>
+
+    <div class="field">
+      <label>PIN</label>
+      <input type="text" id="pinInput" placeholder="Masukkan PIN">
+    </div>
+
+    <div class="field">
+      <label>Foto</label>
+      <div class="dropzone" id="dropzone">
+        <i data-lucide="upload-cloud"></i>
+        <p>Klik untuk pilih foto, atau drag & drop di sini</p>
+        <input type="file" id="fileInput" accept="image/*">
+      </div>
+      <div class="crop-wrap" id="cropWrap">
+        <div class="crop-stage" id="cropStage">
+          <img id="cropImgEl" src="" alt="crop">
+        </div>
+        <div class="crop-controls">
+          <i data-lucide="zoom-out"></i>
+          <input type="range" id="zoomSlider" min="1" max="3" step="0.02" value="1">
+          <i data-lucide="zoom-in"></i>
+        </div>
+        <div class="crop-hint">Drag foto buat atur posisi, geser slider buat zoom</div>
+        <div class="crop-actions">
+          <button type="button" class="btn-secondary" id="cropCancelBtn"><i data-lucide="x"></i> Ganti Foto</button>
+          <button type="button" class="btn-confirm" id="cropConfirmBtn"><i data-lucide="check"></i> Gunakan Foto Ini</button>
+        </div>
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <img id="previewImg" class="preview-img" src="" alt="preview">
+        <div class="preview-info">
+          <div><b id="previewName"></b></div>
+          <div id="previewSize"></div>
+        </div>
+        <button type="button" class="btn-secondary" id="previewResetBtn" style="flex:none; padding:8px 12px;"><i data-lucide="rotate-ccw"></i></button>
+      </div>
+    </div>
+
+    <button class="btn-submit" id="submitBtn" disabled>
+      <i data-lucide="upload"></i> Upload Foto
+    </button>
+
+    <div class="status-box" id="statusBox"></div>
+  </div>
+
+  <div class="footer-divider">
+    <div class="footer-line"></div>
+    <i data-lucide="aperture" class="footer-logo"></i>
+    <div class="footer-line"></div>
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
+
+const MAX_DIMENSION = 500;
+const JPEG_QUALITY = 0.82;
+const CROP_STAGE_SIZE = 280;
+
+let compressedBase64 = null;
+
+let cropNaturalW = 0, cropNaturalH = 0;
+let cropMinDim = 0;
+let cropSize = 0;
+let cropX = 0, cropY = 0;
+let isDragging = false;
+let dragStartX = 0, dragStartY = 0, dragStartCropX = 0, dragStartCropY = 0;
+
+function slugify2Words(name){
+  let clean = String(name || "").replace(/^dr\.\s*/i, '').replace(/,.*$/, '').trim().toLowerCase();
+  clean = clean.replace(/[^a-z0-9\s-]/g, '');
+  const words = clean.split(/\s+/).filter(Boolean).slice(0, 2);
+  return words.join('-');
+}
+
+function isValidPhotoFilename(filename){
+  return /^[a-z0-9_-]+\.(jpg|jpeg|png)$/i.test(filename);
+}
+
+function showStatus(type, message){
+  const box = document.getElementById('statusBox');
+  box.className = 'status-box show ' + type;
+  const icon = type === 'success' ? 'check-circle-2' : 'alert-circle';
+  box.innerHTML = `<i data-lucide="${icon}"></i><div>${message}</div>`;
+  lucide.createIcons();
+}
+
+function hideStatus(){
+  const box = document.getElementById('statusBox');
+  box.className = 'status-box';
+  box.innerHTML = '';
+}
+
+function updateSubmitState(){
+  const nama = document.getElementById('namaSelect').value;
+  const filename = document.getElementById('filenameInput').value.trim();
+  const pin = document.getElementById('pinInput').value.trim();
+  const hint = document.getElementById('filenameHint');
+
+  let filenameOk = true;
+  if (filename) {
+    filenameOk = isValidPhotoFilename(filename);
+    hint.textContent = filenameOk ? '' : 'Nama file tidak valid — hanya huruf kecil, angka, - dan _, diakhiri .jpg/.jpeg/.png';
+    hint.style.color = filenameOk ? '#64748b' : '#fca5a5';
+  } else {
+    hint.textContent = '';
+  }
+
+  document.getElementById('submitBtn').disabled = !(nama && filename && filenameOk && pin && compressedBase64);
+}
+
+async function loadNames(){
+  const select = document.getElementById('namaSelect');
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getPeopleNames");
+    const result = await res.json();
+    if (!result.success) throw new Error(result.message || "Gagal memuat nama");
+
+    select.innerHTML = '<option value="">-- Pilih nama --</option>';
+    result.data.forEach(nama => {
+      const opt = document.createElement('option');
+      opt.value = nama;
+      opt.textContent = nama;
+      select.appendChild(opt);
+    });
+  } catch (err) {
+    select.innerHTML = '<option value="">Gagal memuat daftar nama</option>';
+    console.error(err);
+  }
+}
+
+document.getElementById('namaSelect').addEventListener('change', function(){
+  if (this.value) {
+    document.getElementById('filenameInput').value = slugify2Words(this.value) + '.jpg';
+  }
+  updateSubmitState();
+});
+
+document.getElementById('filenameInput').addEventListener('input', updateSubmitState);
+document.getElementById('pinInput').addEventListener('input', updateSubmitState);
+
+const dropzone = document.getElementById('dropzone');
+const fileInput = document.getElementById('fileInput');
+
+dropzone.addEventListener('click', () => fileInput.click());
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.style.borderColor = '#a855f7'; });
+dropzone.addEventListener('dragleave', () => { dropzone.style.borderColor = ''; });
+dropzone.addEventListener('drop', e => {
+  e.preventDefault();
+  dropzone.style.borderColor = '';
+  if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => {
+  if (e.target.files.length) handleFile(e.target.files[0]);
+});
+
+function handleFile(file){
+  if (!file.type.startsWith('image/')) {
+    showStatus('error', 'File harus berupa gambar.');
+    return;
+  }
+  hideStatus();
+  document.getElementById('previewWrap').classList.remove('active');
+  compressedBase64 = null;
+  updateSubmitState();
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const img = document.getElementById('cropImgEl');
+    img.onload = function(){
+      cropNaturalW = img.naturalWidth;
+      cropNaturalH = img.naturalHeight;
+      cropMinDim = Math.min(cropNaturalW, cropNaturalH);
+
+      document.getElementById('zoomSlider').value = 1;
+      cropSize = cropMinDim;
+      cropX = (cropNaturalW - cropSize) / 2;
+      cropY = (cropNaturalH - cropSize) / 2;
+
+      renderCropImage();
+      document.getElementById('cropWrap').classList.add('active');
+      document.getElementById('dropzone').style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+
+function renderCropImage(){
+  const img = document.getElementById('cropImgEl');
+  const displayScale = CROP_STAGE_SIZE / cropSize;
+  img.style.width = (cropNaturalW * displayScale) + 'px';
+  img.style.height = (cropNaturalH * displayScale) + 'px';
+  img.style.left = (-cropX * displayScale) + 'px';
+  img.style.top = (-cropY * displayScale) + 'px';
+}
+
+function clampCrop(){
+  cropX = Math.max(0, Math.min(cropX, cropNaturalW - cropSize));
+  cropY = Math.max(0, Math.min(cropY, cropNaturalH - cropSize));
+}
+
+const cropStage = document.getElementById('cropStage');
+
+function dragStart(clientX, clientY){
+  isDragging = true;
+  cropStage.classList.add('dragging');
+  dragStartX = clientX;
+  dragStartY = clientY;
+  dragStartCropX = cropX;
+  dragStartCropY = cropY;
+}
+function dragMove(clientX, clientY){
+  if (!isDragging) return;
+  const displayScale = CROP_STAGE_SIZE / cropSize;
+  const dx = (clientX - dragStartX) / displayScale;
+  const dy = (clientY - dragStartY) / displayScale;
+  cropX = dragStartCropX - dx;
+  cropY = dragStartCropY - dy;
+  clampCrop();
+  renderCropImage();
+}
+function dragEnd(){
+  isDragging = false;
+  cropStage.classList.remove('dragging');
+}
+
+cropStage.addEventListener('mousedown', e => { dragStart(e.clientX, e.clientY); e.preventDefault(); });
+window.addEventListener('mousemove', e => dragMove(e.clientX, e.clientY));
+window.addEventListener('mouseup', dragEnd);
+
+cropStage.addEventListener('touchstart', e => {
+  const t = e.touches[0];
+  dragStart(t.clientX, t.clientY);
+}, { passive: true });
+window.addEventListener('touchmove', e => {
+  if (!isDragging) return;
+  const t = e.touches[0];
+  dragMove(t.clientX, t.clientY);
+}, { passive: true });
+window.addEventListener('touchend', dragEnd);
+
+document.getElementById('zoomSlider').addEventListener('input', function(){
+  const zoom = Number(this.value); 
+  const centerX = cropX + cropSize / 2;
+  const centerY = cropY + cropSize / 2;
+
+  cropSize = cropMinDim / zoom;
+  cropX = centerX - cropSize / 2;
+  cropY = centerY - cropSize / 2;
+  clampCrop();
+  renderCropImage();
+});
+
+document.getElementById('cropCancelBtn').addEventListener('click', function(){
+  document.getElementById('cropWrap').classList.remove('active');
+  document.getElementById('dropzone').style.display = '';
+  document.getElementById('fileInput').value = '';
+  compressedBase64 = null;
+  updateSubmitState();
+});
+
+document.getElementById('previewResetBtn').addEventListener('click', function(){
+  document.getElementById('previewWrap').classList.remove('active');
+  document.getElementById('dropzone').style.display = '';
+  document.getElementById('fileInput').value = '';
+  compressedBase64 = null;
+  updateSubmitState();
+});
+
+document.getElementById('cropConfirmBtn').addEventListener('click', function(){
+  const img = document.getElementById('cropImgEl');
+  const canvas = document.createElement('canvas');
+  canvas.width = MAX_DIMENSION;
+  canvas.height = MAX_DIMENSION;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(img, cropX, cropY, cropSize, cropSize, 0, 0, MAX_DIMENSION, MAX_DIMENSION);
+
+  const dataUrl = canvas.toDataURL('image/jpeg', JPEG_QUALITY);
+  compressedBase64 = dataUrl.split(',')[1];
+
+  const approxKB = Math.round((compressedBase64.length * 0.75) / 1024);
+
+  document.getElementById('previewImg').src = dataUrl;
+  document.getElementById('previewName').textContent = 'Foto siap diupload';
+  document.getElementById('previewSize').textContent = `${MAX_DIMENSION}x${MAX_DIMENSION}px (1:1) · ~${approxKB} KB`;
+  document.getElementById('previewWrap').classList.add('active');
+
+  document.getElementById('cropWrap').classList.remove('active');
+
+  updateSubmitState();
+});
+
+document.getElementById('submitBtn').addEventListener('click', async function(){
+  const nama = document.getElementById('namaSelect').value;
+  const filename = document.getElementById('filenameInput').value.trim();
+  const pin = document.getElementById('pinInput').value.trim();
+
+  if (!nama || !filename || !pin || !compressedBase64) return;
+  if (!isValidPhotoFilename(filename)) {
+    showStatus('error', 'Nama file tidak valid.');
+    return;
+  }
+
+  const btn = this;
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader-circle" style="animation:spin 1s linear infinite;"></i> Mengupload...';
+  lucide.createIcons();
+  hideStatus();
+
+  try {
+    const res = await fetch(SCRIPT_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ nama, filename, imageBase64: compressedBase64, pin })
+    });
+    const result = await res.json();
+
+    if (result.success) {
+      showStatus('success', result.message);
+      document.getElementById('pinInput').value = '';
+    } else {
+      showStatus('error', result.message || 'Upload gagal.');
+    }
+  } catch (err) {
+    showStatus('error', 'Gagal menghubungi server: ' + err.message);
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="upload"></i> Upload Foto';
+    lucide.createIcons();
+    updateSubmitState();
+  }
+});
+
+const styleTag = document.createElement('style');
+styleTag.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(styleTag);
+
+loadNames();
+</script>
+</body>
+</html>
