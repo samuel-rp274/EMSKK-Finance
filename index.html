@@ -234,6 +234,7 @@ h1 span.gradient {
 .card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
 .card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
 .card.invoice-overview::before { background: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
+.card.org-structure::before { background: #a855f7; box-shadow: 0 0 15px #a855f7; }
 
 .icon-wrapper {
   width: 56px;
@@ -248,6 +249,7 @@ h1 span.gradient {
 .card.attendance-overview .icon-wrapper { background: rgba(245, 158, 11, 0.15); color: #f59e0b; box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2); }
 .card.invoice-input .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
 .card.invoice-overview .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2); }
+.card.org-structure .icon-wrapper { background: rgba(168, 85, 247, 0.15); color: #a855f7; box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.2); }
 
 .card-content { flex-grow: 1; }
 .card-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: #ffffff; }
@@ -268,12 +270,14 @@ h1 span.gradient {
 .card.attendance-overview .arrow-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
 .card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
 .card.invoice-overview .arrow-btn { color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
+.card.org-structure .arrow-btn { color: #a855f7; border-color: rgba(168, 85, 247, 0.2); }
 
 .card:hover { transform: translateY(-3px); background: rgba(15, 23, 42, 0.75); }
 .card.attendance:hover { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15); }
 .card.attendance-overview:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15); }
 .card.invoice-input:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15); }
 .card.invoice-overview:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15); }
+.card.org-structure:hover { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 12px 30px rgba(168, 85, 247, 0.15); }
 
 .card:hover .arrow-btn { background: currentColor; transform: translateX(10px); }
 .card:hover .arrow-btn i { color: #030712 !important; }
@@ -358,6 +362,7 @@ opacity: 0;
 .container.show-menu .card:nth-child(2) { animation-delay: 0.3s; }
 .container.show-menu .card:nth-child(3) { animation-delay: 0.4s; }
 .container.show-menu .card:nth-child(4) { animation-delay: 0.5s; }
+.container.show-menu .card:nth-child(5) { animation-delay: 0.6s; }
 </style>
 </head>
 <body class="bg-darken">
@@ -409,6 +414,15 @@ opacity: 0;
         <div class="card-content">
           <div class="card-title">Invoice Overview</div>
           <div class="card-desc">Weekly invoice submission summary</div>
+        </div>
+        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
+      </div>
+
+      <div class="card org-structure" onclick="go('structure.html')">
+        <div class="icon-wrapper"><i data-lucide="network"></i></div>
+        <div class="card-content">
+          <div class="card-title">Organizational Structure</div>
+          <div class="card-desc">Browse departments & roles</div>
         </div>
         <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
       </div>
@@ -467,7 +481,5 @@ function go(page){
 }
 
 </script>
-
 </body>
-
 </html>
