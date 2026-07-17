@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMSKK Admin Dashboard</title>
+<title>EMSKK Finance Dashboard</title>
 
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="manifest" href="/manifest-admin.json">
@@ -43,7 +43,7 @@ body {
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  padding: 40px 20px;
+  padding: 100px 20px 40px 20px;
 }
 
 .blob {
@@ -58,6 +58,18 @@ body {
 }
 .blob.top-left { background: #3b82f6; top: -150px; left: -150px; }
 .blob.bottom-right { background: #22c55e; bottom: -150px; right: -150px; }
+
+.topnav {
+  position: fixed; top:0; left:0; width:100%; padding:16px 24px;
+  display:flex; justify-content:space-between; align-items:center;
+  background: rgba(15,23,42,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 999;
+}
+.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
+.topnav a:hover { color:#38bdf8; }
+.topnav .title { font-size:12px; font-weight:700; color:#64748b; letter-spacing:1.5px; text-transform:uppercase; }
+.topnav .nav-links { display:flex; align-items:center; gap:14px; }
+.topnav .nav-sep { color:#334155; font-size:13px; font-weight:600; }
 
 .container {
   width: 100%;
@@ -366,6 +378,15 @@ input[type="checkbox"] {
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
+<div class="topnav">
+  <div class="nav-links">
+    <a href="index.html"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> User Menu</a>
+    <span class="nav-sep">||</span>
+    <a href="indexadminemskk.html"><i data-lucide="shield" style="width:16px;height:16px;"></i> Admin Menu</a>
+  </div>
+  <div class="title">EMSKK SYSTEM</div>
+</div>
+
 <div class="container">
 
 <div id="navbar">
@@ -377,7 +398,7 @@ input[type="checkbox"] {
 </div>
 
 <div class="card" id="loginCard">
-  <h1>Admin Dashboard</h1>
+  <h1>Finance Dashboard</h1>
   <div class="subtitle">Masukkan kredensial keamanan administrator</div>
   <input type="password" id="adminPassword" placeholder="Password Admin">
   <button onclick="checkLogin()"><i data-lucide="lock" style="width:16px; height:16px"></i> Masuk Ke Dashboard</button>
