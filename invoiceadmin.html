@@ -789,13 +789,7 @@ function updateStatus(rowIndex, status, element){
 
       cached.data = cached.data.map(i => {
         if (String(i.RowIndex) === String(rowIndex)) {
-          const divisi = String(i.Divisi || "").trim().toUpperCase();
-          const potonganRate = potonganCache[divisi] || 0;
-          const totalBruto = Number(i.Total || 0);
-          
-          const hitungGajiBersih = status === "VALID" ? (totalBruto - (totalBruto * potonganRate)) : 0;
-          
-          return { ...i, Status: status, GajiBersih: hitungGajiBersih };
+          return { ...i, Status: status };
         }
         return i;
       });
