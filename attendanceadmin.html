@@ -469,7 +469,10 @@ a:hover {
     </div>
 
     <div class="stat">
-      <div class="stat-title"><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Duty Minggu ini</div>
+      <div class="stat-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+        <span><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Duty Minggu ini</span>
+        <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:#f8fafc; color:#030712;"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
+      </div>
       <div class="stat-value" id="topDuty">-</div>
     </div>
   </div>
@@ -744,6 +747,7 @@ function renderAttendanceTable(){
   }
 
   const top3 = Object.values(topMap).sort((a,b) => b.minutes - a.minutes).slice(0,3);
+  window._top3Cache = top3;
   const pending = weekData.filter(i => normalize(i.Status) === "PENDING");
 
   document.getElementById("pendingDuty").innerText = pending.length;
@@ -768,6 +772,7 @@ function renderAttendanceTable(){
   }
 
   const payroll = {};
+
   for(const i of weekData){
     const nama = i.Nama || "-"; const divisi = normalize(i.Divisi); const jabatan = normalize(i.Jabatan);
     if(!payroll[nama]){ payroll[nama] = { nama, divisi, jabatan, validMinutes: 0, gaji: 0, sessions: [] }; }
@@ -840,6 +845,24 @@ function renderAttendanceTable(){
 }
 
 function toggleDetail(idx){ document.getElementById("detail-"+idx).classList.toggle("hidden"); }
+
+function copyTop3(){
+  const top3 = window._top3Cache || [];
+  const text = top3.map((u, i) => {
+    const h = Math.floor(u.minutes / 60); const m = u.minutes % 60;
+    return `${i+1}. ${u.nama} - ${h}h ${m}m`;
+  }).join("\n");
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copyTop3Btn");
+    const original = btn.innerHTML;
+    btn.innerHTML = "Tersalin!";
+    setTimeout(() => {
+      btn.innerHTML = original;
+      if(window.lucide) lucide.createIcons();
+    }, 1500);
+  });
+}
 
 async function loadPotonganCache(){
   const res = await fetch(SCRIPT_URL+"?action=getAllPotongan");
