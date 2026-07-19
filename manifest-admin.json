@@ -2,7 +2,7 @@
   "name": "EMSKK Admin",
   "short_name": "EMSKK Admin",
   "description": "Admin Dashboard - EMSKK Portal",
-  "start_url": "/admin.html",
+  "start_url": "/indexadminemskk.html",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
