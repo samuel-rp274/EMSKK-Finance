@@ -68,8 +68,6 @@ body {
 .topnav .nav-links { display:flex; align-items:center; gap:14px; }
 .topnav .nav-sep { color:#334155; font-size:13px; font-weight:600; }
 
-.spin-icon svg { animation: spin 0.8s linear infinite; }
-@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
 
 
 .container {
@@ -489,7 +487,7 @@ a:hover {
           <th>Jabatan</th>
           <th>Divisi</th>
           <th>Total Jam Valid</th>
-          <th>Rate/Hour <span id="refreshRateBtn" onclick="refreshRates()" style="cursor:pointer;display:inline-flex;vertical-align:middle;color:#38bdf8;" title="Refresh rate"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i></span></th>
+          <th>Rate/Hour</th>
           <th>Total Gaji</th>
           <th>Detail</th>
         </tr>
@@ -552,7 +550,6 @@ a:hover {
 const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 const LOGIN_KEY = "ems_admin_login";
 const CACHE_KEY_ATT = "attendance_cache_v1";
-const CACHE_KEY_RATE = "rates_cache_v1";
 const CACHE_TTL = 1000 * 60 * 3;
 
 let allAttendance = [];
@@ -629,15 +626,8 @@ async function refreshFromServer(){
 }
 
 async function loadRates(){
-  const cached = localStorage.getItem(CACHE_KEY_RATE);
-  let data = null;
-  if(cached){ try { data = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_RATE); } }
-
-  if(!data){
-    const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
-    data = await res.json();
-    localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
-  }
+  const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
+  const data = await res.json();
   if(!data || !data.divisi || !data.jabatan){
     ratesReady = false;
     return;
@@ -645,27 +635,6 @@ async function loadRates(){
   mapRates(data);
   ratesReady = true;
   if(allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
-}
-
-async function refreshRates(){
-  const btn = document.getElementById('refreshRateBtn');
-  if(btn){ btn.style.pointerEvents = 'none'; btn.classList.add('spin-icon'); }
-  try{
-    const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
-    const data = await res.json();
-    if(!data || !data.divisi || !data.jabatan){
-      ratesReady = false;
-      return;
-    }
-    localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
-    mapRates(data);
-    ratesReady = true;
-    if(allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
-  } catch(e){
-    console.log("refresh rate gagal", e);
-  } finally {
-    if(btn){ btn.style.pointerEvents = ''; btn.classList.remove('spin-icon'); }
-  }
 }
 
 function mapRates(data){
@@ -825,7 +794,8 @@ function renderAttendanceTable(){
   
   tbody.innerHTML = sortedPayroll.map((v, idx) => {
     const validHours = v.validMinutes / 60;
-    const rateHour = validHours > 0 ? (v.gaji / validHours) : 0;
+    const priorityDivisi = ["PETINGGI","PENGURUS","SPESIALIS"];
+    const rateHour = priorityDivisi.includes(v.divisi) ? (rateDivisiMap[v.divisi] || 0) : (rateJabatanMap[v.jabatan] || 0);
     const hasPending = v.sessions.some(s => normalize(s.Status) === "PENDING");
     return `
       <tr data-row="${v.sessions[0]?.RowIndex}" class="${hasPending ? "row-pending" : ""}">
