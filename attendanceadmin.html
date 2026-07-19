@@ -68,6 +68,9 @@ body {
 .topnav .nav-links { display:flex; align-items:center; gap:14px; }
 .topnav .nav-sep { color:#334155; font-size:13px; font-weight:600; }
 
+.spin-icon svg { animation: spin 0.8s linear infinite; }
+@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
 
 .container {
   width: 100%;
@@ -486,7 +489,7 @@ a:hover {
           <th>Jabatan</th>
           <th>Divisi</th>
           <th>Total Jam Valid</th>
-          <th>Rate/Hour</th>
+          <th>Rate/Hour <span id="refreshRateBtn" onclick="refreshRates()" style="cursor:pointer;display:inline-flex;vertical-align:middle;color:#38bdf8;" title="Refresh rate"><i data-lucide="refresh-cw" style="width:14px;height:14px;"></i></span></th>
           <th>Total Gaji</th>
           <th>Detail</th>
         </tr>
@@ -644,6 +647,27 @@ async function loadRates(){
   if(allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
 }
 
+async function refreshRates(){
+  const btn = document.getElementById('refreshRateBtn');
+  if(btn){ btn.style.pointerEvents = 'none'; btn.classList.add('spin-icon'); }
+  try{
+    const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
+    const data = await res.json();
+    if(!data || !data.divisi || !data.jabatan){
+      ratesReady = false;
+      return;
+    }
+    localStorage.setItem(CACHE_KEY_RATE, JSON.stringify(data));
+    mapRates(data);
+    ratesReady = true;
+    if(allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
+  } catch(e){
+    console.log("refresh rate gagal", e);
+  } finally {
+    if(btn){ btn.style.pointerEvents = ''; btn.classList.remove('spin-icon'); }
+  }
+}
+
 function mapRates(data){
   rateDivisiMap = {}; rateJabatanMap = {};
   data.divisi.forEach(r => { rateDivisiMap[String(r[0]).trim().toUpperCase()] = Number(r[1]); });
@@ -784,10 +808,7 @@ function renderAttendanceTable(){
 
     if(normalize(i.Status) === "VALID"){
       payroll[nama].validMinutes += minutes;
-      const hours = minutes / 60;
-      const priorityDivisi = ["PETINGGI","PENGURUS","SPESIALIS"];
-      let rate = priorityDivisi.includes(divisi) ? (rateDivisiMap[divisi] || 0) : (rateJabatanMap[jabatan] || 0);
-      payroll[nama].gaji += (hours * rate);
+      payroll[nama].gaji += Number(i.GajiDuty || 0);
     }
     payroll[nama].sessions.push(i);
   }
@@ -897,24 +918,27 @@ function saveEdit(){
 
   closeModal();
 
+  let newGaji = null;
+
   fetch(`${SCRIPT_URL}?action=updateSessionTime&rowIndex=${currentEditId}&start=${start}&finish=${finish}`)
     .then(res => res.json())
     .then(data => {
       if(!data.success){ throw new Error("Gagal update waktu"); }
+      newGaji = data.gaji;
       return fetch(`${SCRIPT_URL}?action=updateAttendanceStatus&rowIndex=${currentEditId}&status=VALID`);
     })
     .then(res => res.json())
     .then(data => {
       if(!data.success){ throw new Error("Gagal set VALID"); }
       
-      updateTimeLocal(currentEditId, formattedStart, formattedFinish, "VALID");
+      updateTimeLocal(currentEditId, formattedStart, formattedFinish, "VALID", newGaji);
     })
     .catch(err => { 
       alert("Server error atau gagal menyimpan perubahan. Silakan refresh halaman."); 
     });
 }
 
-function updateTimeLocal(rowIndex, newStart, newFinish, newStatus){
+function updateTimeLocal(rowIndex, newStart, newFinish, newStatus, newGaji){
   let newDurasi = "-";
   if (newStart && newFinish) {
     const d1 = new Date(newStart.replace(" ", "T"));
@@ -940,7 +964,8 @@ function updateTimeLocal(rowIndex, newStart, newFinish, newStatus){
         Start: newStart, 
         Finish: newFinish, 
         Status: newStatus,
-        Durasi: newDurasi
+        Durasi: newDurasi,
+        GajiDuty: (newGaji !== null && newGaji !== undefined) ? newGaji : item.GajiDuty
       };
     }
     return item;
