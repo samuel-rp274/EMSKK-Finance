@@ -391,7 +391,7 @@ input[type="checkbox"] {
 
 <div id="navbar">
   <div class="nav-container">
-    <a href="admin.html" class="active"><i data-lucide="wallet" style="width:14px; height:14px"></i> Total Salary</a>
+    <a href="financeadmin.html" class="active"><i data-lucide="wallet" style="width:14px; height:14px"></i> Total Salary</a>
     <a href="attendanceadmin.html" class="inactive"><i data-lucide="calendar" style="width:14px; height:14px"></i> Attendance Data</a>
     <a href="invoiceadmin.html" class="inactive"><i data-lucide="file-spreadsheet" style="width:14px; height:14px"></i> Invoice Data</a>
   </div>
@@ -434,7 +434,10 @@ input[type="checkbox"] {
     </div>
 
     <div class="stat">
-      <div class="stat-title"><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Gaji Minggu ini</div>
+      <div class="stat-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+        <span><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Gaji Minggu ini</span>
+        <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:#f8fafc; color:#030712;"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
+      </div>
       <div class="stat-value" id="topGaji">-</div>
     </div>
   </div>
@@ -614,6 +617,7 @@ async function renderTable(){
   document.getElementById("sisaWeek").innerText = "$KK " + sisaWeek.toLocaleString("id-ID");
 
   const top3 = [...filtered].sort((a,b)=>(Number(b.duty) + Number(b.invoice)) - (Number(a.duty) + Number(a.invoice))).slice(0,3);
+  window._top3Cache = top3;
   
   document.getElementById("topGaji").innerHTML = top3.map((x,i)=>`
     <div class="top-rank-item">
@@ -685,6 +689,21 @@ function markPaid(nama, week, checked, element){
     console.error("Gagal memperbarui status:", err);
     alert("Koneksi bermasalah. Gagal mengubah status pembayaran.");
     if(element) element.disabled = false; 
+  });
+}
+
+function copyTop3(){
+  const top3 = window._top3Cache || [];
+  const text = top3.map((x, i) => `${i+1}. ${x.nama}`).join("\n");
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById("copyTop3Btn");
+    const original = btn.innerHTML;
+    btn.innerHTML = "Tersalin!";
+    setTimeout(() => {
+      btn.innerHTML = original;
+      if(window.lucide) lucide.createIcons();
+    }, 1500);
   });
 }
 </script>
