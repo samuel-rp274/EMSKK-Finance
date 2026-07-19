@@ -876,6 +876,10 @@ function setStatus(rowIndex, status) {
     .then(data => {
       if(!data.success){ throw new Error("Gagal update status"); }
       updateStatusLocal(rowIndex, status);
+      allAttendance = allAttendance.map(item => {
+        if(String(item.RowIndex) === String(rowIndex)){ return { ...item, Status: status }; }
+        return item;
+      });
       const cached = localStorage.getItem(CACHE_KEY_ATT);
       if(cached){
         let parsed = null;
