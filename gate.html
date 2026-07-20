@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Gate Access</title>
+
 <link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,12 +30,13 @@ body {
   }
 }
 
+body.internal-mode { background: #030712; }
+
 .blob { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: 0; pointer-events: none; }
 .blob.top-left { background: #ef4444; top: -150px; left: -150px; }
 .blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
 
-body.internal-mode .blob.top-left { background: #f59e0b; }
-body.internal-mode .blob.bottom-right { background: #ef4444; }
+body.internal-mode .blob { opacity: 0.12; }
 
 .container { width:100%; max-width: 420px; z-index:2; position:relative; }
 
@@ -47,25 +49,22 @@ body.internal-mode .blob.bottom-right { background: #ef4444; }
   content:""; position:absolute; top:10%; left:0; width:3px; height:80%; border-radius:4px;
   background:#ef4444; box-shadow: 0 0 15px #ef4444;
 }
-body.internal-mode .card-main::before { background:#f59e0b; box-shadow: 0 0 15px #f59e0b; }
 
 .card-header-icon {
   width:56px; height:56px; background: rgba(239,68,68,0.15); color:#f87171;
   border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;
 }
-body.internal-mode .card-header-icon { background: rgba(245,158,11,0.15); color:#fbbf24; }
 
 .badge {
-  display:none; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:0.8px;
-  text-transform:uppercase; color:#fbbf24; background: rgba(245,158,11,0.12);
-  border:1px solid rgba(245,158,11,0.25); padding:5px 10px; border-radius:8px; margin-bottom:14px; width:fit-content;
+  display:none; align-items:center; gap:8px; font-size:11px; font-weight:700; letter-spacing:0.12em;
+  text-transform:uppercase; color:#fca5a5; background: rgba(239,68,68,0.08);
+  border:1px solid rgba(239,68,68,0.35); padding:7px 16px; border-radius:999px; margin-bottom:14px; width:fit-content;
 }
 body.internal-mode .badge { display:flex; }
 .badge i { width:12px; height:12px; }
 
 h2 { font-size:22px; font-weight:700; margin-bottom:6px; }
 h2 span.gradient { background: linear-gradient(to right, #f87171, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
-body.internal-mode h2 span.gradient { background: linear-gradient(to right, #fbbf24, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
 
 .subtitle { color:#94a3b8; font-size:13px; margin-bottom: 28px; line-height:1.5; }
 
@@ -77,14 +76,12 @@ input[type="password"] {
   border-radius:12px; padding:12px 14px; color:white; font-size:14px; outline:none;
 }
 input[type="password"]:focus { border-color: #ef4444; }
-body.internal-mode input[type="password"]:focus { border-color: #f59e0b; }
 
 .btn-submit {
   width:100%; padding:14px; border:none; border-radius:14px; cursor:pointer;
   background: linear-gradient(to right, #ef4444, #dc2626); color:white; font-size:14px; font-weight:700;
   display:flex; align-items:center; justify-content:center; gap:8px; transition: opacity 0.2s;
 }
-body.internal-mode .btn-submit { background: linear-gradient(to right, #f59e0b, #ef4444); }
 .btn-submit:hover { opacity: 0.9; }
 .btn-submit:disabled { opacity: 0.5; cursor:not-allowed; }
 .btn-submit i { width:16px; height:16px; }
@@ -107,7 +104,7 @@ body.internal-mode .btn-submit { background: linear-gradient(to right, #f59e0b, 
 <div class="container">
   <div class="card-main">
     <div class="card-header-icon"><i data-lucide="lock"></i></div>
-    <div class="badge"><i data-lucide="shield-alert"></i> Internal Access</div>
+    <div class="badge"><i data-lucide="shield-alert"></i> Internal / Admin Access</div>
     <h2><span class="gradient" id="gateTitle">Portal Access</span></h2>
     <div class="subtitle" id="gateSubtitle">Masukkan password untuk mengakses EMSKK Portal.</div>
 
