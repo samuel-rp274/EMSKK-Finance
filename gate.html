@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Gate Access</title>
+<link rel="icon" href="logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+* { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+
+body {
+  background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)),
+              url('imagelandscape.webp') no-repeat center center fixed;
+  background-size: cover;
+  color: #f8fafc; min-height: 100vh; overflow-x: hidden;
+  display: flex; align-items: center; justify-content: center;
+  padding: 20px; position: relative;
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  body {
+    background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)),
+                url('imageportrait.webp') no-repeat center center fixed;
+    background-size: cover;
+  }
+}
+
+.blob { position: fixed; width: 500px; height: 500px; border-radius: 50%; filter: blur(120px); opacity: 0.15; z-index: 0; pointer-events: none; }
+.blob.top-left { background: #ef4444; top: -150px; left: -150px; }
+.blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
+
+body.internal-mode .blob.top-left { background: #f59e0b; }
+body.internal-mode .blob.bottom-right { background: #ef4444; }
+
+.container { width:100%; max-width: 420px; z-index:2; position:relative; }
+
+.card-main {
+  background: rgba(15,23,42,0.5); border:1px solid rgba(255,255,255,0.05);
+  backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  border-radius: 24px; padding: 40px 36px; width:100%; position:relative;
+}
+.card-main::before {
+  content:""; position:absolute; top:10%; left:0; width:3px; height:80%; border-radius:4px;
+  background:#ef4444; box-shadow: 0 0 15px #ef4444;
+}
+body.internal-mode .card-main::before { background:#f59e0b; box-shadow: 0 0 15px #f59e0b; }
+
+.card-header-icon {
+  width:56px; height:56px; background: rgba(239,68,68,0.15); color:#f87171;
+  border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+}
+body.internal-mode .card-header-icon { background: rgba(245,158,11,0.15); color:#fbbf24; }
+
+.badge {
+  display:none; align-items:center; gap:6px; font-size:11px; font-weight:700; letter-spacing:0.8px;
+  text-transform:uppercase; color:#fbbf24; background: rgba(245,158,11,0.12);
+  border:1px solid rgba(245,158,11,0.25); padding:5px 10px; border-radius:8px; margin-bottom:14px; width:fit-content;
+}
+body.internal-mode .badge { display:flex; }
+.badge i { width:12px; height:12px; }
+
+h2 { font-size:22px; font-weight:700; margin-bottom:6px; }
+h2 span.gradient { background: linear-gradient(to right, #f87171, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
+body.internal-mode h2 span.gradient { background: linear-gradient(to right, #fbbf24, #ef4444); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
+
+.subtitle { color:#94a3b8; font-size:13px; margin-bottom: 28px; line-height:1.5; }
+
+.field { margin-bottom: 20px; }
+.field label { display:block; font-size:12px; font-weight:600; color:#94a3b8; margin-bottom:8px; text-transform:uppercase; letter-spacing:0.5px; }
+
+input[type="password"] {
+  width:100%; background: rgba(15,23,42,0.8); border:1px solid rgba(255,255,255,0.08);
+  border-radius:12px; padding:12px 14px; color:white; font-size:14px; outline:none;
+}
+input[type="password"]:focus { border-color: #ef4444; }
+body.internal-mode input[type="password"]:focus { border-color: #f59e0b; }
+
+.btn-submit {
+  width:100%; padding:14px; border:none; border-radius:14px; cursor:pointer;
+  background: linear-gradient(to right, #ef4444, #dc2626); color:white; font-size:14px; font-weight:700;
+  display:flex; align-items:center; justify-content:center; gap:8px; transition: opacity 0.2s;
+}
+body.internal-mode .btn-submit { background: linear-gradient(to right, #f59e0b, #ef4444); }
+.btn-submit:hover { opacity: 0.9; }
+.btn-submit:disabled { opacity: 0.5; cursor:not-allowed; }
+.btn-submit i { width:16px; height:16px; }
+
+.status-box {
+  margin-top: 16px; padding: 12px 14px; border-radius:12px; font-size:13px; display:none; gap:10px; align-items:flex-start;
+}
+.status-box.show { display:flex; }
+.status-box.error { background: rgba(239,68,68,0.1); border:1px solid rgba(239,68,68,0.3); color:#fca5a5; }
+.status-box i { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
+
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<div class="blob top-left"></div>
+<div class="blob bottom-right"></div>
+
+<div class="container">
+  <div class="card-main">
+    <div class="card-header-icon"><i data-lucide="lock"></i></div>
+    <div class="badge"><i data-lucide="shield-alert"></i> Internal Access</div>
+    <h2><span class="gradient" id="gateTitle">Portal Access</span></h2>
+    <div class="subtitle" id="gateSubtitle">Masukkan password untuk mengakses EMSKK Portal.</div>
+
+    <form id="gateForm">
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Masukkan password" autofocus>
+      </div>
+
+      <button type="submit" class="btn-submit" id="submitBtn">
+        <i data-lucide="log-in"></i> Masuk
+      </button>
+    </form>
+
+    <div class="status-box" id="statusBox"></div>
+  </div>
+</div>
+
+<script>
+lucide.createIcons();
+
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
+
+const params = new URLSearchParams(window.location.search);
+const gateType = params.get('type') === 'internal' ? 'internal' : 'portal';
+const redirectTarget = sanitizeRedirect(params.get('redirect'));
+
+function sanitizeRedirect(target){
+  if (!target) return 'index.html';
+  if (target.includes('://') || target.startsWith('//')) return 'index.html';
+  return target;
+}
+
+const isInternal = gateType === 'internal';
+if (isInternal) {
+  document.body.classList.add('internal-mode');
+  document.getElementById('gateTitle').textContent = 'Internal Access';
+  document.getElementById('gateSubtitle').textContent = 'Halaman ini khusus internal/admin EMSKK. Masukkan password internal untuk melanjutkan.';
+}
+
+const ACCESS_LEVEL_KEY = 'emskk_access_level';
+const ACCESS_DATE_KEY = 'emskk_access_date';
+const ACTION_NAME = 'verifyAccess';
+
+function todayLocal(){
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+}
+
+function showError(message){
+  const box = document.getElementById('statusBox');
+  box.className = 'status-box show error';
+  box.innerHTML = `<i data-lucide="alert-circle"></i><div>${message}</div>`;
+  lucide.createIcons();
+}
+
+function hideStatus(){
+  const box = document.getElementById('statusBox');
+  box.className = 'status-box';
+  box.innerHTML = '';
+}
+
+document.getElementById('gateForm').addEventListener('submit', async function(e){
+  e.preventDefault();
+  const password = document.getElementById('passwordInput').value.trim();
+  if (!password) return;
+
+  hideStatus();
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<i data-lucide="loader-circle" style="animation:spin 1s linear infinite;"></i> Memeriksa...';
+  lucide.createIcons();
+
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=" + ACTION_NAME + "&password=" + encodeURIComponent(password));
+    const result = await res.json();
+
+    const level = result.level || null;
+    const levelSufficient = isInternal ? level === 'internal' : (level === 'internal' || level === 'portal');
+
+    if (result.success && levelSufficient) {
+      localStorage.setItem(ACCESS_LEVEL_KEY, level);
+      localStorage.setItem(ACCESS_DATE_KEY, todayLocal());
+      window.location.href = redirectTarget;
+    } else {
+      showError('Password salah.');
+      btn.disabled = false;
+      btn.innerHTML = '<i data-lucide="log-in"></i> Masuk';
+      lucide.createIcons();
+    }
+  } catch (err) {
+    showError('Gagal menghubungi server: ' + err.message);
+    btn.disabled = false;
+    btn.innerHTML = '<i data-lucide="log-in"></i> Masuk';
+    lucide.createIcons();
+  }
+});
+</script>
+</body>
+</html>
