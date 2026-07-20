@@ -1,6 +1,23 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  var GATE_TYPE = 'internal';
+  var level = localStorage.getItem('emskk_access_level');
+  var date = localStorage.getItem('emskk_access_date');
+  var d = new Date();
+  var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+  var levelSufficient = (level === 'internal');
+  var dateValid = (date === today);
+
+  if (!levelSufficient || !dateValid) {
+    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    window.location.replace('gate.html?type=' + GATE_TYPE + '&redirect=' + encodeURIComponent(currentPage));
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Duty Ranking</title>
