@@ -1,9 +1,28 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script>
+(function(){
+  var GATE_TYPE = 'internal';
+  var level = localStorage.getItem('emskk_access_level');
+  var date = localStorage.getItem('emskk_access_date');
+  var d = new Date();
+  var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+
+  var levelSufficient = (level === 'internal');
+  var dateValid = (date === today);
+
+  if (!levelSufficient || !dateValid) {
+    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    window.location.replace('gate.html?type=' + GATE_TYPE + '&redirect=' + encodeURIComponent(currentPage));
+  }
+})();
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Upload Foto</title>
+
+<link rel="icon" href="logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -158,11 +177,6 @@ select:focus, input[type="text"]:focus { border-color: #a855f7; }
     </div>
 
     <div class="field">
-      <label>PIN</label>
-      <input type="text" id="pinInput" placeholder="Masukkan PIN">
-    </div>
-
-    <div class="field">
       <label>Foto</label>
       <div class="dropzone" id="dropzone">
         <i data-lucide="upload-cloud"></i>
@@ -254,7 +268,6 @@ function hideStatus(){
 function updateSubmitState(){
   const nama = document.getElementById('namaSelect').value;
   const filename = document.getElementById('filenameInput').value.trim();
-  const pin = document.getElementById('pinInput').value.trim();
   const hint = document.getElementById('filenameHint');
 
   let filenameOk = true;
@@ -266,7 +279,7 @@ function updateSubmitState(){
     hint.textContent = '';
   }
 
-  document.getElementById('submitBtn').disabled = !(nama && filename && filenameOk && pin && compressedBase64);
+  document.getElementById('submitBtn').disabled = !(nama && filename && filenameOk && compressedBase64);
 }
 
 async function loadNames(){
@@ -297,7 +310,6 @@ document.getElementById('namaSelect').addEventListener('change', function(){
 });
 
 document.getElementById('filenameInput').addEventListener('input', updateSubmitState);
-document.getElementById('pinInput').addEventListener('input', updateSubmitState);
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
@@ -454,9 +466,8 @@ document.getElementById('cropConfirmBtn').addEventListener('click', function(){
 document.getElementById('submitBtn').addEventListener('click', async function(){
   const nama = document.getElementById('namaSelect').value;
   const filename = document.getElementById('filenameInput').value.trim();
-  const pin = document.getElementById('pinInput').value.trim();
 
-  if (!nama || !filename || !pin || !compressedBase64) return;
+  if (!nama || !filename || !compressedBase64) return;
   if (!isValidPhotoFilename(filename)) {
     showStatus('error', 'Nama file tidak valid.');
     return;
@@ -472,13 +483,12 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
     const res = await fetch(SCRIPT_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify({ nama, filename, imageBase64: compressedBase64, pin })
+      body: JSON.stringify({ nama, filename, imageBase64: compressedBase64 })
     });
     const result = await res.json();
 
     if (result.success) {
       showStatus('success', result.message);
-      document.getElementById('pinInput').value = '';
     } else {
       showStatus('error', result.message || 'Upload gagal.');
     }
