@@ -104,7 +104,7 @@ input[type="password"]:focus { border-color: #ef4444; }
 <div class="container">
   <div class="card-main">
     <div class="card-header-icon"><i data-lucide="lock"></i></div>
-    <div class="badge"><i data-lucide="shield-alert"></i> Internal / Admin Access</div>
+    <div class="badge"><i data-lucide="shield-alert"></i>RESTRICTED AREA</div>
     <h2><span class="gradient" id="gateTitle">Portal Access</span></h2>
     <div class="subtitle" id="gateSubtitle">Masukkan password untuk mengakses EMSKK Portal.</div>
 
@@ -142,7 +142,7 @@ const isInternal = gateType === 'internal';
 if (isInternal) {
   document.body.classList.add('internal-mode');
   document.getElementById('gateTitle').textContent = 'Internal Access';
-  document.getElementById('gateSubtitle').textContent = 'Halaman ini khusus internal/admin EMSKK. Masukkan password internal untuk melanjutkan.';
+  document.getElementById('gateSubtitle').textContent = 'Halaman ini khusus Petinggi-Pengurus EMSKK. Masukkan password untuk melanjutkan.';
 }
 
 const ACCESS_LEVEL_KEY = 'emskk_access_level';
