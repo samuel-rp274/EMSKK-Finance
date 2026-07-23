@@ -1,0 +1,172 @@
+#__sbTopbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: var(--sb-scrollbar-w, 0px);
+  z-index: 1000;
+  padding: 10px 20px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(15, 23, 42, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Inter', sans-serif;
+}
+
+#__sbToggleBtn {
+  background: none;
+  border: none;
+  outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  box-sizing: border-box;
+  cursor: pointer;
+  color: #cbd5e1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  padding: 0;
+  margin: 0;
+  flex-shrink: 0;
+  line-height: 0;
+  vertical-align: middle;
+}
+#__sbToggleBtn:hover, #__sbToggleBtn:focus, #__sbToggleBtn:active {
+  background: rgba(255, 255, 255, 0.06);
+  color: #38bdf8;
+  transform: none;
+}
+#__sbToggleBtn svg { width: 18px; height: 18px; display: block; }
+
+#__sbTopbarTitle {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  height: 26px;
+}
+
+#__sbBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1998;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+#__sbBackdrop.__sb-show { opacity: 1; pointer-events: auto; }
+
+#__sbPanel {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100vh;
+  width: 280px;
+  max-width: 85vw;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-right: 1px solid rgba(255, 255, 255, 0.06);
+  z-index: 1999;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 0 0;
+  font-family: 'Inter', sans-serif;
+}
+#__sbPanel.__sb-open { transform: translateX(0); }
+
+.__sb-menu {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+.__sb-menu::-webkit-scrollbar { width: 5px; }
+.__sb-menu::-webkit-scrollbar-track { background: transparent; }
+.__sb-menu::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+}
+.__sb-menu::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.22); }
+
+.__sb-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 15px 15px;
+  margin-bottom: 1px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  text-decoration: none;
+}
+.__sb-brand img { width: 36x; height: 36px; border-radius: 8px; }
+.__sb-brand span { font-size: 22px; font-weight: 700; color: #f8fafc; letter-spacing: 0.6px; }
+
+.__sb-greeting {
+  padding: 15px 15px;
+  margin-bottom: 1px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #94a3b8;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.__sb-section-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 15px 20px 8px;
+}
+
+.__sb-link {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 20px;
+  margin: 3px 10px;
+  border-radius: 10px;
+  color: #cbd5e1;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+.__sb-link:hover { background: rgba(255, 255, 255, 0.05); color: #f8fafc; }
+.__sb-link.__sb-active { background: rgba(56, 189, 248, 0.12); color: #38bdf8; }
+.__sb-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+
+.__sb-link.__sb-logout { color: #f87171; }
+.__sb-link.__sb-logout:hover { background: rgba(239, 68, 68, 0.1); color: #fca5a5; }
+
+.__sb-divider {
+  border: none;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  margin: 12px 16px;
+}
+
+.__sb-footer {
+  margin-top: 1px;
+  padding: 10px 20px 4px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  text-align: center;
+  font-size: 11px;
+  font-weight: 600;
+  color: #475569;
+  line-height: 1.5;
+}
