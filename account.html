@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="1"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/account.css">
+<script src="assets/js/account.js" defer></script>
+
+<title>EMSKK User Account</title>
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+    <div class="card">
+
+      <div class="view active" id="choiceView">
+        <div class="card-header-icon"><i data-lucide="user-cog"></i></div>
+        <h2><span class="gradient" id="greetingText">Halo!</span></h2>
+        <div class="subtitle">Pilih apa yang ingin diperbarui.</div>
+
+        <button type="button" class="btn-submit" id="wantUsernameBtn">
+          <i data-lucide="user"></i> Ganti Username
+        </button>
+        <button type="button" class="btn-submit" id="wantPasswordBtn" style="margin-top:10px;">
+          <i data-lucide="key-round"></i> Ganti Password
+        </button>
+        <button type="button" class="btn-secondary" id="backToPortalBtn">
+          <i data-lucide="arrow-left"></i> Kembali ke Portal
+        </button>
+      </div>
+
+      <div class="view" id="usernameStep1View">
+        <div class="card-header-icon"><i data-lucide="user"></i></div>
+        <h2><span class="gradient">Ganti Username</span></h2>
+        <div class="subtitle">Masukkan username baru yang ingin kamu pakai.</div>
+
+        <form id="usernameStep1Form">
+          <div class="field">
+            <label>Username Baru</label>
+            <input type="text" id="newUsernameInput" placeholder="Masukkan username baru" autocomplete="off">
+          </div>
+          <button type="submit" class="btn-submit" id="usernameStep1Btn">
+            <i data-lucide="arrow-right"></i> Lanjut
+          </button>
+        </form>
+        <button type="button" class="btn-secondary" id="backFromUsernameStep1Btn">
+          <i data-lucide="arrow-left"></i> Kembali
+        </button>
+        <div class="status-box" id="usernameStep1Status"></div>
+      </div>
+
+      <div class="view" id="usernameStep2View">
+        <div class="card-header-icon"><i data-lucide="shield-check"></i></div>
+        <h2><span class="gradient">Konfirmasi</span></h2>
+        <div class="subtitle">Masukkan password saat ini untuk konfirmasi.</div>
+
+        <form id="usernameStep2Form">
+          <div class="field">
+            <label>Password Saat Ini</label>
+            <input type="password" id="usernamePasswordInput" placeholder="Masukkan password saat ini">
+          </div>
+          <button type="submit" class="btn-submit" id="usernameStep2Btn">
+            <i data-lucide="check"></i> Simpan
+          </button>
+        </form>
+        <button type="button" class="btn-secondary" id="backFromUsernameStep2Btn">
+          <i data-lucide="arrow-left"></i> Kembali
+        </button>
+        <div class="status-box" id="usernameStep2Status"></div>
+      </div>
+
+      <div class="view" id="passwordStep1View">
+        <div class="card-header-icon"><i data-lucide="key-round"></i></div>
+        <h2><span class="gradient">Ganti Password</span></h2>
+        <div class="subtitle">Masukkan password saat ini untuk konfirmasi.</div>
+
+        <form id="passwordStep1Form">
+          <div class="field">
+            <label>Password Saat Ini</label>
+            <input type="password" id="currentPasswordInput" placeholder="Masukkan password saat ini">
+          </div>
+          <button type="submit" class="btn-submit" id="passwordStep1Btn">
+            <i data-lucide="arrow-right"></i> Lanjut
+          </button>
+        </form>
+        <button type="button" class="btn-secondary" id="backFromPasswordStep1Btn">
+          <i data-lucide="arrow-left"></i> Kembali
+        </button>
+        <div class="status-box" id="passwordStep1Status"></div>
+      </div>
+
+      <div class="view" id="passwordStep2View">
+        <div class="card-header-icon"><i data-lucide="key-round"></i></div>
+        <h2><span class="gradient">Password Baru</span></h2>
+        <div class="subtitle">Masukkan password baru dan ketik ulang untuk konfirmasi.</div>
+
+        <form id="passwordStep2Form">
+          <div class="field">
+            <label>Password Baru</label>
+            <input type="password" id="newPasswordInput" placeholder="Masukkan password baru">
+          </div>
+          <div class="field">
+            <label>Ketik Ulang Password Baru</label>
+            <input type="password" id="confirmPasswordInput" placeholder="Ketik ulang password baru">
+            <span class="match-hint" id="matchHint"></span>
+          </div>
+          <button type="submit" class="btn-submit" id="passwordStep2Btn">
+            <i data-lucide="check"></i> Simpan
+          </button>
+        </form>
+        <button type="button" class="btn-secondary" id="backFromPasswordStep2Btn">
+          <i data-lucide="arrow-left"></i> Kembali
+        </button>
+        <div class="status-box" id="passwordStep2Status"></div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
