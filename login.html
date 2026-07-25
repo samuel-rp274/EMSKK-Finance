@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>EMSKK Login</title>
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/login.css">
+<script src="assets/js/login.js" defer></script>
+
+<style>
+body {
+  background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)),
+              url('assets/images/imagelandscape.webp') no-repeat center center fixed;
+  background-size: cover;
+}
+
+@media (max-width: 768px) and (orientation: portrait) {
+  body {
+    background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)),
+                url('assets/images/imageportrait.webp') no-repeat center center fixed;
+    background-size: cover;
+  }
+}
+</style>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  document.getElementById('footerYear').textContent = new Date().getFullYear();
+});
+</script>
+
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+    <div class="card">
+
+      <div class="view active" id="loginView">
+        <img src="assets/images/logo.png" alt="EMSKK" class="card-logo">
+        <h2><span class="gradient">EMS KOTAKITA</span></h2>
+        <div class="subtitle">Masukkan username dan password untuk mengakses EMSKK Portal.</div>
+
+        <form id="loginForm">
+          <div class="field">
+            <label>Username</label>
+            <input type="text" id="usernameInput" placeholder="Masukkan username" autofocus autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Password</label>
+            <input type="password" id="passwordInput" placeholder="Masukkan password">
+          </div>
+          <button type="submit" class="btn-submit" id="loginBtn">
+            <i data-lucide="log-in"></i> Masuk
+          </button>
+        </form>
+        <div class="status-box" id="loginStatus"></div>
+        <div class="login-footer">EMS KotaKita | Samuel &copy; <span id="footerYear"></span></div>
+      </div>
+
+      <div class="view" id="choiceView">
+        <img src="assets/images/logo.png" alt="EMSKK" class="card-logo">
+        <h2><span class="gradient">Selamat Datang</span></h2>
+        <div class="subtitle">Ini login pertama kamu. Mau ganti password sekarang, atau pertahankan password yang sekarang?</div>
+
+        <button type="button" class="btn-submit" id="wantChangeBtn">
+          <i data-lucide="key-round"></i> Ganti Password
+        </button>
+        <button type="button" class="btn-secondary" id="keepPasswordBtn">
+          <i data-lucide="check"></i> Pertahankan Password Lama
+        </button>
+        <div class="status-box" id="choiceStatus"></div>
+      </div>
+
+      <div class="view" id="changeView">
+        <img src="assets/images/logo.png" alt="EMSKK" class="card-logo">
+        <h2><span class="gradient">Ganti Password</span></h2>
+        <div class="subtitle">Username baru bersifat opsional. Kosongkan kalau tidak ingin diganti.</div>
+
+        <form id="changeForm">
+          <div class="field">
+            <label>Username Baru (opsional)</label>
+            <input type="text" id="newUsernameInput" placeholder="Kosongkan jika tidak diganti" autocomplete="off">
+          </div>
+          <div class="field">
+            <label>Password Baru</label>
+            <input type="password" id="newPasswordInput" placeholder="Masukkan password baru">
+          </div>
+          <button type="submit" class="btn-submit" id="changeBtn">
+            <i data-lucide="check"></i> Simpan
+          </button>
+        </form>
+        <button type="button" class="btn-secondary" id="backToChoiceBtn">
+          <i data-lucide="arrow-left"></i> Kembali
+        </button>
+        <div class="status-box" id="changeStatus"></div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
