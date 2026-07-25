@@ -1,651 +1,76 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<script>
-(function(){
-  var GATE_TYPE = 'internal';
-  var level = localStorage.getItem('emskk_access_level');
-  var date = localStorage.getItem('emskk_access_date');
-  var d = new Date();
-  var today = d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="2"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/rank.css">
+<script src="assets/js/rank.js" defer></script>
 
-  var levelSufficient = (level === 'internal');
-  var dateValid = (date === today);
-
-  if (!levelSufficient || !dateValid) {
-    var currentPage = window.location.pathname.split('/').pop() || 'index.html';
-    window.location.replace('gate.html?type=' + GATE_TYPE + '&redirect=' + encodeURIComponent(currentPage));
-  }
-})();
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Duty Ranking</title>
 
-<link rel="icon" href="logo.png" type="image/png">
+<link rel="icon" href="assets/images/logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght=400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
-
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
-
-body {
-  background: #030712;
-  color: #f8fafc;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 100px 20px 40px 20px;
-  position: relative;
-}
-
-.blob {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-.blob.top-left { 
-  background: #2563eb; 
-  top: -150px; 
-  left: -150px; 
-}
-.blob.bottom-right { 
-  background: #10b981; 
-  bottom: -150px; 
-  right: -150px; 
-}
-
-.topnav {
-  position: fixed; top:0; left:0; width:100%; padding:16px 24px;
-  display:flex; justify-content:space-between; align-items:center;
-  background: rgba(15,23,42,0.4); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255,255,255,0.05); z-index: 999;
-}
-.topnav a { color:#cbd5e1; text-decoration:none; font-size:13px; font-weight:600; display:inline-flex; align-items:center; gap:6px; }
-.topnav a:hover { color:#38bdf8; }
-.topnav .title { font-size:12px; font-weight:700; color:#64748b; letter-spacing:1.5px; text-transform:uppercase; }
-.topnav .nav-links { display:flex; align-items:center; gap:14px; }
-.topnav .nav-sep { color:#334155; font-size:13px; font-weight:600; }
-
-.container {
-  width: 100%;
-  max-width: 900px; 
-  z-index: 2;
-}
-
-.card-main {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 36px;
-  width: 100%;
-  position: relative;
-  margin-bottom: 24px;
-}
-
-.card-main::before {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 0;
-  width: 3px;
-  height: 80%;
-  border-radius: 4px;
-  background: #fbbf24;
-  box-shadow: 0 0 15px #fbbf24;
-}
-
-.card-header-icon {
-  width: 56px;
-  height: 56px;
-  background: rgba(251, 191, 36, 0.15);
-  color: #fbbf24;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 12px rgba(251, 191, 36, 0.2);
-}
-
-h2 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 20px;
-}
-h2 span.white { color: #ffffff; }
-h2 span.gradient {
-  background: linear-gradient(to right, #fbbf24, #f59e0b);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.topbar {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  align-items: center;
-  margin-bottom: 24px;
-  background: rgba(15, 23, 42, 0.6);
-  padding: 12px;
-  border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-}
-
-button {
-  padding: 10px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: 12px;
-  background: rgba(51, 65, 85, 0.5);
-  color: #cbd5e1;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-}
-
-button:hover {
-  transform: translateY(-1px);
-  background: rgba(71, 85, 105, 0.7);
-  color: white;
-}
-
-button.active {
-  background: #fbbf24 !important;
-  color: #0f172a !important;
-  border-color: #fbbf24 !important;
-  font-weight: 700;
-  box-shadow: 0 4px 12px rgba(251, 191, 36, 0.2);
-}
-
-select {
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: rgba(15, 23, 42, 0.8);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  font-size: 13px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
-}
-select:focus {
-  border-color: rgba(251, 191, 36, 0.5);
-}
-
-.section-title {
-  margin: 32px 0 14px;
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748b;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.table-wrap {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 20px;
-  overflow: hidden;
-  width: 100%;
-}
-
-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-}
-
-th {
-  background: rgba(15, 23, 42, 0.7);
-  padding: 16px;
-  text-align: center;
-  color: #94a3b8;
-  font-size: 12px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-td {
-  padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-  text-align: center;
-  font-size: 14px;
-  color: #cbd5e1;
-}
-
-td:nth-child(2) {
-  text-align: left;
-  font-weight: 500;
-}
-
-tr:last-child td {
-  border-bottom: none;
-}
-
-tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
-  color: white;
-}
-
-.rank {
-  color: #fbbf24;
-  font-weight: 700;
-}
-
-tr:nth-child(1) .rank { color: #f59e0b; font-size: 16px; }
-tr:nth-child(2) .rank { color: #cbd5e1; }
-tr:nth-child(3) .rank { color: #b45309; }
-
-.spinning svg {
-  animation: spin 1s linear infinite !important;
-}
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-.footer-divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-top: 40px;
-  margin-bottom: 16px;
-}
-.footer-line {
-  height: 1px;
-  width: 120px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-}
-.footer-logo {
-  color: #64748b;
-  width: 16px;
-  height: 16px;
-  opacity: 0.3;
-}
-.credits {
-  text-align: center;
-  font-size: 11px;
-  color: #475569;
-  letter-spacing: 0.5px;
-}
-.credits a {
-  color: #3b82f6;
-  text-decoration: none;
-}
-</style>
 </head>
 <body>
-<div class="blob top-left"></div>
-<div class="blob bottom-right"></div>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
 
-<div class="topnav">
-  <div class="nav-links">
-    <a href="index.html"><i data-lucide="arrow-left" style="width:16px;height:16px;"></i> User Menu</a>
-    <span class="nav-sep">||</span>
-    <a href="indexadminemskk.html"><i data-lucide="shield" style="width:16px;height:16px;"></i> Admin Menu</a>
+  <div class="container">
+
+    <div class="card">
+      <div class="card-header-icon">
+        <i data-lucide="trophy"></i>
+      </div>
+      <h1><span class="white">EMSKK</span> <span class="gradient">DUTY RANKING</span></h1>
+
+      <div class="topbar">
+        <button id="weeklyBtn" class="active" onclick="setMode('weekly')">Weekly</button>
+        <button id="monthlyBtn" onclick="setMode('monthly')">Monthly</button>
+
+        <select id="periodSelect" onchange="render()"></select>
+
+        <button id="refreshBtn" onclick="loadData(true)"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Refresh</button>
+        <button onclick="exportTXT()"><i data-lucide="download" style="width:14px; height:14px;"></i> Export TXT</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 80px;">Rank</th>
+              <th>Nama</th>
+              <th style="width: 180px;">Total Jam</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="section-title">
+      <i data-lucide="user-minus" style="width:14px; height:14px;"></i> Belum Pernah Duty
+    </div>
+
+    <div class="table-wrap" style="margin-bottom: 20px;">
+      <table>
+        <thead>
+          <tr>
+            <th style="width: 80px;">No</th>
+            <th>Nama</th>
+          </tr>
+        </thead>
+        <tbody id="neverDutyTable"></tbody>
+      </table>
+    </div>
   </div>
-  <div class="title">EMSKK SYSTEM</div>
-</div>
-
-<div class="container">
-
-<div class="card-main">
-  <div class="card-header-icon">
-    <i data-lucide="trophy"></i>
-  </div>
-  <h2><span class="white">EMSKK</span> <span class="gradient">DUTY RANKING</span></h2>
-
-  <div class="topbar">
-    <button id="weeklyBtn" class="active" onclick="setMode('weekly')">Weekly</button>
-    <button id="monthlyBtn" onclick="setMode('monthly')">Monthly</button>
-
-    <select id="periodSelect" onchange="render()"></select>
-
-    <!-- id dipasang ke tombol utama agar aman dari pembaruan lucide icon -->
-    <button id="refreshBtn" onclick="loadData(true)"><i data-lucide="refresh-cw" style="width:14px; height:14px;"></i> Refresh</button>
-    <button onclick="exportTXT()"><i data-lucide="download" style="width:14px; height:14px;"></i> Export TXT</button>
-  </div>
-
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th style="width: 80px;">Rank</th>
-          <th>Nama</th>
-          <th style="width: 180px;">Total Jam</th>
-        </tr>
-      </thead>
-      <tbody id="tableBody"></tbody>
-    </table>
-  </div>
-</div>
-
-<div class="section-title">
-  <i data-lucide="user-minus" style="width:14px; height:14px;"></i> Belum Pernah Duty
-</div>
-
-<div class="table-wrap" style="margin-bottom: 20px;">
-  <table>
-    <thead>
-      <tr>
-        <th style="width: 80px;">No</th>
-        <th>Nama</th>
-      </tr>
-    </thead>
-    <tbody id="neverDutyTable"></tbody>
-  </table>
-</div>
-
-<div class="footer-divider">
-  <div class="footer-line"></div>
-  <i data-lucide="aperture" class="footer-logo"></i>
-  <div class="footer-line"></div>
-</div>
-<div class="credits">SYSTEM BY <a href="#">SAMUEL</a></div>
-
-</div>
-
-<script>
-lucide.createIcons();
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-
-let allData = [];
-let masterData = [];
-let lastSorted = [];
-let lastNever = [];
-let mode = "weekly";
-let periods = [];
-let selectedPeriod = "";
-
-function parseDate(str){
-  if(!str) return null;
-  return new Date(str.replace(" ","T"));
-}
-
-function getWeekKey(d){
-  const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-  const ws = new Date(local);
-  ws.setDate(local.getDate() - local.getDay());
-  ws.setHours(0,0,0,0);
-
-  const we = new Date(ws);
-  we.setDate(ws.getDate() + 6);
-  we.setHours(23,59,59,999);
-
-  const fmt = (x)=>
-    `${x.getFullYear()}-${String(x.getMonth()+1).padStart(2,'0')}-${String(x.getDate()).padStart(2,'0')}`;
-
-  return `${fmt(ws)}|${fmt(we)}`;
-}
-
-function getDurationHours(s,f){
-  const a=parseDate(s);
-  const b=parseDate(f);
-  if(!a||!b) return 0;
-  return (b-a)/(1000*60*60);
-}
-
-function formatHours(h){
-  const m=Math.floor(h*60);
-  return `${Math.floor(m/60)}h ${m%60}m`;
-}
-
-async function loadData(isClick = false){
-  const refreshBtn = document.getElementById("refreshBtn");
-  
-  if(refreshBtn && isClick) {
-    refreshBtn.classList.add("spinning");
-  }
-
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
-    allData = await res.json() || [];
-
-    const res2 = await fetch(SCRIPT_URL + "?action=getEMSList");
-    const raw = await res2.json() || [];
-
-    masterData = raw
-      .map(x => {
-        if (!x) return "";
-        if (typeof x === "string") return x;
-        if (x.nama) return x.nama;
-        return "";
-      })
-      .map(n => String(n).trim())
-      .filter(n =>
-        n &&
-        n !== "undefined" &&
-        n !== "-" &&
-        n.toLowerCase() !== "nama" &&
-        !/^\d+(\.\d+)?$/.test(n)
-      );
-
-    buildPeriods();
-    render();
-  } catch (error) {
-    console.error("Gagal memuat data:", error);
-    alert("Gagal memuat data dari server. Periksa koneksi internet Anda.");
-  } finally {
-    if(refreshBtn) {
-      refreshBtn.classList.remove("spinning");
-    }
-  }
-}
-
-function buildPeriods(){
-  const weekMap = {};
-  const monthSet = new Set();
-
-  allData.forEach(r=>{
-    if(!r.Start || r.Status !== "VALID") return;
-
-    const d=parseDate(r.Start);
-    if(!d) return;
-
-    weekMap[getWeekKey(d)] = true;
-
-    const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    monthSet.add(`${local.getFullYear()}-${String(local.getMonth()+1).padStart(2,'0')}`);
-  });
-
-  periods = mode==="weekly"
-    ? Object.keys(weekMap).sort().reverse()
-    : Array.from(monthSet).sort().reverse();
-
-  const sel=document.getElementById("periodSelect");
-  sel.innerHTML="";
-
-  periods.forEach(p=>{
-    const o=document.createElement("option");
-    o.value=p;
-    o.textContent=p;
-    sel.appendChild(o);
-  });
-
-  if(periods.length){
-    selectedPeriod = periods[0];
-    sel.value = selectedPeriod;
-  } else {
-    selectedPeriod = "";
-  }
-}
-
-function render(){
-  const selElement = document.getElementById("periodSelect");
-  if (!selElement || !selElement.value) {
-    document.getElementById("tableBody").innerHTML = `<tr><td colspan="3">Tidak ada data untuk ditampilkan</td></tr>`;
-    document.getElementById("neverDutyTable").innerHTML = `<tr><td colspan="2">Tidak ada data</td></tr>`;
-    return;
-  }
-  
-  selectedPeriod = selElement.value;
-  const map = {};
-
-  allData.forEach(r => {
-    if (!r.Start || r.Status !== "VALID") return;
-
-    const d = parseDate(r.Start);
-    if (!d) return;
-
-    let match = false;
-
-    if (mode === "weekly") {
-      match = getWeekKey(d) === selectedPeriod;
-    } else {
-      const local = new Date(d.getFullYear(), d.getMonth(), d.getDate());
-      const mKey = `${local.getFullYear()}-${String(local.getMonth()+1).padStart(2,'0')}`;
-      match = mKey === selectedPeriod;
-    }
-
-    if (!match) return;
-
-    const h = getDurationHours(r.Start, r.Finish);
-    const n = String(r.Nama || "").trim();
-
-    if (!n || n.toLowerCase() === "nama" || n === "-") return;
-
-    if (!map[n]) map[n] = 0;
-    map[n] += h;
-  });
-
-  const sorted = Object.entries(map).sort((a, b) => b[1] - a[1]);
-  lastSorted = sorted;
-
-  const tb = document.getElementById("tableBody");
-  let tableHtml = "";
-
-  if(sorted.length === 0) {
-    tableHtml = `<tr><td colspan="3">Tidak ada aktivitas duty pada periode ini</td></tr>`;
-  } else {
-    sorted.forEach((x, i) => {
-      let trophy = i + 1;
-      if(i === 0) trophy = "🥇";
-      if(i === 1) trophy = "🥈";
-      if(i === 2) trophy = "🥉";
-
-      tableHtml += `
-        <tr>
-          <td class="rank">${trophy}</td>
-          <td>${x[0]}</td>
-          <td>${formatHours(x[1])}</td>
-        </tr>
-      `;
-    });
-  }
-  tb.innerHTML = tableHtml;
-
-  const dutySet = new Set(
-    sorted.map(x => x[0].trim().toLowerCase())
-  );
-
-  const never = masterData
-    .filter(n => !dutySet.has(n.toLowerCase()));
-
-  const tb2 = document.getElementById("neverDutyTable");
-  let neverHtml = "";
-  lastNever = never;
-
-  if(never.length === 0) {
-    neverHtml = `<tr><td colspan="2">Semua anggota sudah pernah melakukan duty!</td></tr>`;
-  } else {
-    never.forEach((u, i) => {
-      neverHtml += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${u}</td>
-        </tr>
-      `;
-    });
-  }
-  tb2.innerHTML = neverHtml;
-
-  if (window.lucide) {
-    lucide.createIcons({
-      attrs: { class: 'lucide-icon' },
-      nameAttr: 'data-lucide'
-    });
-  }
-}
-
-function setMode(m){
-  mode=m;
-  document.getElementById("weeklyBtn").classList.toggle("active",m==="weekly");
-  document.getElementById("monthlyBtn").classList.toggle("active",m==="monthly");
-  buildPeriods();
-  render();
-}
-
-function exportTXT(){
-  if (!selectedPeriod) {
-    alert("Tidak ada data periode yang bisa diekspor.");
-    return;
-  }
-
-  let text = "";
-  text += "EMSKK DUTY RANKING\n";
-  text += "Period: " + selectedPeriod + "\n\n";
-  text += "=== RANKING ===\n";
-
-  if (lastSorted.length === 0) {
-    text += "(Tidak ada data)\n";
-  } else {
-    lastSorted.forEach((x, i) => {
-      text += `${i+1}. ${x[0]} - ${formatHours(x[1])}\n`;
-    });
-  }
-
-  text += "\n=== BELUM PERNAH DUTY ===\n";
-  if (lastNever.length === 0) {
-    text += "(Semua anggota sudah pernah duty)\n";
-  } else {
-    lastNever.forEach((n, i) => {
-      text += `${i+1}. ${n}\n`;
-    });
-  }
-
-  const blob = new Blob([text], { type: "text/plain" });
-  const url = URL.createObjectURL(blob);
-
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `ems-duty-${selectedPeriod}.txt`;
-  a.click();
-
-  URL.revokeObjectURL(url);
-}
-
-loadData();
-</script>
 </body>
 </html>
