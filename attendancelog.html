@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="1"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/attendancelog.css">
+<script src="assets/js/attendancelog.js" defer></script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Attendance Overview</title>
 
-<link rel="icon" href="logo.png" type="image/png">
+<link rel="icon" href="assets/images/logo.png" type="image/png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
@@ -13,677 +22,64 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
-
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-}
-
-body {
-  background: #030712;
-  color: #fff;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 100px 20px 40px 20px;
-  position: relative;
-}
-
-.blob {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-.blob.one { background: #3b82f6; top: -150px; left: -150px; }
-.blob.two { background: #22c55e; bottom: -150px; right: -150px; }
-
-.topnav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  z-index: 999;
-}
-
-.topnav a {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
-}
-
-.topnav a:hover {
-  color: #38bdf8;
-}
-
-.topnav .title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.container {
-  width: 100%;
-  max-width: 800px; 
-  z-index: 2;
-}
-
-.card {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 36px;
-  margin-bottom: 24px;
-  position: relative;
-  text-align: left;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 15%;
-  left: 0;
-  width: 3px;
-  height: 70%;
-  border-radius: 4px;
-  background: #f59e0b;
-  box-shadow: 0 0 15px #f59e0b;
-}
-
-.card-header-icon {
-  width: 56px;
-  height: 56px;
-  background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2);
-}
-
-h1 {
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-h1 span.white { color: #ffffff; }
-h1 span.gradient {
-  background: linear-gradient(to right, #38bdf8, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 28px;
-  line-height: 1.4;
-}
-
-.search-wrap {
-    margin-bottom: 28px;
-}
-
-.ts-wrapper {
-    background: transparent !important;
-    border-radius: 14px !important;
-}
-
-.ts-control {
-    background: rgba(15, 23, 42, 0.6) !important;
-    color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
-    border-radius: 14px !important;
-    padding: 14px 16px !important;
-    font-size: 14px !important;
-}
-
-.ts-wrapper.focus .ts-control {
-    border-color: rgba(56, 189, 248, 0.4) !important;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.1) !important;
-}
-
-.ts-control input { color: white !important; font-size: 14px !important; }
-.ts-control input::placeholder { color: #64748b !important; }
-
-.ts-dropdown {
-    background: #0f172a !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    color: white !important;
-    border-radius: 14px !important;
-    margin-top: 6px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
-    overflow: hidden !important;
-}
-
-.ts-dropdown .option {
-    padding: 12px 16px !important;
-    font-size: 14px !important;
-    color: white !important;
-}
-
-.ts-dropdown .active {
-    background: rgba(56, 189, 248, 0.15) !important;
-    color: #38bdf8 !important;
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 16px;
-}
-
-.stat {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
-    border-radius: 16px;
-    padding: 20px;
-    transition: transform 0.2s;
-}
-
-.stat:hover {
-    transform: translateY(-2px);
-}
-
-.stat-title {
-    color: #64748b;
-    font-size: 12px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-value {
-    font-size: 24px;
-    font-weight: 700;
-    margin-top: 8px;
-    color: #f8fafc;
-}
-
-#weekHours { color: #f59e0b; }
-#monthHours { color: #38bdf8; }
-
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 8px;
-    text-align: left;
-}
-
-th {
-    background: rgba(15, 23, 42, 0.7);
-    padding: 16px;
-    font-size: 12px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-td {
-    padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    color: #cbd5e1;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
-    color: #ffffff;
-}
-
-.empty {
-    text-align: center;
-    color: #64748b;
-    padding: 48px !important;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-</style>
 </head>
-
 <body>
-<div class="blob one"></div>
-<div class="blob two"></div>
 
-<div class="topnav">
-  <a href="index.html"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Home</a>
-  <div class="title">EMSKK SYSTEM</div>
-</div>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
 
-<div class="container">
+  <div class="container">
 
-  <div class="card main-card">
-    <div class="card-header-icon">
-      <i data-lucide="bar-chart-3"></i>
-    </div>
+    <div class="card main-card">
+      <div class="card-header-icon">
+        <i data-lucide="history"></i>
+      </div>
 
-    <h1><span class="white">EMSKK</span> <span class="gradient">ATTENDANCE OVERVIEW</span></h1>
-    <div class="subtitle">Weekly working hours & duty summary</div>
+      <h1><span class="white">EMSKK</span> <span class="gradient">ATTENDANCE OVERVIEW</span></h1>
+      <div class="subtitle">Weekly working hours & duty summary</div>
 
-    <div class="search-wrap">
+      <div class="search-wrap">
         <select id="searchEMS"></select>
+      </div>
+
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-title">Total Jam Minggu Ini</div>
+          <div class="stat-value" id="weekHours">0h</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Total Jam Bulan Ini</div>
+          <div class="stat-value" id="monthHours">0h</div>
+        </div>
+
+        <div class="stat">
+          <div class="stat-title">Waktu On Duty Terakhir</div>
+          <div class="stat-value" id="topDuty" style="font-size: 14px; word-break: break-all; font-weight: 500; color: #cbd5e1; margin-top: 14px;">-</div>
+        </div>
+      </div>
     </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="stat-title">Total Jam Minggu Ini</div>
-        <div class="stat-value" id="weekHours">0h</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">Total Jam Bulan Ini</div>
-        <div class="stat-value" id="monthHours">0h</div>
-      </div>
-
-      <div class="stat">
-        <div class="stat-title">Waktu On Duty Terakhir</div>
-        <div class="stat-value" id="topDuty" style="font-size: 14px; word-break: break-all; font-weight: 500; color: #cbd5e1; margin-top: 14px;">-</div>
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Nama</th>
+              <th>Start</th>
+              <th>Finish</th>
+              <th>Durasi</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="5" class="empty">Pilih EMS terlebih dahulu</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
-
-  <div class="card">
-    <div class="table-responsive">
-      <table>
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Nama</th>
-            <th>Start</th>
-            <th>Finish</th>
-            <th>Durasi</th>
-          </tr>
-        </thead>
-        <tbody id="tbody">
-          <tr>
-            <td colspan="5" class="empty">Pilih EMS terlebih dahulu</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
-
-<script>
-lucide.createIcons();
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-
-let allData = [];
-let ts;
-const CACHE_KEY_EMS = "ems_cache_v1";
-const CACHE_KEY_ATT = "attendance_cache_v1";
-const CACHE_TTL = 1000 * 60 * 8;
-
-function isCacheValid(time){
-  return (Date.now() - time) < CACHE_TTL;
-}
-
-async function loadEMS(){
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  if(cached){
-    let parsed = null;
-    try {
-      parsed = JSON.parse(cached);
-    } catch(e){
-      console.warn("Cache EMS rusak, dihapus");
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-
-    if(parsed && isCacheValid(parsed.time)){
-      buildEMS(parsed.data || []);
-      return;
-    }
-  }
-
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safeData = data || [];
-
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safeData,
-      time: Date.now()
-    }));
-
-    buildEMS(safeData);
-  } catch(e){
-    console.error("Gagal fetch EMS:", e);
-    const fallback = localStorage.getItem(CACHE_KEY_EMS);
-    if(fallback){
-      try {
-        const parsed = JSON.parse(fallback);
-        buildEMS(parsed.data || []);
-      } catch(err){
-        buildEMS([]);
-      }
-    } else {
-      buildEMS([]);
-    }
-  }
-}
-
-function buildEMS(data){
-  const select = document.getElementById("searchEMS");
-  select.innerHTML = "";
-
-  data
-    .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
-    .sort((a,b)=>a.nama.localeCompare(b.nama))
-    .forEach(d=>{
-      let clean = d.nama.trim();
-      let opt = document.createElement("option");
-      opt.value = clean;
-      opt.textContent = clean;
-      select.appendChild(opt);
-    });
-
-  ts = new TomSelect("#searchEMS",{
-    create: false,
-    items: [],
-    sortField: [{ field: "text", direction: "asc" }],
-    placeholder: "Cari nama EMS...",
-    dropdownParent: "body",
-    onChange: function(value){
-      localStorage.setItem("ems_name", value);
-      render(value);
-    }
-  });
-
-  const saved = localStorage.getItem("ems_name");
-  if(saved){
-    setTimeout(()=>{
-      ts.setValue(saved);
-    },100);
-  }
-}
-
-async function loadData(){
-  const cached = localStorage.getItem(CACHE_KEY_ATT);
-
-  if(cached){
-    let parsed = null;
-    try {
-      parsed = JSON.parse(cached);
-    } catch(e){
-      console.warn("Cache rusak, dihapus");
-      localStorage.removeItem(CACHE_KEY_ATT);
-    }
-
-    if(parsed && isCacheValid(parsed.time)){
-      allData = parsed.data || [];
-      requestAnimationFrame(() => render());
-      refreshFromServer();
-      return;
-    }
-  }
-
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
-    const data = await res.json();
-    allData = data || [];
-
-    localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
-      data: allData,
-      time: Date.now()
-    }));
-
-    const oldMsg = document.getElementById("attendance-error-msg");
-    if(oldMsg) oldMsg.remove();
-
-  } catch(e){
-    console.error("Gagal fetch server:", e);
-    const fallback = localStorage.getItem(CACHE_KEY_ATT);
-    if(fallback){
-      try {
-        const parsed = JSON.parse(fallback);
-        allData = parsed.data || [];
-        showAttendanceStatusMessage("⚠️ Gagal terhubung ke server. Menampilkan data cadangan terakhir (Offline).", "#f59e0b");
-      } catch(err) {
-        allData = [];
-      }
-    } else {
-      allData = [];
-    }
-
-    if(allData.length === 0) {
-      showAttendanceTableError();
-    }
-  }
-  render();
-}
-
-async function refreshFromServer(){
-  try{
-    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogAll");
-    const fresh = await res.json();
-
-    localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
-      data: fresh,
-      time: Date.now()
-    }));
-
-    allData = fresh;
-
-    const oldMsg = document.getElementById("attendance-error-msg");
-    if(oldMsg) oldMsg.remove();
-
-    requestAnimationFrame(() => {
-        render();
-    });
-  } catch(e){
-    console.log("sync gagal, pakai cache");
-    showAttendanceStatusMessage("⚠️ Gagal sinkronisasi data terbaru. Menampilkan data offline.", "#f59e0b");
-  }
-}
-
-function showAttendanceStatusMessage(msg, color) {
-  let oldMsg = document.getElementById("attendance-error-msg");
-  if(oldMsg) oldMsg.remove();
-  
-  const div = document.createElement("div");
-  div.id = "attendance-error-msg";
-  div.style.color = color;
-  div.style.textAlign = "center";
-  div.style.fontSize = "13px";
-  div.style.fontWeight = "600";
-  div.style.marginTop = "15px";
-  div.innerText = msg;
-  
-  const container = document.querySelector(".card");
-  if(container) container.appendChild(div);
-}
-
-function showAttendanceTableError() {
-  const tbody = document.getElementById("tbody");
-  if(tbody) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="empty" style="color: #ef4444; padding: 40px !important; text-align: center;">
-          <i data-lucide="alert-triangle" style="width: 24px; height: 24px; margin: 0 auto 10px auto; display: block;"></i>
-          Gagal memuat data absensi dari server. Silakan periksa koneksi internet Anda atau hubungi admin.
-        </td>
-      </tr>
-    `;
-  }
-  
-  if(document.getElementById("weekHours")) document.getElementById("weekHours").innerText = "-";
-  if(document.getElementById("monthHours")) document.getElementById("monthHours").innerText = "-";
-  if(document.getElementById("topDuty")) document.getElementById("topDuty").innerText = "-";
-  
-  if(window.lucide) lucide.createIcons();
-}
-
-function parseDuration(str){
-    if(!str) return 0;
-    str = String(str).trim().toLowerCase();
-
-    if(str.includes(":")){
-        const p = str.split(":");
-        if(p.length === 3){
-            return (+p[0]*3600) + (+p[1]*60) + (+p[2]);
-        }
-    }
-
-    let h = 0, m = 0, s = 0;
-    const hMatch = str.match(/(\d+)\s*h/);
-    const mMatch = str.match(/(\d+)\s*m/);
-    const sMatch = str.match(/(\d+)\s*s/);
-
-    if(hMatch) h = +hMatch[1];
-    if(mMatch) m = +mMatch[1];
-    if(sMatch) s = +sMatch[1];
-
-    return (h * 3600) + (m * 60) + s;
-}
-
-function safeDate(v){
-    if(!v) return new Date(0);
-    if(v instanceof Date) return v;
-    return new Date(v);
-}
-
-function getWeekRange(){
-    const d = new Date();
-    const day = d.getDay();
-    const start = new Date(d);
-    start.setDate(d.getDate()-day);
-    start.setHours(0,0,0,0);
-
-    const end = new Date(start);
-    end.setDate(start.getDate()+6);
-    end.setHours(23,59,59,999);
-
-    return {start,end};
-}
-
-function render(selectedName){	
-    const name = (selectedName || ts?.getValue() || "").toString().trim();
-	
-    if(!name){
-        document.getElementById("tbody").innerHTML =
-        `<tr><td colspan="5" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
-        return;
-    }
-	
-    const normalize = (s) =>
-      (s || "")
-        .toLowerCase()
-        .replace(/[^a-z0-9 ]/g,'')
-        .replace(/\s+/g,' ')
-        .trim();
-	
-    const filtered = allData.filter(i =>
-      normalize(i["Nama"]) === normalize(name)
-    );
-	
-    const {start,end} = getWeekRange();
-
-    const week = filtered.filter(i=>{
-        const t = safeDate(i["Start"]);
-        return t>=start && t<=end;
-    });
-
-    let total = 0;
-    week.forEach(i=>{
-        total += parseDuration(i["Durasi"]);
-    });
-
-    const hours = Math.floor(total / 3600);
-    const minutes = Math.floor((total % 3600) / 60);
-
-    document.getElementById("weekHours").innerText = `${hours}h ${minutes}m`;
-		
-    const now = new Date();
-    const month = filtered.filter(i=>{
-        const t = safeDate(i["Start"]);
-        return t.getMonth() === now.getMonth() &&
-               t.getFullYear() === now.getFullYear();
-    });
-	
-    let monthTotal = 0;
-    month.forEach(i=>{
-        monthTotal += parseDuration(i["Durasi"]);
-    });
-
-    const mHours = Math.floor(monthTotal / 3600);
-    const mMinutes = Math.floor((monthTotal % 3600) / 60);
-
-    document.getElementById("monthHours").innerText = `${mHours}h ${mMinutes}m`;
-	
-    const lastDuty = filtered.length
-        ? [...filtered]
-            .filter(i => i["Finish"])
-            .sort((a,b)=> safeDate(b["Finish"]) - safeDate(a["Finish"]))[0]
-        : null;
-	
-    document.getElementById("topDuty").innerText =
-    lastDuty && lastDuty["Finish"]
-        ? lastDuty["Finish"].replace("T", " ")
-        : "-";
-
-    document.getElementById("tbody").innerHTML =
-    week.length ? week.map((i, idx)=>`	
-        <tr>
-            <td>${idx + 1}</td>
-            <td>${i["Nama"]}</td>
-            <td>${i["Start"]}</td>
-            <td>${i["Finish"]}</td>
-            <td>${i["Durasi"]}</td>
-        </tr>
-    `).join("") : `
-    <tr><td colspan="5" class="empty">Tidak ada data minggu ini</td></tr>`;
-}
-
-document.addEventListener("DOMContentLoaded", async ()=>{
-    await loadEMS();
-    await loadData();
-});
-</script>
 </body>
 </html>
