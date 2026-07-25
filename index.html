@@ -1,531 +1,114 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="1"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/index.css">
+<script src="assets/js/index.js" defer></script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMSKK Portal</title>
+<title>EMSKK Dashboard</title>
 
-<link rel="icon" href="logo.png" type="image/png">
-<link rel="manifest" href="/manifest.json">
-<meta name="theme-color" content="#030712">
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="manifest" href="assets/manifest.json">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
-}
 
-body {
-  background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-              url('imagelandscape.webp') no-repeat center center fixed;
-  background-size: cover;
-  color: white;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center; 
-  padding: 60px 20px;
-  overflow-x: hidden;
-  position: relative;
-  transition: background 1s ease;
-}
-
-body.bg-darken {
-  background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
-              url('imagelandscape.webp') no-repeat center center fixed;
-  background-size: cover;
-  align-items: flex-start;
-}
-
-@media (max-width: 768px) and (orientation: portrait) {
-  body {
-    background: linear-gradient(rgba(3, 7, 18, 0.75), rgba(3, 7, 18, 0.75)), 
-                url('imageportrait.webp') no-repeat center center fixed;
-    background-size: cover;
-  }
-  
-  body.bg-darken {
-    background: linear-gradient(rgba(3, 7, 18, 0.85), rgba(3, 7, 18, 0.85)), 
-                url('imageportrait.webp') no-repeat center center fixed;
-    background-size: cover;
-  }
-  
-  h1 {
-    font-size: 36px;
-  }
-  .container.show-menu h1 {
-    font-size: 28px;
-  }
-  .subtitle {
-    font-size: 14px;
-    margin-bottom: 30px;
-  }
-  .card {
-    padding: 20px 22px;
-    gap: 16px;
-  }
-  .icon-wrapper {
-    width: 48px;
-    height: 48px;
-  }
-  .card-title {
-    font-size: 16px;
-  }
-  .card-desc {
-    font-size: 12px;
-  }
-}
-
-.blob {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.blob.top-left { background: #ef4444; top: -150px; left: -150px; }
-.blob.bottom-right { background: #ef4444; bottom: -150px; right: -150px; }
-
-.container {
-  width: 100%;
-  max-width: 640px;
-  z-index: 2;
-  text-align: center;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.landing-wrapper {
-  text-align: center;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-  opacity: 1;
-  transform: translateY(0);
-}
-
-h1 {
-  font-size: 48px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  margin-bottom: 12px;
-  text-transform: uppercase;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-h1 span.white { color: #ffffff; }
-h1 span.gradient {
-  background: linear-gradient(to right, #38bdf8, #c084fc);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  color: #cbd5e1;
-  font-size: 16px;
-  margin-bottom: 40px;
-  letter-spacing: 0.5px;
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.enter-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  background: linear-gradient(135deg, #a855f7, #3b82f6);
-  color: white;
-  padding: 14px 32px;
-  font-size: 16px;
-  font-weight: 600;
-  border-radius: 50px;
-  border: none;
-  cursor: pointer;
-  box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.enter-btn i {
-  width: 18px;
-  height: 18px;
-  transition: transform 0.3s ease;
-}
-
-.enter-btn:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 0 30px rgba(168, 85, 247, 0.6);
-  background: linear-gradient(135deg, #b55fe6, #4f92ff);
-}
-
-.enter-btn:hover i { transform: translateX(6px); }
-.enter-btn:active { transform: scale(0.98); }
-
-.mainmenu-wrapper {
-  width: 100%;
-  display: none;
-  opacity: 0;
-  transform: translateY(40px);
-  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.divider {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  margin-bottom: 36px;
-}
-
-.line {
-  height: 1px;
-  width: 100px;
-  background: linear-gradient(to right, transparent, rgba(255,255,255,0.1), transparent);
-}
-
-.star {
-  color: #a855f7;
-  width: 14px;
-  height: 14px;
-  opacity: 0.7;
-}
-
-.menu-stack {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  margin-bottom: 48px;
-}
-
-@property --border-angle {
-  syntax: "<angle>";
-  inherits: false;
-  initial-value: 0deg;
-}
-
-.card {
-  background: rgba(15, 23, 42, 0.65);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(25px);
-  -webkit-backdrop-filter: blur(25px);
-  border-radius: 20px;
-  padding: 24px 28px;
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  cursor: pointer;
-  position: relative;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  text-align: left;
-  z-index: 0;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 18%;
-  left: 0;
-  width: 3px;
-  height: 64%;
-  border-radius: 4px;
-  transition: all 0.3s ease;
-  z-index: 2;
-}
-
-.card::after {
-  content: "";
-  position: absolute;
-  inset: -1px;
-  border-radius: 20px;
-  padding: 2px;
-  background: conic-gradient(from var(--border-angle), var(--dna-c1), var(--dna-c2), var(--dna-c1), var(--dna-c2), var(--dna-c1));
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-  z-index: 1;
-}
-
-.card:hover::after {
-  opacity: 1;
-  animation: dna-rotate 2.4s linear infinite;
-}
-
-@keyframes dna-rotate {
-  to { --border-angle: 360deg; }
-}
-
-.card.attendance { --dna-c1: #ef4444; --dna-c2: #7f1d1d; }
-.card.attendance-overview { --dna-c1: #f59e0b; --dna-c2: #78350f; }
-.card.invoice-input { --dna-c1: #10b981; --dna-c2: #064e3b; }
-.card.invoice-overview { --dna-c1: #3b82f6; --dna-c2: #1e3a8a; }
-.card.org-structure { --dna-c1: #a855f7; --dna-c2: #581c87; }
-
-.card-content,
-.icon-wrapper,
-.arrow-btn {
-  position: relative;
-  z-index: 2;
-}
-
-.card.attendance::before { background: #ef4444; box-shadow: 0 0 15px #ef4444; }
-.card.attendance-overview::before { background: #f59e0b; box-shadow: 0 0 15px #f59e0b; }
-.card.invoice-input::before { background: #10b981; box-shadow: 0 0 15px #10b981; }
-.card.invoice-overview::before { background: #3b82f6; box-shadow: 0 0 15px #3b82f6; }
-.card.org-structure::before { background: #a855f7; box-shadow: 0 0 15px #a855f7; }
-
-.icon-wrapper {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-}
-.card.attendance .icon-wrapper { background: rgba(239, 68, 68, 0.15); color: #ef4444; box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.2); }
-.card.attendance-overview .icon-wrapper { background: rgba(245, 158, 11, 0.15); color: #f59e0b; box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2); }
-.card.invoice-input .icon-wrapper { background: rgba(16, 185, 129, 0.15); color: #10b981; box-shadow: inset 0 0 12px rgba(16, 185, 129, 0.2); }
-.card.invoice-overview .icon-wrapper { background: rgba(59, 130, 246, 0.15); color: #3b82f6; box-shadow: inset 0 0 12px rgba(59, 130, 246, 0.2); }
-.card.org-structure .icon-wrapper { background: rgba(168, 85, 247, 0.15); color: #a855f7; box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.2); }
-
-.card-content { flex-grow: 1; }
-.card-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; color: #ffffff; }
-.card-desc { font-size: 13px; color: #94a3b8; line-height: 1.4; }
-
-.arrow-btn {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-}
-
-.card.attendance .arrow-btn { color: #ef4444; border-color: rgba(239, 68, 68, 0.2); }
-.card.attendance-overview .arrow-btn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.2); }
-.card.invoice-input .arrow-btn { color: #10b981; border-color: rgba(16, 185, 129, 0.2); }
-.card.invoice-overview .arrow-btn { color: #3b82f6; border-color: rgba(59, 130, 246, 0.2); }
-.card.org-structure .arrow-btn { color: #a855f7; border-color: rgba(168, 85, 247, 0.2); }
-
-.card:hover { transform: translateY(-3px); background: rgba(15, 23, 42, 0.75); }
-.card.attendance:hover { border-color: rgba(239, 68, 68, 0.4); box-shadow: 0 12px 30px rgba(239, 68, 68, 0.15); }
-.card.attendance-overview:hover { border-color: rgba(245, 158, 11, 0.4); box-shadow: 0 12px 30px rgba(245, 158, 11, 0.15); }
-.card.invoice-input:hover { border-color: rgba(16, 185, 129, 0.4); box-shadow: 0 12px 30px rgba(16, 185, 129, 0.15); }
-.card.invoice-overview:hover { border-color: rgba(59, 130, 246, 0.4); box-shadow: 0 12px 30px rgba(59, 130, 246, 0.15); }
-.card.org-structure:hover { border-color: rgba(168, 85, 247, 0.4); box-shadow: 0 12px 30px rgba(168, 85, 247, 0.15); }
-
-.card:hover .arrow-btn { background: currentColor; transform: translateX(10px); }
-.card:hover .arrow-btn i { color: #030712 !important; }
-.card:active { transform: scale(0.99); }
-
-.footer-divider { display: flex; align-items: center; justify-content: center; gap: 16px; margin-bottom: 16px; }
-.footer-logo { color: #94a3b8; width: 16px; height: 16px; opacity: 0.5; }
-.credits { font-size: 12px; color: #64748b; }
-.credits a { color: #3b82f6; text-decoration: none; }
-
-.fab-tutorial {
-  position: fixed;
-  bottom: 25px;
-  right: 25px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  backdrop-filter: blur(10px);
-  color: #e2e8f0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-  transition: 0.2s ease;
-  z-index: 9998;
-  opacity: 0;
-  pointer-events: none;
-}
-.fab-tutorial.show { opacity: 1; pointer-events: auto; animation: pulse 2s infinite; }
-
-@keyframes pulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2); }
-  70% { box-shadow: 0 0 0 10px rgba(255, 255, 255, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 255, 255, 0); }
-}
-.fab-tutorial:hover { transform: scale(1.08); background: rgba(255, 255, 255, 0.1); }
-.fab-tutorial::after {
-  content: "Tutorial"; position: absolute; right: 70px; background: #111827; color: white;
-  padding: 6px 10px; font-size: 12px; border-radius: 8px; opacity: 0; transform: translateX(10px);
-  transition: 0.2s ease; pointer-events: none; white-space: nowrap;
-}
-.fab-tutorial:hover::after { opacity: 1; transform: translateX(0); }
-
-.container.show-menu .landing-wrapper {
-opacity: 0;
-  transform: translateY(-50px);
-  pointer-events: none; 
-  max-height: 0;
-  margin: 0;
-  overflow: hidden;
-}
-
-.container.show-menu h1 {
-  font-size: 38px;
-  margin-top: 10px;
-  margin-bottom: 8px;
-}
-
-.container.show-menu .subtitle {
-  font-size: 14px;
-  margin-bottom: 24px;
-}
-
-.container.show-menu .mainmenu-wrapper {
-  display: block;
-  animation: slideUpIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-@keyframes slideUpIn {
-  from { opacity: 0; transform: translateY(50px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.container.show-menu .card {
-  opacity: 0;
-  animation: slideUpIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-.container.show-menu .card:nth-child(1) { animation-delay: 0.2s; }
-.container.show-menu .card:nth-child(2) { animation-delay: 0.3s; }
-.container.show-menu .card:nth-child(3) { animation-delay: 0.4s; }
-.container.show-menu .card:nth-child(4) { animation-delay: 0.5s; }
-.container.show-menu .card:nth-child(5) { animation-delay: 0.6s; }
-</style>
 </head>
-<body class="bg-darken">
+<body>
 <div class="blob top-left"></div>
 <div class="blob bottom-right"></div>
 
-<div class="container show-menu" id="portalContainer">
-  
-  <h1><span class="white">EMSKK</span> <span class="gradient">PORTAL</span></h1>
-  <div class="subtitle">Finance Dashboard Navigation Hub</div>
+<div class="container">
 
-  <div class="mainmenu-wrapper">
-    <div class="divider">
-      <div class="line"></div>
-      <i data-lucide="sparkles" class="star"></i>
-      <div class="line"></div>
+  <div class="page-header">
+    <div>
+      <h1><span class="white">EMSKK</span> <span class="gradient">DASHBOARD</span></h1>
+      <div class="page-subtitle" id="dateSubtitle">&nbsp;</div>
     </div>
-
-    <div class="menu-stack">
-      <div class="card attendance" onclick="go('attendance.html')">
-        <div class="icon-wrapper"><i data-lucide="clock"></i></div>
-        <div class="card-content">
-          <div class="card-title">Attendance</div>
-          <div class="card-desc">Realtime on-duty tracking system</div>
-        </div>
-        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
-      </div>
-
-      <div class="card attendance-overview" onclick="go('attendancelog.html')">
-        <div class="icon-wrapper"><i data-lucide="bar-chart-3"></i></div>
-        <div class="card-content">
-          <div class="card-title">Attendance Overview</div>
-          <div class="card-desc">Weekly working hours & duty summary</div>
-        </div>
-        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
-      </div>
-
-      <div class="card invoice-input" onclick="go('invoice.html')">
-        <div class="icon-wrapper"><i data-lucide="credit-card"></i></div>
-        <div class="card-content">
-          <div class="card-title">Invoice Input</div>
-          <div class="card-desc">Create and upload invoices records</div>
-        </div>
-        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
-      </div>
-
-      <div class="card invoice-overview" onclick="go('invoicelog.html')">
-        <div class="icon-wrapper"><i data-lucide="trending-up"></i></div>
-        <div class="card-content">
-          <div class="card-title">Invoice Overview</div>
-          <div class="card-desc">Weekly invoice submission summary</div>
-        </div>
-        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
-      </div>
-
-      <div class="card org-structure" onclick="go('structure.html')">
-        <div class="icon-wrapper"><i data-lucide="network"></i></div>
-        <div class="card-content">
-          <div class="card-title">Organizational Structure</div>
-          <div class="card-desc">Browse departments & roles</div>
-        </div>
-        <div class="arrow-btn"><i data-lucide="arrow-right" style="width: 16px; height: 16px;"></i></div>
-      </div>
-    </div>
-
-    <div class="footer-divider">
-      <div class="line" style="width: 150px;"></div>
-      <i data-lucide="aperture" class="footer-logo"></i>
-      <div class="line" style="width: 150px;"></div>
-    </div>
-    <div class="credits">System by <a href="#">Samuel</a></div>
+    <div class="freshness"><i data-lucide="refresh-cw"></i><span id="freshnessText">Memuat...</span></div>
   </div>
 
+  <div id="loadingState" class="loading-state">
+    <i data-lucide="loader-circle"></i>
+    loading EMSKK Portal dashboard...
+  </div>
+
+  <div id="contentWrap" style="display:none;">
+
+    <div class="summary-grid">
+      <div class="card accent-red summary-card">
+        <div class="summary-value mono red" id="totalDuty">0</div>
+        <div class="summary-label">Total Sesi Duty</div>
+        <div class="summary-week" id="weekRangeA">Minggu ini</div>
+      </div>
+      <div class="card accent-orange summary-card">
+        <div class="summary-value mono orange" id="totalDutyToday">0</div>
+        <div class="summary-label">Sesi Duty</div>
+        <div class="summary-week">Hari ini</div>
+      </div>
+      <div class="card accent-green summary-card">
+        <div class="summary-value mono green" id="totalInvoice">0</div>
+        <div class="summary-label">Total Invoice</div>
+        <div class="summary-week" id="weekRangeB">Minggu ini</div>
+      </div>
+      <div class="card accent-cyan summary-card">
+        <div class="summary-value mono cyan" id="totalInvoiceToday">0</div>
+        <div class="summary-label">Invoice</div>
+        <div class="summary-week">Hari ini</div>
+      </div>
+      <div class="card accent-purple ems-card">
+        <div class="ems-card-header">
+          <span class="ems-card-title">Anggota EMS</span>
+          <i data-lucide="users" style="width:14px; height:14px; color:#a855f7;"></i>
+        </div>
+        <div class="ems-rotator">
+          <div class="ems-arrow" id="emsPrev"><i data-lucide="chevron-left"></i></div>
+          <div class="ems-center">
+            <div class="ems-number mono" id="emsNumber">0</div>
+            <div class="ems-label" id="emsLabel">–</div>
+          </div>
+          <div class="ems-arrow" id="emsNext"><i data-lucide="chevron-right"></i></div>
+        </div>
+        <div class="ems-dots" id="emsDots"></div>
+      </div>
+    </div>
+
+    <div class="duo-grid">
+      <div class="card accent-amber">
+        <div class="card-title"><i data-lucide="activity" style="color:#f59e0b;"></i> Top Duty Minggu Ini</div>
+        <div class="card-sub">total jam</div>
+        <div id="topDutyList" class="mono scroll-list"></div>
+      </div>
+
+      <div class="card accent-blue">
+        <div class="card-title"><i data-lucide="zap" style="color:#3b82f6;"></i> Aktivitas Terbaru</div>
+        <div class="card-sub">start duty & upload invoice</div>
+        <div id="activityList" class="scroll-list"></div>
+      </div>
+    </div>
+
+    <div class="card accent-rose">
+      <div class="card-title"><i data-lucide="image" style="color:#ec4899;"></i> Galeri</div>
+      <div class="card-sub">dokumentasi &amp; kegiatan</div>
+      <div class="gallery-wrap" id="galleryWrap">
+        <div class="loading-state" style="padding:0; height:100%; justify-content:center;">
+          <i data-lucide="loader-circle"></i>
+          memuat galeri...
+        </div>
+      </div>
+    </div>
+
+  </div>
 </div>
 
-<div class="fab-tutorial" id="fabTutorial" onclick="go('tutorial.html')">
+<a href="tutorial.html" class="fab-tutorial" id="fabTutorial">
   <i data-lucide="book-open" style="width: 20px; height: 20px;"></i>
-</div>
-
-<script>
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').catch(console.error);
-  });
-}
-
-lucide.createIcons();
-
-async function cacheBackgroundImage() {
-  const assetsToCache = ['imagelandscape.webp', 'imageportrait.webp'];
-  
-  if ('caches' in window) {
-    try {
-      const cache = await caches.open('emskk-asset-cache');
-      for (const imageUrl of assetsToCache) {
-        const cachedResponse = await cache.match(imageUrl);
-        if (!cachedResponse) {
-          await cache.add(imageUrl);
-          console.log(`${imageUrl} berhasil disimpan ke lokal cache!`);
-        }
-      }
-    } catch (error) {
-      console.error('Gagal menyimpan cache:', error);
-    }
-  }
-}
-
-window.addEventListener('load', cacheBackgroundImage);
-
-window.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('fabTutorial').classList.add('show');
-});
-
-function go(page){
-  window.location.href = page;
-}
-
-</script>
+</a>
 </body>
 </html>
