@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="1"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/invoicelog.css">
+<script src="assets/js/invoicelog.js" defer></script>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>EMSKK Invoice Overview</title>
 
-<link rel="icon" href="logo.png" type="image/png">
+<link rel="icon" href="assets/images/logo.png" type="image/png">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.css">
 <script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
 
@@ -13,626 +22,62 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
-
-<style>
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: 'Inter', sans-serif;
-}
-
-body {
-  background: #030712;
-  color: #f8fafc;
-  min-height: 100vh;
-  overflow-x: hidden;
-  overflow-y: auto;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding: 100px 20px 40px 20px;
-  position: relative;
-}
-
-.blob {
-  position: fixed;
-  width: 500px;
-  height: 500px;
-  border-radius: 50%;
-  filter: blur(120px);
-  opacity: 0.15;
-  z-index: 0;
-  pointer-events: none;
-}
-.blob.one { background: #3b82f6; top: -150px; left: -150px; }
-.blob.two { background: #22c55e; bottom: -150px; right: -150px; }
-
-.topnav {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  padding: 16px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: rgba(15, 23, 42, 0.4);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-  z-index: 999;
-}
-
-.topnav a {
-  color: #cbd5e1;
-  text-decoration: none;
-  font-size: 13px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  transition: color 0.2s;
-}
-
-.topnav a:hover {
-  color: #38bdf8;
-}
-
-.topnav .title {
-  font-size: 12px;
-  font-weight: 700;
-  color: #64748b;
-  letter-spacing: 1.5px;
-  text-transform: uppercase;
-}
-
-.container {
-  width: 100%;
-  max-width: 1000px;
-  z-index: 2;
-}
-
-.card {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 24px;
-  padding: 36px;
-  width: 100%;
-  position: relative;
-}
-
-.card + .card {
-  margin-top: 24px;
-}
-
-.card::before {
-  content: "";
-  position: absolute;
-  top: 10%;
-  left: 0;
-  width: 3px;
-  height: 80%;
-  border-radius: 4px;
-  background: #38bdf8;
-  box-shadow: 0 0 15px #38bdf8;
-}
-
-.card-header-icon {
-  width: 56px;
-  height: 56px;
-  background: rgba(56, 189, 248, 0.15);
-  color: #38bdf8;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 20px;
-  box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.2);
-}
-
-h1 {
-  font-size: 28px;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-  margin-bottom: 6px;
-}
-h1 span.white { color: #ffffff; }
-h1 span.gradient {
-  background: linear-gradient(to right, #38bdf8, #0ea5e9);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
-.subtitle {
-  color: #94a3b8;
-  font-size: 13px;
-  margin-bottom: 24px;
-  line-height: 1.4;
-}
-
-.stats {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-    gap: 16px;
-    margin-top: 24px;
-}
-
-.stat {
-    background: rgba(15, 23, 42, 0.6);
-    border: 1px solid rgba(255, 255, 255, 0.03);
-    border-radius: 16px;
-    padding: 20px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.stat-title {
-    color: #64748b;
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-}
-
-.stat-value {
-    font-size: 22px;
-    font-weight: 800;
-    margin-top: 8px;
-    color: #f8fafc;
-}
-
-#totalGaji {
-    color: #38bdf8;
-}
-
-#uploadTerakhir {
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.5;
-  color: #cbd5e1;
-}
-
-.table-responsive {
-    width: 100%;
-    overflow-x: auto;
-}
-
-table {
-    width: 100%;
-    border-collapse: separate;
-    border-spacing: 0;
-    margin-top: 8px;
-}
-
-th {
-    background: rgba(15, 23, 42, 0.7);
-    padding: 16px;
-    text-align: left;
-    font-size: 12px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-td {
-    padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    color: #cbd5e1;
-    font-size: 14px;
-    white-space: nowrap;
-}
-
-tr:last-child td {
-    border-bottom: none;
-}
-
-tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
-    color: #ffffff;
-}
-
-table a {
-    color: #38bdf8;
-    text-decoration: none;
-    font-weight: 600;
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    transition: color 0.2s;
-}
-
-table a:hover {
-    color: #0ea5e9;
-    text-decoration: underline;
-}
-
-.empty {
-    text-align: center;
-    color: #64748b;
-    padding: 48px !important;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.ts-wrapper.single .ts-control {
-    background: rgba(15, 23, 42, 0.6) !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
-    color: white !important;
-    border-radius: 14px !important;
-    padding: 14px 16px !important;
-    font-size: 14px !important;
-}
-.ts-wrapper.focus .ts-control {
-    border-color: rgba(56, 189, 248, 0.4) !important;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.1) !important;
-}
-.ts-control input { color: white !important; font-size: 14px !important; }
-.ts-control input::placeholder { color: #64748b !important; }
-.ts-dropdown {
-    background: #0f172a !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
-    color: white !important;
-    border-radius: 14px !important;
-    margin-top: 6px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
-    overflow: hidden !important;
-    z-index: 9999 !important;
-}
-.ts-dropdown .option { padding: 12px 16px !important; font-size: 14px !important; color: white !important; }
-.ts-dropdown .active { background: rgba(56, 189, 248, 0.15) !important; color: #38bdf8 !important; }
-</style>
 </head>
-
 <body>
-<div class="blob one"></div>
-<div class="blob two"></div>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
 
-<div class="topnav">
-  <a href="index.html"><i data-lucide="arrow-left" style="width: 16px; height: 16px;"></i> Home</a>
-  <div class="title">EMSKK SYSTEM</div>
-</div>
+  <div class="container">
 
-<div class="container">
+    <div class="card">
+      <div class="card-header-icon">
+        <i data-lucide="folder-clock"></i>
+      </div>
 
-<div class="card">
-  <div class="card-header-icon">
-    <i data-lucide="pie-chart"></i>
-  </div>
-  
-  <h1><span class="white">EMSKK</span> <span class="gradient">INVOICE OVERVIEW</span></h1>
-  <div class="subtitle">Weekly invoice submission summary</div>
+      <h1><span class="white">EMSKK</span> <span class="gradient">INVOICE OVERVIEW</span></h1>
+      <div class="subtitle">Weekly invoice submission summary</div>
 
-  <div class="form-group">
-    <select id="searchEMS" placeholder="Cari nama EMS..."></select>
-  </div>
+      <div class="form-group">
+        <select id="searchEMS" placeholder="Cari nama EMS..."></select>
+      </div>
 
-  <div class="stats">
-    <div class="stat">
-      <div class="stat-title">Jumlah Invoice Minggu Ini</div>
-      <div class="stat-value" id="jumlahInvoice">0</div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-title">Jumlah Invoice Minggu Ini</div>
+          <div class="stat-value" id="jumlahInvoice">0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Total Invoice Minggu Ini</div>
+          <div class="stat-value" id="totalGaji">$KK 0</div>
+        </div>
+        <div class="stat">
+          <div class="stat-title">Upload Terakhir</div>
+          <div class="stat-value" id="uploadTerakhir">-</div>
+        </div>
+      </div>
     </div>
-    <div class="stat">
-      <div class="stat-title">Total Invoice Minggu Ini</div>
-      <div class="stat-value" id="totalGaji">$KK 0</div>
-    </div>
-    <div class="stat">
-      <div class="stat-title">Upload Terakhir</div>
-      <div class="stat-value" id="uploadTerakhir">-</div>
+
+    <div class="card">
+      <div class="table-responsive">
+        <table>
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Tanggal</th>
+              <th>Invoice</th>
+              <th>Qty</th>
+              <th>Total</th>
+              <th>Bukti</th>
+            </tr>
+          </thead>
+          <tbody id="tbody">
+            <tr>
+              <td colspan="6" class="empty">Pilih EMS terlebih dahulu</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
   </div>
-</div>
-
-<div class="card">
-  <div class="table-responsive">
-    <table>
-      <thead>
-        <tr>
-          <th>No</th>
-          <th>Tanggal</th>
-          <th>Invoice</th>
-          <th>Qty</th>
-          <th>Total</th>
-          <th>Bukti</th>
-        </tr>
-      </thead>
-      <tbody id="tbody">
-        <tr>
-          <td colspan="6" class="empty">Pilih EMS terlebih dahulu</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-</div>
-
-</div>
-
-<script>
-lucide.createIcons();
-
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-
-let allInvoices = [];
-let tomSelectInstance = null;
-const CACHE_KEY_EMS = "ems_cache_v1";
-const CACHE_KEY_INV = "invoice_cache_v1";
-const CACHE_TTL = 1000 * 60 * 8;
-
-function isCacheValid(time){
-  return (Date.now() - time) < CACHE_TTL;
-}
-
-async function loadEMS(){
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  if(cached){
-    let parsed = null;
-    try {
-      parsed = JSON.parse(cached);
-    } catch(e){
-      console.warn("Cache EMS rusak, dihapus");
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-
-    if(parsed && isCacheValid(parsed.time)){
-      buildEMS(parsed.data || []);
-      return;
-    }
-  }
-
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safeData = data || [];
-
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safeData,
-      time: Date.now()
-    }));
-
-    buildEMS(safeData);
-  } catch(e){
-    console.error("Gagal fetch EMS:", e);
-    const fallback = localStorage.getItem(CACHE_KEY_EMS);
-    if(fallback){
-      try {
-        const parsed = JSON.parse(fallback);
-        buildEMS(parsed.data || []);
-      } catch(err){
-        buildEMS([]);
-      }
-    } else {
-      buildEMS([]);
-    }
-  }
-}
-
-function buildEMS(data){
-    const select = document.getElementById("searchEMS");
-    select.innerHTML = "";
-
-    data
-      .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
-      .sort((a,b)=>a.nama.localeCompare(b.nama))
-      .forEach(item=>{
-        const opt = document.createElement("option");
-        opt.value = item.nama.trim();
-        opt.textContent = item.nama.trim();
-        select.appendChild(opt);
-    });
-
-    tomSelectInstance = new TomSelect("#searchEMS",{
-        create:false,
-        sortField:{field:"text",direction:"asc"},
-        placeholder:"Cari nama EMS...",
-        dropdownParent: "body",
-        onChange: function(value){
-          localStorage.setItem("ems_name", value);
-          renderTable();
-        }
-    });
-
-    const saved = localStorage.getItem("ems_name");
-    if (saved) {
-      setTimeout(() => {
-        tomSelectInstance.setValue(saved);
-      }, 100);
-    }
-}
-
-async function loadData(){
-    const cached = localStorage.getItem(CACHE_KEY_INV);
-
-    if(cached){
-        let parsed = null;
-        try {
-            parsed = JSON.parse(cached);
-        } catch(e){
-            localStorage.removeItem(CACHE_KEY_INV);
-        }
-
-        if(parsed && isCacheValid(parsed.time)){
-            allInvoices = parsed.data || [];
-            requestAnimationFrame(() => renderTable());
-            refreshFromServer();
-            return;
-        }
-    }
-
-    try {
-        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
-        const data = await res.json();
-        allInvoices = data || [];
-        localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
-            data: allInvoices,
-            time: Date.now()
-        }));
-        requestAnimationFrame(() => renderTable());
-    } catch(e){
-        console.error("Gagal fetch invoice:", e);
-        handleFetchError();
-    }
-}
-
-async function refreshFromServer(){
-    try{
-        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
-        const fresh = await res.json();
-        allInvoices = fresh;
-        localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
-            data: fresh,
-            time: Date.now()
-        }));
-        requestAnimationFrame(() => renderTable());
-    } catch(e){
-        console.log("sync gagal, pakai cache");
-        handleFetchError();
-    }
-}
-
-function handleFetchError() {
-    const fallback = localStorage.getItem(CACHE_KEY_INV);
-    if(fallback) {
-        try {
-            const parsed = JSON.parse(fallback);
-            allInvoices = parsed.data || [];
-            requestAnimationFrame(() => renderTable());
-            
-            showStatusMessage("⚠️ Gagal sinkronisasi dengan server. Menampilkan data cadangan terakhir (Offline).", "#f59e0b");
-            return;
-        } catch(err) {
-        }
-    }
-    
-    allInvoices = [];
-    document.getElementById("tbody").innerHTML = `
-        <tr>
-            <td colspan="6" class="empty" style="color: #ef4444; padding: 40px !important;">
-                <i data-lucide="alert-triangle" style="width: 24px; height: 24px; margin: 0 auto 10px auto; display: block;"></i>
-                Gagal memuat data dari server. Silakan periksa koneksi internet Anda atau hubungi admin.
-            </td>
-        </tr>
-    `;
-    if(window.lucide) lucide.createIcons();
-}
-
-function showStatusMessage(msg, color) {
-    let oldMsg = document.getElementById("error-status-msg");
-    if(oldMsg) oldMsg.remove();
-    
-    const div = document.createElement("div");
-    div.id = "error-status-msg";
-    div.style.color = color;
-    div.style.textAlign = "center";
-    div.style.fontSize = "13px";
-    div.style.fontWeight = "600";
-    div.style.marginTop = "15px";
-    div.innerText = msg;
-    
-    const container = document.querySelector(".card");
-    if(container) container.appendChild(div);
-}
-
-function getWeekRange(date){
-    const d = new Date(date);
-    const day = d.getDay();
-    const start = new Date(d);
-    start.setDate(d.getDate() - day);
-    start.setHours(0,0,0,0);
-
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    end.setHours(23,59,59,999);
-
-    return { start, end };
-}
-
-function safeDate(val){
-  if(!val) return new Date(0);
-  const str = String(val).split("T")[0].split(" ")[0];
-  const parts = str.split("-");
-  if(parts.length === 3){
-    return new Date(parts[0], parts[1] - 1, parts[2]);
-  }
-  return new Date(val);
-}
-
-function renderTable(){
-    const name = (tomSelectInstance?.getValue() || "").toLowerCase().trim();
-
-    if(!name){
-        document.getElementById("tbody").innerHTML =
-        `<tr><td colspan="6" class="empty">Pilih EMS terlebih dahulu</td></tr>`;
-        return;
-    }
-
-    const filtered = allInvoices.filter(i =>
-     (i["Nama"] || "").toLowerCase().trim() === name
-    );
-    
-    if(filtered.length===0){
-        document.getElementById("jumlahInvoice").innerText = "0";
-        document.getElementById("totalGaji").innerText = "$KK 0";
-        document.getElementById("uploadTerakhir").innerText = "-";
-        document.getElementById("tbody").innerHTML =
-        `<tr><td colspan="6" class="empty">Belum ada invoice</td></tr>`;
-        return;
-    }
-    
-    const today = new Date();
-    const { start, end } = getWeekRange(today);
-    
-    const weekInvoices = filtered.filter(i => {
-        const t = safeDate(i["Tanggal Invoice"]);
-        return t >= start && t <= end;
-    });
-
-    document.getElementById("jumlahInvoice").innerText = weekInvoices.length;
-
-    document.getElementById("totalGaji").innerText =
-    "$KK " + weekInvoices
-        .reduce((a,b)=>a+(Number(b["Total"])||0),0)
-        .toLocaleString("id-ID");
-    
-    const last = filtered
-     .filter(i => i["Tanggal Invoice"])
-     .sort((a, b) => safeDate(b["Tanggal Invoice"]) - safeDate(a["Tanggal Invoice"]))[0];
-    
-    if(last && last["Tanggal Invoice"]){
-        const dateObj = safeDate(last["Tanggal Invoice"]);
-        const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : last["Tanggal Invoice"];
-        document.getElementById("uploadTerakhir").innerText = formattedDate + " - " + (last["Jenis Invoice"] || "");
-    } else {
-        document.getElementById("uploadTerakhir").innerText = "-";
-    }
-
-    document.getElementById("tbody").innerHTML = weekInvoices.length ? weekInvoices.map((i, idx)=>{
-        const dateObj = safeDate(i["Tanggal Invoice"]);
-        const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : i["Tanggal Invoice"];
-        return `
-        <tr>
-            <td>${idx + 1}</td>
-            <td>${formattedDate}</td>
-            <td>${i["Jenis Invoice"] || ""}</td>
-            <td>${i["Qty"] || 0}</td>
-            <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
-            <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
-        </tr>
-        `;
-    }).join("") : `<tr><td colspan="6" class="empty">Tidak ada invoice minggu ini</td></tr>`;
-    
-    lucide.createIcons();
-}
-
-document.addEventListener("DOMContentLoaded", async () => {
-    await loadEMS();
-    await loadData();
-});
-</script>
 </body>
 </html>
