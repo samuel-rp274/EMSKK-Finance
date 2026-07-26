@@ -30,6 +30,7 @@ async function checkLogin(){
 
       await loadRates();
       await loadAttendanceData();
+      loadActiveDuty();
       requestIdleCallback(refreshFromServer);
     } else {
       document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
@@ -451,5 +452,119 @@ window.addEventListener("load", () => {
     document.getElementById("adminPanel").classList.remove("hidden");
     document.getElementById("navbar").style.display = "flex";
     loadRates().then(() => { loadAttendanceData(); });
+    loadActiveDuty();
   }
 });
+
+let activeDutyList = [];
+let stopMode = null;
+let stopTargetNama = null;
+
+async function loadActiveDuty(){
+  const tbody = document.getElementById("activeDutyBody");
+  tbody.innerHTML = `<tr><td colspan="6" class="empty">Memuat...</td></tr>`;
+
+  try {
+    const res = await fetch(SCRIPT_URL + "?action=getActiveDutyList");
+    const data = await res.json();
+    activeDutyList = Array.isArray(data) ? data : [];
+    renderActiveDutyTable();
+  } catch(e){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">Gagal memuat data, coba refresh lagi</td></tr>`;
+  }
+}
+
+function formatElapsed(startStr){
+  const start = new Date(String(startStr).replace(" ", "T"));
+  if(isNaN(start.getTime())) return "-";
+
+  const now = new Date(new Date().toLocaleString("en-US", { timeZone: "Asia/Jakarta" }));
+  const diffMs = now - start;
+  if(diffMs < 0) return "0h 0m";
+
+  const totalMinutes = Math.floor(diffMs / 60000);
+  const hours = Math.floor(totalMinutes / 60);
+  const minutes = totalMinutes % 60;
+  return `${hours}h ${minutes}m`;
+}
+
+function renderActiveDutyTable(){
+  const tbody = document.getElementById("activeDutyBody");
+  const stopAllBtn = document.getElementById("stopAllBtn");
+
+  if(!activeDutyList.length){
+    tbody.innerHTML = `<tr><td colspan="6" class="empty">Tidak ada yang sedang on duty</td></tr>`;
+    if(stopAllBtn) stopAllBtn.disabled = true;
+    return;
+  }
+
+  if(stopAllBtn) stopAllBtn.disabled = false;
+
+  tbody.innerHTML = activeDutyList.map(u => `
+    <tr>
+      <td style="font-weight:600; color:#ffffff;">${u.nama}</td>
+      <td>${u.jabatan || "-"}</td>
+      <td>${u.divisi || "-"}</td>
+      <td style="font-family:monospace;">${u.start}</td>
+      <td style="font-weight:500;">${formatElapsed(u.start)}</td>
+      <td>
+        <div class="btn-group-actions">
+          <button class="btn-red" onclick="confirmStopSingle('${String(u.nama).replace(/'/g, "\\'")}')">STOP</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+
+function confirmStopSingle(nama){
+  stopMode = "single";
+  stopTargetNama = nama;
+  document.getElementById("stopModalText").innerHTML = `Yakin ingin menghentikan duty <b>${nama}</b> sekarang?`;
+  document.getElementById("stopModal").style.display = "flex";
+}
+
+function confirmStopAll(){
+  if(!activeDutyList.length) return;
+
+  stopMode = "all";
+  stopTargetNama = null;
+  const names = activeDutyList.map(u => u.nama).join(", ");
+  document.getElementById("stopModalText").innerHTML =
+    `Yakin ingin menghentikan <b>${activeDutyList.length} duty</b> yang sedang aktif?<br><br><span style="color:#94a3b8; font-size:13px;">${names}</span>`;
+  document.getElementById("stopModal").style.display = "flex";
+}
+
+function closeStopModal(){
+  document.getElementById("stopModal").style.display = "none";
+  stopMode = null;
+  stopTargetNama = null;
+}
+
+async function executeStop(){
+  const btn = document.getElementById("stopModalConfirmBtn");
+  btn.disabled = true;
+  const originalText = btn.innerText;
+  btn.innerText = "Memproses...";
+
+  try {
+    if(stopMode === "single"){
+      const res = await fetch(SCRIPT_URL + "?action=adminStopDuty&nama=" + encodeURIComponent(stopTargetNama));
+      const data = await res.json();
+      if(!data.success){ alert(data.message || "Gagal stop duty"); }
+    } else if(stopMode === "all"){
+      const res = await fetch(SCRIPT_URL + "?action=adminStopAllDuty");
+      const data = await res.json();
+      if(!data.success){ alert("Gagal stop semua duty"); }
+    }
+
+    closeStopModal();
+    await loadActiveDuty();
+    refreshFromServer();
+
+  } catch(e){
+    alert("Server error, coba lagi");
+  } finally {
+    btn.disabled = false;
+    btn.innerText = originalText;
+  }
+}
