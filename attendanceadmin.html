@@ -99,6 +99,41 @@
           </tbody>
         </table>
       </div>
+
+      <div id="activeDutyCard" style="margin-top: 32px;">
+        <h2 style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:18px; font-weight:700; margin-bottom: 4px;">
+          <span style="display:flex; align-items:center; gap:8px;">
+            <i data-lucide="zap" style="width:18px; height:18px; color:#f59e0b;"></i> Kontrol Duty Aktif
+          </span>
+          <div style="display:flex; gap:8px;">
+            <button onclick="loadActiveDuty()" style="width:auto; padding:8px 14px; font-size:12px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08); margin:0;">
+              <i data-lucide="refresh-cw" style="width:14px; height:14px"></i> Refresh
+            </button>
+            <button id="stopAllBtn" onclick="confirmStopAll()" class="btn-red" style="width:auto; padding:8px 14px; font-size:12px; margin:0;">
+              <i data-lucide="octagon-x" style="width:14px; height:14px"></i> Stop All
+            </button>
+          </div>
+        </h2>
+        <div class="subtitle" style="margin-bottom: 16px;">Daftar EMS yang sedang ON DUTY saat ini</div>
+
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Mulai</th>
+                <th>Berjalan</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="activeDutyBody">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
   </div>
 
@@ -135,6 +170,36 @@
         </button>
         <button onclick="closeModal()" class="btn-red" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08);">
           Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div id="stopModal" style="
+    display:none;
+    position:fixed;
+    top:0;left:0;
+    width:100%;height:100%;
+    background:rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    justify-content:center;
+    align-items:center;
+    z-index:9999;
+  ">
+    <div class="card" style="width:420px; background:#0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 28px; margin-bottom: 0;">
+      <h2 style="margin-bottom:12px; font-size: 20px; font-weight: 700; display:flex; align-items:center; gap:8px;">
+        <i data-lucide="alert-triangle" style="width:20px; height:20px; color:#ef4444;"></i> Konfirmasi Stop Duty
+      </h2>
+
+      <div id="stopModalText" style="color:#cbd5e1; font-size:14px; margin-bottom: 20px; line-height:1.6;"></div>
+
+      <div style="display:flex; gap:10px; justify-content:flex-end;">
+        <button id="stopModalConfirmBtn" onclick="executeStop()" class="btn-red" style="width:auto; padding: 10px 20px; border-radius: 10px;">
+          Ya, Stop
+        </button>
+        <button onclick="closeStopModal()" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08);">
+          Batal
         </button>
       </div>
     </div>
