@@ -2,7 +2,6 @@ lucide.createIcons();
 let emsData={};
 let currentUser=null;
 
-
 const preventClose = (e) => { 
   e.preventDefault(); 
   e.returnValue = 'Proses sedang berjalan, jangan tutup halaman ini!'; 
@@ -170,10 +169,45 @@ async function startDuty(){
   startBtn.innerText = "PROCESSING...";
 
   window.addEventListener('beforeunload', preventClose);
-  setStatus("loading","STARTING...");
+  setStatus("loading","MEMERIKSA DATA...");
 
-  const data = emsData[currentUser];
-  if(!data) {
+  let freshData;
+  try {
+    const checkRes = await fetch(SCRIPT_URL + "?action=getEMS");
+    const checkList = await checkRes.json();
+    const safeCheckList = Array.isArray(checkList) ? checkList : [];
+
+    const found = safeCheckList.find(
+      u => u && u.nama && u.nama.trim() === currentUser
+    );
+
+    if(!found){
+      setStatus("off","Silahkan refresh halaman terlebih dahulu");
+      startBtn.disabled = false;
+      finishBtn.disabled = true;
+      startBtn.innerText = originalText;
+      window.removeEventListener('beforeunload', preventClose);
+      return;
+    }
+
+    freshData = found;
+
+    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
+      data: safeCheckList,
+      time: Date.now()
+    }));
+
+    const updatedEmsData = {};
+    safeCheckList
+      .filter(u => u && u.nama && u.nama.trim().toUpperCase() !== "NAMA")
+      .forEach(u => {
+        updatedEmsData[u.nama.trim()] = u;
+      });
+    emsData = updatedEmsData;
+
+  } catch(err){
+    console.error("Gagal memeriksa data EMS terbaru:", err);
+    setStatus("off","Silahkan refresh halaman terlebih dahulu");
     startBtn.disabled = false;
     finishBtn.disabled = true;
     startBtn.innerText = originalText;
@@ -181,13 +215,15 @@ async function startDuty(){
     return;
   }
 
+  setStatus("loading","STARTING...");
+
   try {
     const res = await fetch(
       SCRIPT_URL +
       "?action=startDuty" +
       "&nama=" + encodeURIComponent(currentUser) +
-      "&jabatan=" + encodeURIComponent(data.jabatan || "") +
-      "&divisi=" + encodeURIComponent(data.divisi || "")
+      "&jabatan=" + encodeURIComponent(freshData.jabatan || "") +
+      "&divisi=" + encodeURIComponent(freshData.divisi || "")
     );
 
     const result = await res.json();
