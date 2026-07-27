@@ -1,23 +1,23 @@
-.blob.top-left { background: #f59e0b; }
-.blob.bottom-right { background: #fbbf24; }
+.blob.top-left { background: var(--accent-amber); }
+.blob.bottom-right { background: var(--accent-amber-glow); }
 
 .container {
   max-width: 800px; 
 }
 
 .card::before {
-  background: #f59e0b;
-  box-shadow: 0 0 15px #f59e0b;
+  background: var(--accent-amber);
+  box-shadow: 0 0 15px var(--accent-amber);
 }
 
 .card-header-icon {
   background: rgba(245, 158, 11, 0.15);
-  color: #f59e0b;
+  color: var(--accent-amber);
   box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2);
 }
 
 h1 span.gradient {
-  background: linear-gradient(to right, #f59e0b, #fbbf24);
+  background: linear-gradient(to right, var(--accent-amber), var(--accent-amber-glow));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
@@ -46,10 +46,10 @@ h1 span.gradient {
 }
 
 .ts-control input { color: white !important; font-size: 14px !important; }
-.ts-control input::placeholder { color: #64748b !important; }
+.ts-control input::placeholder { color: var(--muted-2) !important; }
 
 .ts-dropdown {
-    background: #0f172a !important;
+    background: var(--surface) !important;
     border: 1px solid rgba(255, 255, 255, 0.08) !important;
     color: white !important;
     border-radius: 14px !important;
@@ -66,7 +66,7 @@ h1 span.gradient {
 
 .ts-dropdown .active {
     background: rgba(56, 189, 248, 0.15) !important;
-    color: #38bdf8 !important;
+    color: var(--accent-sky) !important;
 }
 
 .stats {
@@ -88,7 +88,7 @@ h1 span.gradient {
 }
 
 .stat-title {
-    color: #64748b;
+    color: var(--muted-2);
     font-size: 12px;
     font-weight: 600;
     text-transform: uppercase;
@@ -99,11 +99,11 @@ h1 span.gradient {
     font-size: 24px;
     font-weight: 700;
     margin-top: 8px;
-    color: #f8fafc;
+    color: var(--text);
 }
 
-#weekHours { color: #f59e0b; }
-#monthHours { color: #38bdf8; }
+#weekHours { color: var(--accent-amber); }
+#monthHours { color: var(--accent-sky); }
 
 .table-responsive {
     width: 100%;
@@ -123,7 +123,7 @@ th {
     padding: 16px;
     font-size: 12px;
     font-weight: 700;
-    color: #94a3b8;
+    color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
@@ -132,7 +132,7 @@ th {
 td {
     padding: 16px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-    color: #cbd5e1;
+    color: var(--text-secondary);
     font-size: 14px;
     white-space: nowrap;
 }
@@ -148,8 +148,13 @@ tr:hover td {
 
 .empty {
     text-align: center;
-    color: #64748b;
+    color: var(--muted-2);
     padding: 48px !important;
     font-size: 14px;
     font-weight: 500;
+}
+
+@media (max-width: 640px) {
+  .card { padding: 24px; }
+  h1 { font-size: 22px; }
 }
