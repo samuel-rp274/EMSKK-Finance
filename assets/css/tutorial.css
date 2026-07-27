@@ -1,0 +1,113 @@
+.blob.top-left { background: var(--accent-blue); }
+.blob.bottom-right { background: var(--accent-green); }
+
+.container {
+  max-width: 800px;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 36px;
+}
+
+.header h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.header h1 span.white { color: #ffffff; }
+.header h1 span.gradient {
+  background: linear-gradient(to right, var(--accent-sky), var(--accent-purple-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.header p {
+  color: var(--muted-2);
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.card h2 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.card ul {
+  padding-left: 20px;
+}
+
+.card li {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 8px;
+}
+
+.card.attendance::before { background: var(--accent-red); box-shadow: 0 0 15px var(--accent-red); }
+.card.attendance h2 { color: var(--accent-red); }
+.card.attendance li::marker { color: var(--accent-red); }
+.card.attendance .highlight {
+  color: var(--accent-red);
+  background: rgba(239, 68, 68, 0.1);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  font-weight: 600;
+}
+
+.card.attendance-overview::before { background: var(--accent-amber); box-shadow: 0 0 15px var(--accent-amber); }
+.card.attendance-overview h2 { color: var(--accent-amber); }
+.card.attendance-overview li::marker { color: var(--accent-amber); }
+
+.card.invoice-input::before { background: var(--accent-green); box-shadow: 0 0 15px var(--accent-green); }
+.card.invoice-input h2 { color: var(--accent-green); }
+.card.invoice-input li::marker { color: var(--accent-green); }
+
+.card.invoice-overview::before { background: var(--accent-sky); box-shadow: 0 0 15px var(--accent-sky); }
+.card.invoice-overview h2 { color: var(--accent-sky); }
+.card.invoice-overview li::marker { color: var(--accent-sky); }
+
+.note {
+  margin-top: 20px;
+  padding: 16px 20px;
+  border-radius: 16px;
+  background: rgba(15, 23, 42, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.note-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #facc15;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.note ul {
+  padding-left: 18px;
+}
+
+.note li {
+  font-size: 13px;
+  color: var(--muted);
+  margin-bottom: 6px;
+  line-height: 1.6;
+}
+
+.note li::marker {
+  color: #facc15;
+}
+
+@media (max-width: 640px) {
+  .card { padding: 24px; }
+  .header h1 { font-size: 24px; }
+}
