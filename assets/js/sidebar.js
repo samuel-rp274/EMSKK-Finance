@@ -67,9 +67,9 @@
       items.push({ type: 'sectionLabel', label: 'Admin Menu' });
       items.push({ type: 'link', label: 'Admin Dashboard', href: 'indexadminemskk.html', icon: 'layout-dashboard' });
       items.push({ type: 'link', label: 'Finance', href: 'financeadmin.html', icon: 'wallet' });
-      items.push({ type: 'link', label: 'Photo Upload', href: 'photoupload.html', icon: 'image-plus' });
-      items.push({ type: 'link', label: 'HRD', href: 'hrd.html', icon: 'users' });
       items.push({ type: 'link', label: 'Rank', href: 'rank.html', icon: 'trophy' });
+      items.push({ type: 'link', label: 'HRD', href: 'hrd.html', icon: 'users' });
+      items.push({ type: 'link', label: 'Photo Upload', href: 'photoupload.html', icon: 'image-plus' });
     }
 
     items.push({ type: 'divider' });
