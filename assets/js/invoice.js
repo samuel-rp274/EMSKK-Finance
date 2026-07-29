@@ -184,13 +184,13 @@ async function applySessionIdentity(){
   const sessionNama = session.nama.trim();
 
   if(!emsData[sessionNama]){
-    nama.value = sessionNama + " (data EMS tidak ditemukan)";
+    nama.innerText = sessionNama + " (data EMS tidak ditemukan)";
     return;
   }
 
-  nama.value = sessionNama;
-  jabatan.value = emsData[sessionNama].jabatan || "";
-  divisi.value = emsData[sessionNama].divisi || "";
+  nama.innerText = sessionNama;
+  jabatan.innerText = emsData[sessionNama].jabatan || "";
+  divisi.innerText = emsData[sessionNama].divisi || "";
 }
 
 document.getElementById("bukti").addEventListener("keydown", function(e){
@@ -248,7 +248,7 @@ document.addEventListener("input", updateTotal);
 
 document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
-    if(!nama.value || !emsData[nama.value]){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
+    if(!nama.innerText || !emsData[nama.innerText]){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
     if(!invoiceType.value){ status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
     if(!document.getElementById("tanggalInvoice").value){ status.innerHTML = "⚠️ Pilih Tanggal Invoice"; return; }
 
@@ -266,9 +266,9 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     else{ hargaFinal = Number(harga.value)||0; qtyFinal = Number(qty.value)||1; }
 
     const payload = {
-        nama: nama.value,
-        jabatan: jabatan.value,
-        divisi: divisi.value,
+        nama: nama.innerText,
+        jabatan: jabatan.innerText,
+        divisi: divisi.innerText,
         tanggalInvoice: document.getElementById("tanggalInvoice").value,
         jenisInvoice: invoiceType.options[invoiceType.selectedIndex].text,
         jenisOperasi: document.getElementById("jenisOperasi")?.value || "",
@@ -284,7 +284,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
     status.innerHTML = "⏳ Mengirim...";
     try{
-        const yakin = confirm(`Nama: ${nama.value}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
+        const yakin = confirm(`Nama: ${nama.innerText}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
         if(!yakin) { status.innerHTML = ""; return; }
         
         await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
@@ -294,7 +294,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
             status.textContent = "";
         }, 3000);
 		
-        const namaTerpilih = nama.value;
+        const namaTerpilih = nama.innerText;
 
         document.getElementById("tanggalInvoice").value = "";
         document.getElementById("invoiceType").value = "";
@@ -319,8 +319,8 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
         document.getElementById("total").innerText = "$KK 0";
 
-        jabatan.value = emsData[namaTerpilih]?.jabatan || "";
-        divisi.value = emsData[namaTerpilih]?.divisi || "";
+        jabatan.innerText = emsData[namaTerpilih]?.jabatan || "";
+        divisi.innerText = emsData[namaTerpilih]?.divisi || "";
 		
     } catch(err){
         console.error(err);

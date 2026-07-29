@@ -19,12 +19,41 @@ setInterval(()=>{
 
 function setStatus(type,text){
   const el=document.getElementById("status");
-  el.className="status";
+  el.className="status-box";
   el.innerText=text;
 
   if(type==="on") el.classList.add("badge-on");
   else if(type==="loading") el.classList.add("badge-loading","loading");
   else el.classList.add("badge-off");
+}
+
+function setDutyBtn(state,text){
+  const btn=document.getElementById("duty-btn");
+  btn.dataset.state=state;
+  btn.className="duty-btn";
+
+  if(state==="start"){
+    btn.classList.add("state-start");
+    btn.disabled=false;
+    btn.innerText=text || "START DUTY";
+  } else if(state==="finish"){
+    btn.classList.add("state-finish");
+    btn.disabled=false;
+    btn.innerText=text || "FINISH DUTY";
+  } else if(state==="processing"){
+    btn.classList.add(btn.dataset.prevState==="finish" ? "state-finish" : "state-start");
+    btn.disabled=true;
+    btn.innerText=text || "PROCESSING...";
+  }
+}
+
+function handleDutyClick(){
+  const btn=document.getElementById("duty-btn");
+  if(btn.dataset.state==="finish"){
+    finishDuty();
+  } else {
+    startDuty();
+  }
 }
 
 async function loadEMS(){
@@ -99,15 +128,15 @@ async function applySessionIdentity(){
   const nama = session.nama.trim();
 
   if(!emsData[nama]){
-    document.getElementById("nama").value = nama + " (data EMS tidak ditemukan)";
+    document.getElementById("nama").innerText = nama + " (data EMS tidak ditemukan)";
     setStatus("off","DATA EMS TIDAK DITEMUKAN");
     return;
   }
 
   currentUser = nama;
-  document.getElementById("nama").value = nama;
-  document.getElementById("jabatan").value = emsData[nama].jabatan || "";
-  document.getElementById("divisi").value = emsData[nama].divisi || "";
+  document.getElementById("nama").innerText = nama;
+  document.getElementById("jabatan").innerText = emsData[nama].jabatan || "";
+  document.getElementById("divisi").innerText = emsData[nama].divisi || "";
 
   checkSession(nama);
 }
@@ -120,12 +149,10 @@ async function checkSession(nama){
     if(data.active){
       setStatus("on","ON DUTY ACTIVE");
       startTimer(data.startTime);
-      document.querySelector(".start").disabled=true;
-      document.querySelector(".finish").disabled=false;
+      setDutyBtn("finish");
     }else{
       setStatus("off","OFF DUTY");
-      document.querySelector(".start").disabled=false;
-      document.querySelector(".finish").disabled=true;
+      setDutyBtn("start");
     }
   } catch(e) {
     console.error("Gagal memeriksa sesi aktif:", e);
@@ -160,13 +187,9 @@ function startTimer(start){
 async function startDuty(){
   if(!currentUser) return;
 
-  const startBtn = document.querySelector(".start");
-  const finishBtn = document.querySelector(".finish");
-
-  startBtn.disabled = true;
-  finishBtn.disabled = true;
-  const originalText = startBtn.innerText;
-  startBtn.innerText = "PROCESSING...";
+  const btn=document.getElementById("duty-btn");
+  btn.dataset.prevState="start";
+  setDutyBtn("processing","PROCESSING...");
 
   window.addEventListener('beforeunload', preventClose);
   setStatus("loading","MEMERIKSA DATA...");
@@ -183,9 +206,7 @@ async function startDuty(){
 
     if(!found){
       setStatus("off","Silahkan refresh halaman terlebih dahulu");
-      startBtn.disabled = false;
-      finishBtn.disabled = true;
-      startBtn.innerText = originalText;
+      setDutyBtn("start");
       window.removeEventListener('beforeunload', preventClose);
       return;
     }
@@ -208,9 +229,7 @@ async function startDuty(){
   } catch(err){
     console.error("Gagal memeriksa data EMS terbaru:", err);
     setStatus("off","Silahkan refresh halaman terlebih dahulu");
-    startBtn.disabled = false;
-    finishBtn.disabled = true;
-    startBtn.innerText = originalText;
+    setDutyBtn("start");
     window.removeEventListener('beforeunload', preventClose);
     return;
   }
@@ -230,8 +249,7 @@ async function startDuty(){
 
     if(!result.success){
       setStatus("off", result.message || "FAILED START DUTY");
-      startBtn.disabled = false;
-      finishBtn.disabled = true;
+      setDutyBtn("start");
       return;
     }
 
@@ -240,11 +258,8 @@ async function startDuty(){
   } catch (err) {
     console.error(err);
     setStatus("off","NETWORK ERROR / API FAILED");
-    startBtn.disabled = false;
-    finishBtn.disabled = true;
+    setDutyBtn("start");
   } finally {
-
-    startBtn.innerText = originalText;
     window.removeEventListener('beforeunload', preventClose);
   }
 }
@@ -252,13 +267,9 @@ async function startDuty(){
 async function finishDuty(){
   if(!currentUser) return;
 
-  const startBtn = document.querySelector(".start");
-  const finishBtn = document.querySelector(".finish");
-
-  startBtn.disabled = true;
-  finishBtn.disabled = true;
-  const originalText = finishBtn.innerText;
-  finishBtn.innerText = "PROCESSING...";
+  const btn=document.getElementById("duty-btn");
+  btn.dataset.prevState="finish";
+  setDutyBtn("processing","PROCESSING...");
 
   if (timer) {
     clearInterval(timer);
@@ -275,19 +286,14 @@ async function finishDuty(){
     const data = await res.json();
     
     setStatus("off", data.message || "DUTY FINISHED");
-
-    startBtn.disabled = false;
-    finishBtn.disabled = true;
+    setDutyBtn("start");
 
   } catch(e) {
     console.error(e);
 
     setStatus("off", "OFF DUTY");
-    startBtn.disabled = false;
-    finishBtn.disabled = true;
+    setDutyBtn("start");
   } finally {
-
-    finishBtn.innerText = originalText;
     window.removeEventListener('beforeunload', preventClose);
   }
 }
