@@ -62,24 +62,24 @@ h1 span.accent { color: var(--accent-red); }
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(var(--red-rgb), 0.12);
   color: var(--accent-red-glow);
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(var(--red-rgb), 0.25);
 }
 
 .card-content { flex-grow: 1; }
-.card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: #f3f4f6; }
-.card-desc { font-size: 13px; color: #9ca3af; line-height: 1.4; }
+.card-title { font-size: 16px; font-weight: 600; margin-bottom: 4px; color: var(--admin-gray-100); }
+.card-desc { font-size: 13px; color: var(--admin-gray-400); line-height: 1.4; }
 
 .arrow-btn {
   width: 34px;
   height: 34px;
   border-radius: 50%;
-  border: 1px solid rgba(239, 68, 68, 0.25);
+  border: 1px solid rgba(var(--red-rgb), 0.25);
   color: var(--accent-red-glow);
   display: flex;
   align-items: center;
@@ -91,7 +91,7 @@ h1 span.accent { color: var(--accent-red); }
 .card:hover {
   transform: translateY(-2px);
   border-color: var(--accent-red);
-  background: #111827;
+  background: var(--bg-deep);
 }
 
 .card:hover .arrow-btn { background: var(--accent-red); color: var(--bg); transform: translateX(6px); }
@@ -100,7 +100,7 @@ h1 span.accent { color: var(--accent-red); }
 .back-wrap {
   width: 100%;
   padding-top: 24px;
-  border-top: 1px solid #1f2937;
+  border-top: 1px solid var(--admin-gray-800);
   display: flex;
   justify-content: center;
 }
@@ -111,20 +111,20 @@ h1 span.accent { color: var(--accent-red); }
   gap: 8px;
   font-size: 13px;
   font-weight: 600;
-  color: #9ca3af;
+  color: var(--admin-gray-400);
   text-decoration: none;
   padding: 10px 20px;
   border-radius: 999px;
-  border: 1px solid #374151;
+  border: 1px solid var(--admin-gray-700);
   transition: all 0.2s ease;
 }
 
 .back-link i { width: 15px; height: 15px; }
 
 .back-link:hover {
-  color: #e5e7eb;
-  border-color: #6b7280;
-  background: rgba(255, 255, 255, 0.03);
+  color: var(--admin-gray-200);
+  border-color: var(--admin-gray-500);
+  background: rgba(var(--white-rgb), 0.03);
 }
 
 .card,
@@ -142,9 +142,9 @@ h1 span.accent { color: var(--accent-red); }
 }
 
 .card-title {
-    color: #f3f4f6;
+    color: var(--admin-gray-100);
 }
 
 .card-desc {
-    color: #9ca3af;
+    color: var(--admin-gray-400);
 }

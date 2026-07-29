@@ -11,9 +11,9 @@
 }
 
 .card-header-icon {
-  background: rgba(56, 189, 248, 0.15);
+  background: rgba(var(--sky-rgb), 0.15);
   color: var(--accent-sky);
-  box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.2);
+  box-shadow: inset 0 0 12px rgba(var(--sky-rgb), 0.2);
 }
 
 h1 span.gradient {
@@ -29,17 +29,17 @@ h1 span.gradient {
   align-items: center;
   margin-top: 24px;
   margin-bottom: 16px;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(var(--surface-rgb), 0.6);
   padding: 14px;
   border-radius: 16px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(var(--white-rgb), 0.03);
 }
 
 input[type="date"] {
   padding: 10px 16px;
   border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  background: rgba(15, 23, 42, 0.8);
+  border: 1px solid rgba(var(--white-rgb), 0.05);
+  background: rgba(var(--surface-rgb), 0.8);
   color: white;
   font-size: 13px;
   font-weight: 500;
@@ -49,7 +49,7 @@ input[type="date"] {
 }
 
 input[type="date"]:focus {
-  border-color: rgba(56, 189, 248, 0.5);
+  border-color: rgba(var(--sky-rgb), 0.5);
 }
 
 button {
@@ -65,7 +65,7 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  box-shadow: 0 4px 12px rgba(56, 189, 248, 0.2);
+  box-shadow: 0 4px 12px rgba(var(--sky-rgb), 0.2);
 }
 
 button:hover:not(:disabled) {
@@ -74,7 +74,7 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-  background: #334155;
+  background: var(--border-slate);
   color: var(--muted-2);
   cursor: not-allowed;
   box-shadow: none;
@@ -89,8 +89,8 @@ button:disabled {
 }
 
 .table-wrap {
-  background: rgba(15, 23, 42, 0.4);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(var(--surface-rgb), 0.4);
+  border: 1px solid rgba(var(--white-rgb), 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 20px;
@@ -105,7 +105,7 @@ table {
 }
 
 th {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(var(--surface-rgb), 0.7);
   padding: 16px;
   text-align: center;
   color: var(--muted);
@@ -113,12 +113,12 @@ th {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.05);
 }
 
 td {
   padding: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.03);
   text-align: center;
   font-size: 14px;
   color: var(--text-secondary);
@@ -134,18 +134,18 @@ tr:last-child td {
 }
 
 tr:hover td {
-  background: rgba(255, 255, 255, 0.02);
+  background: rgba(var(--white-rgb), 0.02);
   color: white;
 }
 
 .rank {
-  color: #fbbf24;
+  color: var(--accent-amber-glow);
   font-weight: 700;
 }
 
-tr:nth-child(1) .rank { color: #f59e0b; font-size: 16px; }
+tr:nth-child(1) .rank { color: var(--accent-amber); font-size: 16px; }
 tr:nth-child(2) .rank { color: var(--text-secondary); }
-tr:nth-child(3) .rank { color: #b45309; }
+tr:nth-child(3) .rank { color: var(--accent-amber-dark); }
 
 .empty-state {
   color: var(--muted-2);

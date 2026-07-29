@@ -17,7 +17,7 @@
   margin-bottom: 8px;
 }
 
-.header h1 span.white { color: #ffffff; }
+.header h1 span.white { color: var(--white); }
 .header h1 span.gradient {
   background: linear-gradient(to right, var(--accent-sky), var(--accent-purple-glow));
   -webkit-background-clip: text;
@@ -55,10 +55,10 @@
 .card.attendance li::marker { color: var(--accent-red); }
 .card.attendance .highlight {
   color: var(--accent-red);
-  background: rgba(239, 68, 68, 0.1);
+  background: rgba(var(--red-rgb), 0.1);
   padding: 2px 6px;
   border-radius: 6px;
-  border: 1px solid rgba(239, 68, 68, 0.2);
+  border: 1px solid rgba(var(--red-rgb), 0.2);
   font-weight: 600;
 }
 
@@ -78,14 +78,14 @@
   margin-top: 20px;
   padding: 16px 20px;
   border-radius: 16px;
-  background: rgba(15, 23, 42, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(var(--surface-rgb), 0.6);
+  border: 1px solid rgba(var(--white-rgb), 0.03);
 }
 
 .note-title {
   font-size: 13px;
   font-weight: 700;
-  color: #facc15;
+  color: var(--accent-amber-alt);
   margin-bottom: 10px;
   display: flex;
   align-items: center;
@@ -104,7 +104,7 @@
 }
 
 .note li::marker {
-  color: #facc15;
+  color: var(--accent-amber-alt);
 }
 
 @media (max-width: 640px) {

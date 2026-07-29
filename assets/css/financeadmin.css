@@ -5,7 +5,7 @@
 select, input[type="password"] {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(var(--white-rgb), 0.08);
   border-radius: 14px;
   background: var(--input-bg);
   color: white;
@@ -15,7 +15,7 @@ select, input[type="password"] {
   margin-bottom: 16px;
 }
 select:focus, input[type="password"]:focus {
-  border-color: rgba(239, 68, 68, 0.4);
+  border-color: rgba(var(--red-rgb), 0.4);
 }
 
 #topGaji {
@@ -25,17 +25,17 @@ select:focus, input[type="password"]:focus {
 }
 
 tr.row-unpaid td {
-  background: rgba(239, 68, 68, 0.07);
+  background: rgba(var(--red-rgb), 0.07);
 }
 tr.row-unpaid td:first-child {
   border-left: 3px solid var(--primary);
 }
 tr.row-unpaid:hover td {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(var(--red-rgb), 0.12);
 }
 
 input[type="checkbox"] {
-  accent-color: #10b981;
+  accent-color: var(--accent-emerald);
   width: 16px;
   height: 16px;
   cursor: pointer;

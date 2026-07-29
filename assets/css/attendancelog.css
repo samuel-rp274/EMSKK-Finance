@@ -11,9 +11,9 @@
 }
 
 .card-header-icon {
-  background: rgba(245, 158, 11, 0.15);
+  background: rgba(var(--amber-rgb), 0.15);
   color: var(--accent-amber);
-  box-shadow: inset 0 0 12px rgba(245, 158, 11, 0.2);
+  box-shadow: inset 0 0 12px rgba(var(--amber-rgb), 0.2);
 }
 
 h1 span.gradient {
@@ -32,17 +32,17 @@ h1 span.gradient {
 }
 
 .ts-control {
-    background: rgba(15, 23, 42, 0.6) !important;
+    background: rgba(var(--surface-rgb), 0.6) !important;
     color: white !important;
-    border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    border: 1px solid rgba(var(--white-rgb), 0.04) !important;
     border-radius: 14px !important;
     padding: 14px 16px !important;
     font-size: 14px !important;
 }
 
 .ts-wrapper.focus .ts-control {
-    border-color: rgba(56, 189, 248, 0.4) !important;
-    box-shadow: 0 0 10px rgba(56, 189, 248, 0.1) !important;
+    border-color: rgba(var(--sky-rgb), 0.4) !important;
+    box-shadow: 0 0 10px rgba(var(--sky-rgb), 0.1) !important;
 }
 
 .ts-control input { color: white !important; font-size: 14px !important; }
@@ -50,11 +50,11 @@ h1 span.gradient {
 
 .ts-dropdown {
     background: var(--surface) !important;
-    border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    border: 1px solid rgba(var(--white-rgb), 0.08) !important;
     color: white !important;
     border-radius: 14px !important;
     margin-top: 6px !important;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5) !important;
+    box-shadow: 0 10px 25px rgba(var(--black-rgb), 0.5) !important;
     overflow: hidden !important;
 }
 
@@ -65,7 +65,7 @@ h1 span.gradient {
 }
 
 .ts-dropdown .active {
-    background: rgba(56, 189, 248, 0.15) !important;
+    background: rgba(var(--sky-rgb), 0.15) !important;
     color: var(--accent-sky) !important;
 }
 
@@ -76,8 +76,8 @@ h1 span.gradient {
 }
 
 .stat {
-    background: rgba(255, 255, 255, 0.02);
-    border: 1px solid rgba(255, 255, 255, 0.04);
+    background: rgba(var(--white-rgb), 0.02);
+    border: 1px solid rgba(var(--white-rgb), 0.04);
     border-radius: 16px;
     padding: 20px;
     transition: transform 0.2s;
@@ -119,19 +119,19 @@ table {
 }
 
 th {
-    background: rgba(15, 23, 42, 0.7);
+    background: rgba(var(--surface-rgb), 0.7);
     padding: 16px;
     font-size: 12px;
     font-weight: 700;
     color: var(--muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(var(--white-rgb), 0.05);
 }
 
 td {
     padding: 16px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(var(--white-rgb), 0.03);
     color: var(--text-secondary);
     font-size: 14px;
     white-space: nowrap;
@@ -142,8 +142,8 @@ tr:last-child td {
 }
 
 tr:hover td {
-    background: rgba(255, 255, 255, 0.02);
-    color: #ffffff;
+    background: rgba(var(--white-rgb), 0.02);
+    color: var(--white);
 }
 
 .empty {

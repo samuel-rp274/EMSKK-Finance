@@ -11,9 +11,9 @@
 }
 
 .card-header-icon {
-  background: rgba(239, 68, 68, 0.15);
+  background: rgba(var(--red-rgb), 0.15);
   color: var(--accent-red);
-  box-shadow: inset 0 0 12px rgba(239, 68, 68, 0.2);
+  box-shadow: inset 0 0 12px rgba(var(--red-rgb), 0.2);
 }
 
 h1 span.gradient {
@@ -24,15 +24,15 @@ h1 span.gradient {
 
 .clock-box {
   text-align: center;
-  padding: 20px;
-  background: rgba(255, 255, 255, 0.02);
+  padding: 28px 20px;
+  background: rgba(var(--white-rgb), 0.02);
   border-radius: 16px;
-  margin-bottom: 28px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
+  margin-bottom: 24px;
+  border: 1px solid rgba(var(--white-rgb), 0.04);
 }
 
 .clock-time {
-  font-size: 42px;
+  font-size: 64px;
   color: var(--accent-red);
   font-weight: 800;
   letter-spacing: 1px;
@@ -45,101 +45,108 @@ h1 span.gradient {
   font-weight: 500;
 }
 
-.form-group {
+.identity-block {
+  padding: 18px 20px;
+  margin-bottom: 20px;
+  border-radius: 14px;
+  background: rgba(var(--white-rgb), 0.02);
+  border: 1px solid rgba(var(--white-rgb), 0.04);
+}
+
+.field-label {
+  font-size: 11px;
+  color: var(--accent-red);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.identity-name-group {
   margin-bottom: 18px;
 }
 
-label {
-  font-size: 13px;
-  color: var(--muted);
+.identity-name {
+  font-size: 17px;
   font-weight: 600;
-  display: block;
-  margin-bottom: 8px;
-  letter-spacing: 0.3px;
+  color: var(--text-secondary);
 }
 
-input {
-  width: 100%;
-  padding: 14px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.04);
-  background: rgba(15, 23, 42, 0.6);
-  color: white;
-  outline: none;
+.identity-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.field-value {
   font-size: 14px;
-  transition: all 0.25s;
+  font-weight: 600;
+  color: var(--text-secondary);
 }
 
-input[readonly] {
-  color: var(--muted);
-  background: rgba(15, 23, 42, 0.3);
-  cursor: not-allowed;
-}
-
-button {
+.duty-btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 12px;
+  padding: 15px;
+  margin-top: 4px;
   border: none;
   border-radius: 14px;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.5px;
   cursor: pointer;
+  color: white;
   transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-button:hover {
+.duty-btn:hover:not(:disabled) {
   transform: translateY(-3px);
 }
 
-button:disabled {
+.duty-btn:disabled {
   opacity: 0.3;
   cursor: not-allowed;
   transform: none !important;
 }
 
-.start {
-  background: #10b981;
-  color: white;
-  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.2);
+.duty-btn.state-start {
+  background: var(--accent-emerald);
+  box-shadow: 0 4px 15px rgba(var(--emerald-rgb), 0.2);
 }
-.start:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
+.duty-btn.state-start:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(var(--emerald-rgb), 0.4);
 }
 
-.finish {
+.duty-btn.state-finish {
   background: var(--accent-red);
-  color: white;
-  box-shadow: 0 4px 15px rgba(239, 68, 68, 0.2);
+  box-shadow: 0 4px 15px rgba(var(--red-rgb), 0.2);
 }
-.finish:hover:not(:disabled) {
-  box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+.duty-btn.state-finish:hover:not(:disabled) {
+  box-shadow: 0 6px 20px rgba(var(--red-rgb), 0.4);
 }
 
-.status {
+.status-box {
   text-align: center;
-  margin-top: 20px;
-  padding: 12px;
+  margin-top: 12px;
+  padding: 14px;
   border-radius: 14px;
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.5px;
-  background: rgba(255, 255, 255, 0.02);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(var(--white-rgb), 0.02);
+  border: 1px solid rgba(var(--white-rgb), 0.05);
   transition: all 0.3s;
 }
 
 .badge-off { color: var(--muted); }
-.badge-on { 
-  color: #10b981; 
-  background: rgba(16, 185, 129, 0.06) !important; 
-  border-color: rgba(16, 185, 129, 0.2) !important; 
+.badge-on {
+  color: var(--accent-emerald);
+  background: rgba(var(--emerald-rgb), 0.08) !important;
+  border-color: rgba(var(--emerald-rgb), 0.25) !important;
 }
-.badge-loading { 
-  color: #f59e0b; 
-  background: rgba(245, 158, 11, 0.06) !important; 
-  border-color: rgba(245, 158, 11, 0.2) !important; 
+.badge-loading {
+  color: var(--accent-amber);
+  background: rgba(var(--amber-rgb), 0.08) !important;
+  border-color: rgba(var(--amber-rgb), 0.25) !important;
 }
 
 .loading {
@@ -155,4 +162,6 @@ button:disabled {
 @media (max-width: 640px) {
   .card { padding: 24px; }
   h1 { font-size: 22px; }
+  .clock-time { font-size: 44px; }
+  .identity-cols { gap: 12px; }
 }

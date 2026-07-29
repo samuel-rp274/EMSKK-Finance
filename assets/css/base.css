@@ -2,9 +2,9 @@
   /* Neutral */
   --bg: #030712;
   --surface: #0f172a;
-  --card-bg: rgba(15, 23, 42, 0.4);
-  --border-glow: rgba(255, 255, 255, 0.05);
-  --input-bg: rgba(30, 41, 59, 0.5);
+  --card-bg: rgba(var(--surface-rgb), 0.4);
+  --border-glow: rgba(var(--white-rgb), 0.05);
+  --input-bg: rgba(var(--input-rgb), 0.5);
   --primary: #ef4444;
   --text: #f8fafc;
   --text-secondary: #cbd5e1;
@@ -26,6 +26,51 @@
   --accent-rose: #ec4899;
   --accent-orange: #fb923c;
   --accent-slate: #64748b;
+
+  /* RGB triplets (for rgba() opacity variants) */
+  --white-rgb: 255, 255, 255;
+  --black-rgb: 0, 0, 0;
+  --surface-rgb: 15, 23, 42;
+  --bg-rgb: 3, 7, 18;
+  --input-rgb: 30, 41, 59;
+  --red-rgb: 239, 68, 68;
+  --green-rgb: 34, 197, 94;
+  --emerald-rgb: 16, 185, 129;
+  --amber-rgb: 245, 158, 11;
+  --sky-rgb: 56, 189, 248;
+  --purple-rgb: 168, 85, 247;
+  --rose-rgb: 236, 72, 153;
+  --slate-rgb: 71, 85, 105;
+  --slate-dark-rgb: 51, 65, 85;
+
+  /* Extra solid colors */
+  --white: #e2e8f0;
+  --text-alt: #e2e8f0;
+  --text-heading: #f1f5f9;
+  --accent-emerald: #10b981;
+  --accent-emerald-light: #6ee7b7;
+  --accent-emerald-dark: #16a34a;
+  --accent-red-light: #fca5a5;
+  --accent-red-dark: #dc2626;
+  --accent-green-light: #86efac;
+  --accent-blue-light: #60a5fa;
+  --accent-sky-light: #7dd3fc;
+  --accent-amber-dark: #b45309;
+  --accent-amber-alt: #facc15;
+  --accent-purple-light: #e9d5ff;
+  --accent-rose-light: #fbcfe8;
+  --border-slate: #334155;
+  --border-slate-light: #475569;
+  --bg-deep: #111827;
+
+  /* Admin neutral scale (indexadminemskk) */
+  --admin-gray-100: #f3f4f6;
+  --admin-gray-200: #e5e7eb;
+  --admin-gray-400: #9ca3af;
+  --admin-gray-500: #6b7280;
+  --admin-gray-700: #374151;
+  --admin-gray-800: #1f2937;
+  --admin-gray-900: #111827;
 }
 
 * {
@@ -36,8 +81,8 @@
 }
 
 body {
-  background: #030712;
-  color: #f8fafc;
+  background: var(--bg);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   justify-content: center;
@@ -69,8 +114,8 @@ body {
 }
 
 .card {
-  background: rgba(15,23,42,0.5); 
-  border:1px solid rgba(255,255,255,0.05);
+  background: rgba(var(--surface-rgb), 0.5); 
+  border:1px solid rgba(var(--white-rgb), 0.05);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
   border-radius: 24px;
@@ -107,10 +152,10 @@ h1 {
   margin-bottom: 6px;
 }
 
-h1 span.white { color: #ffffff; }
+h1 span.white { color: var(--white); }
 
 .subtitle {
-  color: #94a3b8;
+  color: var(--muted);
   font-size: 13px;
   margin-bottom: 28px;
   line-height: 1.4;

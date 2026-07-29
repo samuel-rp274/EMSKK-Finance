@@ -5,7 +5,7 @@
 select, input[type="password"], input[type="datetime-local"] {
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(var(--white-rgb), 0.08);
   border-radius: 14px;
   background: var(--input-bg);
   color: white;
@@ -15,7 +15,7 @@ select, input[type="password"], input[type="datetime-local"] {
   margin-bottom: 16px;
 }
 select:focus, input:focus {
-  border-color: rgba(239, 68, 68, 0.4);
+  border-color: rgba(var(--red-rgb), 0.4);
 }
 
 #topDuty {
@@ -25,17 +25,17 @@ select:focus, input:focus {
 }
 
 tr.row-pending td {
-  background: rgba(239, 68, 68, 0.07);
+  background: rgba(var(--red-rgb), 0.07);
 }
 tr.row-pending td:first-child {
   border-left: 3px solid var(--primary);
 }
 tr.row-pending:hover td {
-  background: rgba(239, 68, 68, 0.12);
+  background: rgba(var(--red-rgb), 0.12);
 }
 
 a {
-  color: #60a5fa;
+  color: var(--accent-blue-light);
   cursor: pointer;
   text-decoration: none;
   font-weight: 600;
@@ -45,7 +45,7 @@ a:hover {
 }
 
 .detail-row-box {
-  background: rgba(15, 23, 42, 0.8) !important;
+  background: rgba(var(--surface-rgb), 0.8) !important;
   padding: 20px !important;
 }
 .session-item {
@@ -54,15 +54,15 @@ a:hover {
   gap: 12px;
   padding: 14px;
   margin-bottom: 8px;
-  background: rgba(30, 41, 59, 0.4);
+  background: rgba(var(--input-rgb), 0.4);
   border-radius: 14px;
   align-items: center;
   font-size: 13px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(var(--white-rgb), 0.03);
 }
 .session-item:last-child { margin-bottom: 0; }
 .session-item .start, .session-item .finish {
-  color: #e2e8f0;
+  color: var(--text-alt);
   font-family: monospace;
 }
 
@@ -78,9 +78,9 @@ a:hover {
   width: auto;
   margin-bottom: 0;
 }
-.btn-green { background: #10b981; }
+.btn-green { background: var(--accent-emerald); }
 .btn-red { background: var(--accent-red); }
-.btn-orange { background: #f59e0b; }
+.btn-orange { background: var(--accent-amber); }
 
 @media (max-width: 640px) {
   .session-item {
