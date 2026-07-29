@@ -39,25 +39,26 @@
         <div class="clock-date" id="clock-date">loading...</div>
       </div>
 
-      <div class="form-group">
-        <label>Nama EMS</label>
-        <input id="nama" readonly value="Memuat...">
+      <div class="identity-block">
+        <div class="identity-name-group">
+          <div class="field-label">Nama</div>
+          <div class="identity-name" id="nama">Memuat...</div>
+        </div>
+        <div class="identity-cols">
+          <div class="field-col">
+            <div class="field-label">Jabatan</div>
+            <div class="field-value" id="jabatan"></div>
+          </div>
+          <div class="field-col">
+            <div class="field-label">Divisi</div>
+            <div class="field-value" id="divisi"></div>
+          </div>
+        </div>
       </div>
 
-      <div class="form-group">
-        <label>Jabatan</label>
-        <input id="jabatan" readonly>
-      </div>
+      <button id="duty-btn" class="duty-btn state-start" onclick="handleDutyClick()">START DUTY</button>
 
-      <div class="form-group">
-        <label>Divisi</label>
-        <input id="divisi" readonly>
-      </div>
-
-      <button class="start" onclick="startDuty()">START DUTY</button>
-      <button class="finish" onclick="finishDuty()">FINISH DUTY</button>
-
-      <div id="status" class="status badge-off">OFF DUTY</div>
+      <div id="status" class="status-box badge-off">OFF DUTY</div>
     </div>
   </div>
 </body>

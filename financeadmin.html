@@ -17,7 +17,7 @@
 
 <link rel="icon" href="assets/images/logo.png" type="image/png">
 <link rel="manifest" href="assets/manifest-admin.json">
-<meta name="theme-color" content="#030712">
+<meta name="theme-color" content="var(--bg)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -53,33 +53,33 @@
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-title"><i data-lucide="pie-chart" style="width:14px; height:14px; color:#3b82f6"></i> Sumber Gaji Minggu Ini</div>
+          <div class="stat-title"><i data-lucide="pie-chart" style="width:14px; height:14px; color:var(--accent-blue)"></i> Sumber Gaji Minggu Ini</div>
           <div class="stat-value">
             <div class="sub-stat-item">
-              <span>Invoice</span> <span id="totalInvoice" style="color:#ef4444">0</span>
+              <span>Invoice</span> <span id="totalInvoice" style="color:var(--primary)">0</span>
             </div>
             <div class="sub-stat-item">
-              <span>Duty</span> <span id="totalDuty" style="color:#ef4444">0</span>
+              <span>Duty</span> <span id="totalDuty" style="color:var(--primary)">0</span>
             </div>
           </div>
         </div>
 
         <div class="stat">
-          <div class="stat-title"><i data-lucide="wallet" style="width:14px; height:14px; color:#f59e0b"></i> Total Gaji Minggu Ini</div>
+          <div class="stat-title"><i data-lucide="wallet" style="width:14px; height:14px; color:var(--accent-amber)"></i> Total Gaji Minggu Ini</div>
           <div class="stat-value">
             <div class="sub-stat-item">
-              <span>Total</span> <span id="totalWeek" style="color:#10b981">0</span>
+              <span>Total</span> <span id="totalWeek" style="color:var(--accent-emerald)">0</span>
             </div>
             <div class="sub-stat-item">
-              <span>Sisa</span> <span id="sisaWeek" style="color:#f59e0b">0</span>
+              <span>Sisa</span> <span id="sisaWeek" style="color:var(--accent-amber)">0</span>
             </div>
           </div>
         </div>
 
         <div class="stat">
           <div class="stat-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Gaji Minggu ini</span>
-            <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:#f8fafc; color:#030712;"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
+            <span><i data-lucide="trophy" style="width:14px; height:14px; color:var(--accent-amber-alt)"></i> Top 3 Total Gaji Minggu ini</span>
+            <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:var(--text); color:var(--bg);"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
           </div>
           <div class="stat-value" id="topGaji">-</div>
         </div>

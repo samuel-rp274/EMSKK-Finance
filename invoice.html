@@ -34,22 +34,24 @@
       <h1><span class="white">EMSKK</span> <span class="gradient">INVOICE INPUT</span></h1>
       <div class="subtitle">Create and upload invoices records</div>
 
+      <div class="identity-block">
+        <div class="identity-name-group">
+          <div class="field-label">Nama EMS</div>
+          <div class="identity-name" id="nama">Memuat...</div>
+        </div>
+        <div class="identity-cols">
+          <div class="field-col">
+            <div class="field-label">Jabatan</div>
+            <div class="field-value" id="jabatan"></div>
+          </div>
+          <div class="field-col">
+            <div class="field-label">Divisi</div>
+            <div class="field-value" id="divisi"></div>
+          </div>
+        </div>
+      </div>
+
       <form id="invoiceForm">
-        <div class="form-group">
-          <label>Nama EMS</label>
-          <input type="text" id="nama" readonly value="Memuat...">
-        </div>
-
-        <div class="form-group">
-          <label>Jabatan</label>
-          <input type="text" id="jabatan" readonly>
-        </div>
-
-        <div class="form-group">
-          <label>Divisi</label>
-          <input type="text" id="divisi" readonly>
-        </div>
-
         <div class="form-group">
           <label>Tanggal Invoice</label>
           <input type="date" id="tanggalInvoice">

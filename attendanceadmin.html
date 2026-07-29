@@ -50,28 +50,28 @@
 
       <div class="stats">
         <div class="stat">
-          <div class="stat-title"><i data-lucide="bar-chart-3" style="width:14px; height:14px; color:#3b82f6"></i> Attendance Status</div>
+          <div class="stat-title"><i data-lucide="bar-chart-3" style="width:14px; height:14px; color:var(--accent-blue)"></i> Attendance Status</div>
           <div class="stat-value">
             <div class="sub-stat-item">
-              <span>Pending</span> <span id="pendingDuty" style="color:#ef4444">0</span>
+              <span>Pending</span> <span id="pendingDuty" style="color:var(--primary)">0</span>
             </div>
             <div class="sub-stat-item">
-              <span>Valid</span> <span id="jumlahDuty" style="color:#10b981">0</span>
+              <span>Valid</span> <span id="jumlahDuty" style="color:var(--accent-emerald)">0</span>
             </div>
           </div>
         </div>
 
         <div class="stat">
-          <div class="stat-title"><i data-lucide="activity" style="width:14px; height:14px; color:#10b981"></i> On Duty Sekarang</div>
+          <div class="stat-title"><i data-lucide="activity" style="width:14px; height:14px; color:var(--accent-emerald)"></i> On Duty Sekarang</div>
           <div class="stat-value" style="padding: 10px 0; font-size: 28px;">
-            <span id="onDutyCount" style="color:#10b981; font-weight: 800;">0</span> <span style="font-size: 16px; color: var(--muted); font-weight: 500;">Orang</span>
+            <span id="onDutyCount" style="color:var(--accent-emerald); font-weight: 800;">0</span> <span style="font-size: 16px; color: var(--muted); font-weight: 500;">Orang</span>
           </div>
         </div>
 
         <div class="stat">
           <div class="stat-title" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-            <span><i data-lucide="trophy" style="width:14px; height:14px; color:#facc15"></i> Top 3 Total Duty Minggu ini</span>
-            <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:#f8fafc; color:#030712;"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
+            <span><i data-lucide="trophy" style="width:14px; height:14px; color:var(--accent-amber-alt)"></i> Top 3 Total Duty Minggu ini</span>
+            <button id="copyTop3Btn" onclick="copyTop3()" style="width:auto; padding:4px 10px; font-size:12px; margin:0; display:flex; align-items:center; gap:4px; background:var(--text); color:var(--bg);"><i data-lucide="copy" style="width:12px; height:12px"></i> Salin</button>
           </div>
           <div class="stat-value" id="topDuty">-</div>
         </div>
@@ -104,10 +104,10 @@
       <div id="activeDutyCard" style="margin-top: 32px;">
         <h2 style="display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; font-size:18px; font-weight:700; margin-bottom: 4px;">
           <span style="display:flex; align-items:center; gap:8px;">
-            <i data-lucide="zap" style="width:18px; height:18px; color:#f59e0b;"></i> Kontrol Duty Aktif
+            <i data-lucide="zap" style="width:18px; height:18px; color:var(--accent-amber);"></i> Kontrol Duty Aktif
           </span>
           <div style="display:flex; gap:8px;">
-            <button onclick="loadActiveDuty()" style="width:auto; padding:8px 14px; font-size:12px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08); margin:0;">
+            <button onclick="loadActiveDuty()" style="width:auto; padding:8px 14px; font-size:12px; background: rgba(var(--white-rgb), 0.05); color:var(--text-secondary); border: 1px solid rgba(var(--white-rgb), 0.08); margin:0;">
               <i data-lucide="refresh-cw" style="width:14px; height:14px"></i> Refresh
             </button>
             <button id="stopAllBtn" onclick="confirmStopAll()" class="btn-red" style="width:auto; padding:8px 14px; font-size:12px; margin:0;">
@@ -143,16 +143,16 @@
     position:fixed;
     top:0;left:0;
     width:100%;height:100%;
-    background:rgba(0,0,0,0.7);
+    background:rgba(var(--black-rgb), 0.7);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     justify-content:center;
     align-items:center;
     z-index:9999;
   ">
-    <div class="card" style="width:420px; background:#0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 28px; margin-bottom: 0;">
+    <div class="card" style="width:420px; background:var(--surface); border: 1px solid rgba(var(--white-rgb), 0.1); padding: 28px; margin-bottom: 0;">
       <h2 style="margin-bottom:18px; font-size: 20px; font-weight: 700; display:flex; align-items:center; gap:8px;">
-        <i data-lucide="edit-3" style="width:20px; height:20px; color:#f59e0b;"></i> Edit Attendance
+        <i data-lucide="edit-3" style="width:20px; height:20px; color:var(--accent-amber);"></i> Edit Attendance
       </h2>
 
       <div class="form-group">
@@ -169,7 +169,7 @@
         <button onclick="saveEdit()" class="btn-green" style="width:auto; padding: 10px 20px; border-radius: 10px;">
           Save Changes
         </button>
-        <button onclick="closeModal()" class="btn-red" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08);">
+        <button onclick="closeModal()" class="btn-red" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(var(--white-rgb), 0.05); color:var(--text-secondary); border: 1px solid rgba(var(--white-rgb), 0.08);">
           Close
         </button>
       </div>
@@ -181,25 +181,25 @@
     position:fixed;
     top:0;left:0;
     width:100%;height:100%;
-    background:rgba(0,0,0,0.7);
+    background:rgba(var(--black-rgb), 0.7);
     backdrop-filter: blur(5px);
     -webkit-backdrop-filter: blur(5px);
     justify-content:center;
     align-items:center;
     z-index:9999;
   ">
-    <div class="card" style="width:420px; background:#0f172a; border: 1px solid rgba(255,255,255,0.1); padding: 28px; margin-bottom: 0;">
+    <div class="card" style="width:420px; background:var(--surface); border: 1px solid rgba(var(--white-rgb), 0.1); padding: 28px; margin-bottom: 0;">
       <h2 style="margin-bottom:12px; font-size: 20px; font-weight: 700; display:flex; align-items:center; gap:8px;">
-        <i data-lucide="alert-triangle" style="width:20px; height:20px; color:#ef4444;"></i> Konfirmasi Stop Duty
+        <i data-lucide="alert-triangle" style="width:20px; height:20px; color:var(--primary);"></i> Konfirmasi Stop Duty
       </h2>
 
-      <div id="stopModalText" style="color:#cbd5e1; font-size:14px; margin-bottom: 20px; line-height:1.6;"></div>
+      <div id="stopModalText" style="color:var(--text-secondary); font-size:14px; margin-bottom: 20px; line-height:1.6;"></div>
 
       <div style="display:flex; gap:10px; justify-content:flex-end;">
         <button id="stopModalConfirmBtn" onclick="executeStop()" class="btn-red" style="width:auto; padding: 10px 20px; border-radius: 10px;">
           Ya, Stop
         </button>
-        <button onclick="closeStopModal()" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(255,255,255,0.05); color:#cbd5e1; border: 1px solid rgba(255,255,255,0.08);">
+        <button onclick="closeStopModal()" style="width:auto; padding: 10px 20px; border-radius: 10px; background: rgba(var(--white-rgb), 0.05); color:var(--text-secondary); border: 1px solid rgba(var(--white-rgb), 0.08);">
           Batal
         </button>
       </div>
