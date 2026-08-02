@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="3"></script>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/manualadmin.css">
+<script src="assets/js/manualadmin.js" defer></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Manual Entry</title>
+
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+
+    <div class="card" id="loginCard">
+      <h1>Super Admin Entry</h1>
+      <div class="subtitle">Masukkan kredensial keamanan</div>
+      <input type="password" id="adminPassword" placeholder="Password Super Admin">
+      <button onclick="checkLogin()"><i data-lucide="lock" style="width:16px; height:16px"></i> Masuk</button>
+      <div id="loginStatus"></div>
+    </div>
+
+    <div class="card hidden" id="adminPanel">
+
+      <div class="card-header-icon">
+        <i data-lucide="shield-check"></i>
+      </div>
+
+      <h1><span class="white">EMSKK</span> <span class="gradient">MANUAL ENTRY</span></h1>
+      <div class="subtitle">Superadmin tool — tambahkan sesi duty atau invoice yang tertinggal</div>
+
+      <div class="tab-switch">
+        <button type="button" class="tab-btn active" data-tab="attendance">ATTENDANCE</button>
+        <button type="button" class="tab-btn" data-tab="invoice">INVOICE</button>
+      </div>
+
+      <!-- ATTENDANCE TAB -->
+      <div class="tab-panel active" id="panel-attendance">
+        <form id="attendanceManualForm">
+
+          <div class="form-group">
+            <label>Pilih Nama</label>
+            <select id="attNama" required>
+              <option value="">Memuat...</option>
+            </select>
+          </div>
+
+          <div class="identity-block">
+            <div class="identity-cols">
+              <div class="field-col">
+                <div class="field-label">Jabatan</div>
+                <div class="field-value" id="attJabatan">-</div>
+              </div>
+              <div class="field-col">
+                <div class="field-label">Divisi</div>
+                <div class="field-value" id="attDivisi">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Start Duty</label>
+            <input type="datetime-local" id="attStart" required>
+          </div>
+
+          <div class="form-group">
+            <label>Finish Duty</label>
+            <input type="datetime-local" id="attFinish" required>
+          </div>
+
+          <button type="submit">TAMBAH SESI DUTY</button>
+          <div id="attStatus" class="status-msg"></div>
+        </form>
+      </div>
+
+      <!-- INVOICE TAB -->
+      <div class="tab-panel" id="panel-invoice">
+        <form id="invoiceManualForm">
+
+          <div class="form-group">
+            <label>Pilih Nama</label>
+            <select id="invNama" required>
+              <option value="">Memuat...</option>
+            </select>
+          </div>
+
+          <div class="identity-block">
+            <div class="identity-cols">
+              <div class="field-col">
+                <div class="field-label">Jabatan</div>
+                <div class="field-value" id="invJabatan">-</div>
+              </div>
+              <div class="field-col">
+                <div class="field-label">Divisi</div>
+                <div class="field-value" id="invDivisi">-</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Tanggal Invoice</label>
+            <input type="date" id="invTanggal" required>
+          </div>
+
+          <div class="form-group">
+            <label>Jenis Invoice</label>
+            <select id="invType">
+              <option value="">Pilih Invoice</option>
+            </select>
+          </div>
+
+          <div id="invNormalSection">
+            <div class="form-group"><label>Harga</label><input type="number" id="invHarga" readonly min="0"></div>
+            <div class="form-group"><label>Kuantitas</label><input type="number" id="invQty" value="1" min="1"></div>
+          </div>
+
+          <div id="invOperasiSection" class="hidden">
+            <div class="form-group"><label>Jenis Operasi</label><input type="text" id="invJenisOperasi"></div>
+            <div class="form-group"><label>Rawat Inap</label>
+              <select id="invRawatInap"><option>Reguler</option><option>VIP</option><option>VVIP</option></select>
+            </div>
+            <div class="form-group"><label>Pembayaran</label>
+              <select id="invPembayaran"><option>BPJS</option><option>Non BPJS</option></select>
+            </div>
+            <div class="form-group"><label>Harga</label><input type="number" id="invHargaOperasi" min="0"></div>
+            <div class="form-group"><label>Kuantitas</label><input type="number" id="invQtyOperasi" value="1" min="1"></div>
+          </div>
+
+          <div id="invSuratSection" class="hidden">
+            <div class="form-group"><label>Jenis Surat</label><input type="text" id="invJenisSurat"></div>
+            <div class="form-group"><label>Harga</label><input type="number" id="invHargaSurat" min="0"></div>
+            <div class="form-group"><label>Kuantitas</label><input type="number" id="invQtySurat" value="1" min="1"></div>
+          </div>
+
+          <div id="invLainSection" class="hidden">
+            <div class="form-group"><label>Deskripsi</label><input type="text" id="invDeskripsiLain"></div>
+            <div class="form-group"><label>Harga</label><input type="number" id="invHargaLain" min="0"></div>
+            <div class="form-group"><label>Kuantitas</label><input type="number" id="invQtyLain" value="1" min="1"></div>
+          </div>
+
+          <div class="form-group">
+            <label>Link Bukti Invoice</label>
+            <input type="url" id="invBukti" placeholder="wajib link discord dari Bukti-Invoice" required>
+          </div>
+
+          <div class="total">
+            <span>Total Pembayaran</span>
+            <span id="invTotal">$KK 0</span>
+          </div>
+
+          <button type="submit">SIMPAN INVOICE</button>
+          <div id="invStatus" class="status-msg"></div>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
