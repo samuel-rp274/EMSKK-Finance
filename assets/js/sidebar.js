@@ -62,7 +62,7 @@
       { type: 'link', label: 'Invoice Overview', href: 'invoicelog.html', icon: 'folder-clock' },
     ];
 
-    if (role === 'admin') {
+    if (role === 'admin' || role === 'superadmin') {
       items.push({ type: 'divider' });
       items.push({ type: 'sectionLabel', label: 'Admin Menu' });
       items.push({ type: 'link', label: 'Admin Dashboard', href: 'indexadminemskk.html', icon: 'layout-dashboard' });
@@ -72,11 +72,17 @@
       items.push({ type: 'link', label: 'Photo Upload', href: 'photoupload.html', icon: 'image-plus' });
     }
 
+    if (role === 'superadmin') {
+      items.push({ type: 'divider' });
+      items.push({ type: 'sectionLabel', label: 'Super Admin Menu' });
+      items.push({ type: 'link', label: 'Manual Entry', href: 'manualadmin.html', icon: 'shield-check' });
+    }
+
     items.push({ type: 'divider' });
     items.push({ type: 'link', label: 'Organizational Structure', href: 'structure.html', icon: 'network' });
     items.push({ type: 'link', label: 'Tutorial', href: 'tutorial.html', icon: 'book-open' });
 
-    return items;
+    return items; 
   }
 
   function renderMenuHTML(items, currentPage){
