@@ -1,6 +1,6 @@
 window.__guardSession = (function(){
   var SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
-  var ROLE_LEVELS = { user: 1, admin: 2 };
+  var ROLE_LEVELS = { user: 1, admin: 2, superadmin: 3 };
 
   var thisScript = document.currentScript;
   var REQUIRED_LEVEL = parseInt(thisScript.getAttribute('data-level'), 10) || 1;
