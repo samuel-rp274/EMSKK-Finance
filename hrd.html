@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+<script src="assets/js/config.js"></script>
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/guard.css">
 <script src="assets/js/guard.js" data-level="2"></script>
-<script src="assets/js/config.js"></script>
 <link rel="stylesheet" href="assets/css/sidebar.css">
 <script src="assets/js/sidebar.js" defer></script>
 <link rel="stylesheet" href="assets/css/hrd.css">
@@ -35,13 +35,13 @@
       <div class="topbar">
         <input type="date" id="startDate">
         <input type="date" id="endDate">
-        <button id="btnGenerate" onclick="generate()" disabled>
-          <i data-lucide="refresh-cw" class="animate-spin" id="btnIcon" style="width:14px; height:14px;"></i>
-          <span id="btnText">Isi tanggal terlebih dahulu</span>
-        </button>
+        <button id="btnGenerate" onclick="generate()">
+          <i data-lucide="refresh-cw" id="btnIcon" style="width:14px; height:14px;"></i>
+          <span id="btnText">Generate</span>
+        </button>        
       </div>
 
-      <div class="info" id="infoText">Mengambil data dari server, mohon tunggu...</div>
+      <div class="info" id="infoText">Silakan masukkan rentang tanggal di atas.</div>
 
       <div class="table-wrap">
         <table>
