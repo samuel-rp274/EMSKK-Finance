@@ -1,7 +1,7 @@
 lucide.createIcons();
 
 const CACHE_KEY = "emskk_index_cache_v1";
-const REFRESH_MS = 5 * 60 * 1000;
+const REFRESH_MS = 15 * 60 * 1000;
 const ROTATE_MS = 3000;
 const FRESHNESS_TICK_MS = 30 * 1000;
 
@@ -70,7 +70,10 @@ function formatWeekRange(startStr, endStr){
 
 function timeAgo(isoLocal){
   if (!isoLocal) return "-";
-  const then = new Date(isoLocal.replace(" ", "T") + "+07:00");
+  const hasTimezone = /Z$|[+-]\d{2}:\d{2}$/.test(isoLocal);
+  const then = hasTimezone
+    ? new Date(isoLocal)
+    : new Date(isoLocal.replace(" ", "T") + "+07:00");
   const diffMin = Math.max(0, Math.round((Date.now() - then.getTime()) / 60000));
   if (diffMin < 1) return "baru saja";
   if (diffMin < 60) return `${diffMin} menit lalu`;
