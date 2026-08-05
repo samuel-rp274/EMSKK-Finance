@@ -5,15 +5,25 @@
   var PHOTO_BASE = "assets/photos/";
   var DEFAULT_AVATAR_COLOR = "#334155";
 
-  var cachedUsername = localStorage.getItem('emskk_username');
-  var cachedRole = localStorage.getItem('emskk_role');
-  var cachedNama = localStorage.getItem('emskk_nama');
-  var cachedPhoto = localStorage.getItem('emskk_photo');
-  var cachedPhotoUpdatedAt = localStorage.getItem('emskk_photo_updated_at');
+  function getSession(){
+    try {
+      return JSON.parse(localStorage.getItem(LOGIN_KEY)) || null;
+    } catch (e) {
+      return null;
+    }
+  }
 
-  if (cachedUsername && cachedRole) {
+  var cached = getSession();
+
+  if (cached && cached.username && cached.role) {
     rendered = true;
-    initSidebar({ username: cachedUsername, role: cachedRole, nama: cachedNama || cachedUsername, photo: cachedPhoto || null, photoUpdatedAt: cachedPhotoUpdatedAt || null });
+    initSidebar({
+      username: cached.username,
+      role: cached.role,
+      nama: cached.nama || cached.username,
+      photo: cached.photo || null,
+      photoUpdatedAt: cached.photoUpdatedAt || null
+    });
   }
 
   window.__guardSession.then(function(session){
@@ -237,11 +247,7 @@
     if (logoutBtn) {
       logoutBtn.addEventListener('click', function(e){
         e.preventDefault();
-        localStorage.removeItem('emskk_username');
-        localStorage.removeItem('emskk_role');
-        localStorage.removeItem('emskk_nama');
-        localStorage.removeItem('emskk_photo');
-        localStorage.removeItem('emskk_photo_updated_at');
+        localStorage.removeItem(LOGIN_KEY);
         window.location.href = 'login.html';
       });
     }

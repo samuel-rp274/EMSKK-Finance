@@ -24,9 +24,7 @@ async function loadEMS(){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safeData = data || [];
+    const safeData = await callApi("getEMS") || [];
 
     localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
       data: safeData,
@@ -106,8 +104,7 @@ async function loadData(){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
-    const data = await res.json();
+    const data = await callApi("getAttendanceLog", { scope: "all" });
     allData = data || [];
 
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
@@ -142,8 +139,7 @@ async function loadData(){
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogAll");
-    const fresh = await res.json();
+    const fresh = await callApi("getAttendanceLog", { scope: "all" });
 
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
       data: fresh,
@@ -244,6 +240,11 @@ function getWeekRange(){
     return {start,end};
 }
 
+function fmtDateTime(v){
+    if(!v) return "-";
+    return String(v).replace("T", " ").slice(0, 19);
+}
+
 function render(selectedName){	
     const name = (selectedName || ts?.getValue() || "").toString().trim();
 	
@@ -314,8 +315,8 @@ function render(selectedName){
         <tr>
             <td>${idx + 1}</td>
             <td>${i["Nama"]}</td>
-            <td>${i["Start"]}</td>
-            <td>${i["Finish"]}</td>
+            <td>${fmtDateTime(i["Start"])}</td>
+            <td>${fmtDateTime(i["Finish"])}</td>
             <td>${i["Durasi"]}</td>
         </tr>
     `).join("") : `

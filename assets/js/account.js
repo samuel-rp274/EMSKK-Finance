@@ -1,5 +1,13 @@
 lucide.createIcons();
 
+function getSession(){
+  try {
+    return JSON.parse(localStorage.getItem(LOGIN_KEY)) || null;
+  } catch(e) {
+    return null;
+  }
+}
+
 if (window.__guardSession) {
   window.__guardSession.then(function(session){
     if (session && session.nama) {
@@ -52,7 +60,7 @@ function resetAllForms(){
 }
 
 function forceLogoutAndRedirect(){
-  localStorage.removeItem('emskk_username');
+  localStorage.removeItem(LOGIN_KEY);
   setTimeout(function(){
     window.location.href = 'login.html';
   }, 1500);
@@ -100,7 +108,8 @@ document.getElementById('usernameStep1Form').addEventListener('submit', function
 document.getElementById('usernameStep2Form').addEventListener('submit', async function(e){
   e.preventDefault();
 
-  const currentUsername = localStorage.getItem('emskk_username');
+  const session = getSession();
+  const currentUsername = session ? session.username : null;
   const currentPassword = document.getElementById('usernamePasswordInput').value.trim();
 
   if (!currentUsername) {
@@ -116,11 +125,11 @@ document.getElementById('usernameStep2Form').addEventListener('submit', async fu
   setBtnLoading('usernameStep2Btn', true);
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=updateCredentials"
-      + "&currentUsername=" + encodeURIComponent(currentUsername)
-      + "&currentPassword=" + encodeURIComponent(currentPassword)
-      + "&newUsername=" + encodeURIComponent(draftNewUsername));
-    const result = await res.json();
+    const result = await callApi('updateCredentials', {
+      currentUsername: currentUsername,
+      currentPassword: currentPassword,
+      newUsername: draftNewUsername
+    });
 
     if (result.success) {
       showStatus('usernameStep2Status', 'success', 'Username berhasil diperbarui. Silakan login ulang...');
@@ -172,7 +181,8 @@ document.getElementById('confirmPasswordInput').addEventListener('input', checkP
 document.getElementById('passwordStep2Form').addEventListener('submit', async function(e){
   e.preventDefault();
 
-  const currentUsername = localStorage.getItem('emskk_username');
+  const session = getSession();
+  const currentUsername = session ? session.username : null;
   const newPassword = document.getElementById('newPasswordInput').value.trim();
   const confirmPassword = document.getElementById('confirmPasswordInput').value.trim();
 
@@ -193,11 +203,11 @@ document.getElementById('passwordStep2Form').addEventListener('submit', async fu
   setBtnLoading('passwordStep2Btn', true);
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=updateCredentials"
-      + "&currentUsername=" + encodeURIComponent(currentUsername)
-      + "&currentPassword=" + encodeURIComponent(draftCurrentPassword)
-      + "&newPassword=" + encodeURIComponent(newPassword));
-    const result = await res.json();
+    const result = await callApi('updateCredentials', {
+      currentUsername: currentUsername,
+      currentPassword: draftCurrentPassword,
+      newPassword: newPassword
+    });
 
     if (result.success) {
       showStatus('passwordStep2Status', 'success', 'Password berhasil diperbarui. Silakan login ulang...');

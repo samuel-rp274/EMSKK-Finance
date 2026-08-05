@@ -36,14 +36,20 @@ function setBtnLoading(btn, loading, idleHtml){
   lucide.createIcons();
 }
 
-function finishLogin(username){
-  localStorage.setItem('emskk_username', username);
+function finishLogin(session){
+  localStorage.setItem(LOGIN_KEY, JSON.stringify({
+    token: session.token,
+    username: session.username,
+    role: session.role,
+    nama: session.nama
+  }));
   window.location.href = redirectTarget;
 }
 
 // state carried between views
 let sessionUsername = null;
 let sessionPassword = null;
+let sessionResult = null; // hasil login lengkap (token, role, nama, dst), disimpen sampai step terakhir
 
 document.getElementById('loginForm').addEventListener('submit', async function(e){
   e.preventDefault();
@@ -56,17 +62,17 @@ document.getElementById('loginForm').addEventListener('submit', async function(e
   setBtnLoading(btn, true);
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=login&username=" + encodeURIComponent(username) + "&password=" + encodeURIComponent(password));
-    const result = await res.json();
+    const result = await callApi('login', { username, password });
 
     if (result.success) {
       sessionUsername = result.username;
       sessionPassword = password;
+      sessionResult = result;
 
       if (!result.passwordChanged) {
         showView('choiceView');
       } else {
-        finishLogin(result.username);
+        finishLogin(result);
       }
     } else {
       showStatus('loginStatus', 'error', result.message || 'Username atau Password salah.');
@@ -95,13 +101,13 @@ document.getElementById('keepPasswordBtn').addEventListener('click', async funct
   setBtnLoading(btn, true);
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=updateCredentials"
-      + "&currentUsername=" + encodeURIComponent(sessionUsername)
-      + "&currentPassword=" + encodeURIComponent(sessionPassword));
-    const result = await res.json();
+    const result = await callApi('updateCredentials', {
+      currentUsername: sessionUsername,
+      currentPassword: sessionPassword
+    });
 
     if (result.success) {
-      finishLogin(result.username);
+      finishLogin({ ...sessionResult, username: result.username });
     } else {
       showStatus('choiceStatus', 'error', result.message || 'Terjadi kesalahan.');
       setBtnLoading(btn, false, '<i data-lucide="check"></i> Pertahankan Password Lama');
@@ -123,15 +129,15 @@ document.getElementById('changeForm').addEventListener('submit', async function(
   setBtnLoading(btn, true);
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=updateCredentials"
-      + "&currentUsername=" + encodeURIComponent(sessionUsername)
-      + "&currentPassword=" + encodeURIComponent(sessionPassword)
-      + "&newUsername=" + encodeURIComponent(newUsername)
-      + "&newPassword=" + encodeURIComponent(newPassword));
-    const result = await res.json();
+    const result = await callApi('updateCredentials', {
+      currentUsername: sessionUsername,
+      currentPassword: sessionPassword,
+      newUsername: newUsername,
+      newPassword: newPassword
+    });
 
     if (result.success) {
-      finishLogin(result.username);
+      finishLogin({ ...sessionResult, username: result.username });
     } else {
       showStatus('changeStatus', 'error', result.message || 'Terjadi kesalahan.');
       setBtnLoading(btn, false, '<i data-lucide="check"></i> Simpan');

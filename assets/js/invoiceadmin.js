@@ -3,8 +3,7 @@ let potonganCache = {};
 const CACHE_KEY_INV = "invoice_cache_v1";
 
 async function loadPotonganCache(){
-  const res = await fetch(SCRIPT_URL + "?action=getAllPotongan");
-  const data = await res.json();
+  const data = await callApi("getAllPotongan");
   potonganCache = {};
   data.forEach(item => {
     potonganCache[item.divisi] = Number(item.potongan || 0);
@@ -20,11 +19,10 @@ async function checkLogin(){
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerText = "⏳ Memeriksa tingkat otentikasi...";
   try{
-    const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
-    const data = await res.json();
+    const data = await callApi("verifyAdminGate", { password: pw });
 	
 	if(data.success){
-		sessionStorage.setItem(LOGIN_KEY, "true");
+		sessionStorage.setItem(ADMIN_GATE_KEY, "true");
 		document.getElementById("loginCard").classList.add("hidden");
 		document.getElementById("adminPanel").classList.remove("hidden");
 		document.getElementById("navbar").style.display = "flex";
@@ -55,8 +53,7 @@ async function loadData(){
     }
   }
 
-  const res = await fetch(SCRIPT_URL+"?action=getInvoicesMonthly");
-  const data = await res.json();
+  const data = await callApi("getInvoices", { weeks: 2 });
   allInvoices = data;
   localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: allInvoices, time: Date.now() }));
 
@@ -71,8 +68,7 @@ async function loadData(){
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL+"?action=getInvoicesMonthly");
-    const fresh = await res.json();
+    const fresh = await callApi("getInvoices", { weeks: 2 });
     allInvoices = fresh;
     localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: fresh, time: Date.now() }));
     requestAnimationFrame(() => {
@@ -238,7 +234,7 @@ async function renderTable(){
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
                 <td><a href="${inv["Bukti"]}" target="_blank" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a></td>
                 <td>
-                  <select onchange="updateStatus(${inv["RowIndex"]}, this.value, this)">
+                  <select onchange="updateStatus('${inv["id"]}', this.value, this)">
                     <option value="PENDING" ${inv.Status==="PENDING"?'selected':''}>⏳ PENDING</option>
                     <option value="VALID" ${inv.Status==="VALID"?'selected':''}>🟢 VALID</option>
                     <option value="INVALID" ${inv.Status==="INVALID"?'selected':''}>❌ INVALID</option>
@@ -262,50 +258,49 @@ function toggleDetail(idx){
   if(row) row.classList.toggle("hidden");
 }
 
-function updateStatus(rowIndex, status, element){
+async function updateStatus(invoiceId, status, element){
   if(element) element.disabled = true;
 
-  fetch(`${SCRIPT_URL}?action=updateStatus&rowIndex=${rowIndex}&status=${status}`)
-    .then(res => res.json())
-    .then(data => {
-      if(!data.success) {
-        alert("Gagal memperbarui status di server.");
-        if(element) element.disabled = false;
-        return;
-      }
-      
-      let cached = localStorage.getItem(CACHE_KEY_INV);
-      if(!cached) return;
-
-      try { 
-        cached = JSON.parse(cached); 
-      } catch(e){ 
-        localStorage.removeItem(CACHE_KEY_INV); 
-        return; 
-      }
-
-      cached.data = cached.data.map(i => {
-        if (String(i.RowIndex) === String(rowIndex)) {
-          return { ...i, Status: status };
-        }
-        return i;
-      });
-
-      cached.time = Date.now();
-      localStorage.setItem(CACHE_KEY_INV, JSON.stringify(cached));
-      allInvoices = cached.data;
-
-      requestAnimationFrame(() => { renderTable(); });
-    })
-    .catch(err => { 
-      alert("Gagal update status akibat gangguan jaringan."); 
+  try {
+    const data = await callApi("updateInvoiceStatus", { invoice_id: invoiceId, status });
+    if(!data.success) {
+      alert("Gagal memperbarui status di server.");
       if(element) element.disabled = false;
+      return;
+    }
+    
+    let cached = localStorage.getItem(CACHE_KEY_INV);
+    if(!cached) return;
+
+    let parsed;
+    try { 
+      parsed = JSON.parse(cached); 
+    } catch(e){ 
+      localStorage.removeItem(CACHE_KEY_INV); 
+      return; 
+    }
+
+    parsed.data = parsed.data.map(i => {
+      if (String(i.id) === String(invoiceId)) {
+        return { ...i, Status: status };
+      }
+      return i;
     });
+
+    parsed.time = Date.now();
+    localStorage.setItem(CACHE_KEY_INV, JSON.stringify(parsed));
+    allInvoices = parsed.data;
+
+    requestAnimationFrame(() => { renderTable(); });
+  } catch(err) { 
+    alert("Gagal update status akibat gangguan jaringan."); 
+    if(element) element.disabled = false;
+  }
 }
 
 window.addEventListener("load", () => {
   if(window.lucide) { lucide.createIcons(); }
-  const isLoggedIn = sessionStorage.getItem(LOGIN_KEY);
+  const isLoggedIn = sessionStorage.getItem(ADMIN_GATE_KEY);
   if(isLoggedIn === "true"){
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
@@ -316,7 +311,7 @@ window.addEventListener("load", () => {
 function handleNavbar(){
   const navbar = document.getElementById("navbar");
   if (!navbar) return;
-  const isLoggedIn = sessionStorage.getItem("ems_admin_login");
+  const isLoggedIn = sessionStorage.getItem(ADMIN_GATE_KEY);
   if (isLoggedIn === "true") {
     navbar.style.display = "flex";
   } else {

@@ -10,6 +10,7 @@ const MODES = {
 let currentMode = 'profile';
 
 let compressedBase64 = null;
+let peopleData = {}; // nama -> id
 
 let cropNaturalW = 0, cropNaturalH = 0;
 let baseCropW = 0, baseCropH = 0;
@@ -94,32 +95,39 @@ function updateSubmitState(){
   document.getElementById('submitBtn').disabled = !(nama && filename && filenameOk && compressedBase64);
 }
 
+let namaTS = null;
+
 async function loadNames(){
   const select = document.getElementById('namaSelect');
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getPeopleNames");
-    const result = await res.json();
+    const result = await callApi("getPeopleNames");
     if (!result.success) throw new Error(result.message || "Gagal memuat nama");
 
-    select.innerHTML = '<option value="">-- Pilih nama --</option>';
-    result.data.forEach(nama => {
-      const opt = document.createElement('option');
-      opt.value = nama;
-      opt.textContent = nama;
-      select.appendChild(opt);
+    peopleData = {};
+    const options = result.data.map(p => {
+      peopleData[p.nama] = p.id;
+      return { value: p.nama, text: p.nama };
+    });
+
+    namaTS = new TomSelect(select, {
+      options: options,
+      valueField: "value",
+      labelField: "text",
+      searchField: "text",
+      placeholder: "Ketik atau pilih nama",
+      create: false,
+      onChange: function(value){
+        if (value) {
+          document.getElementById('filenameInput').value = slugify2Words(value) + '.jpg';
+        }
+        updateSubmitState();
+      }
     });
   } catch (err) {
     select.innerHTML = '<option value="">Gagal memuat daftar nama</option>';
     console.error(err);
   }
 }
-
-document.getElementById('namaSelect').addEventListener('change', function(){
-  if (this.value) {
-    document.getElementById('filenameInput').value = slugify2Words(this.value) + '.jpg';
-  }
-  updateSubmitState();
-});
 
 document.getElementById('filenameInput').addEventListener('input', updateSubmitState);
 
@@ -286,13 +294,14 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
   } else {
     const nama = document.getElementById('namaSelect').value;
     const filename = document.getElementById('filenameInput').value.trim();
+    const userId = peopleData[nama];
 
-    if (!nama || !filename || !compressedBase64) return;
+    if (!nama || !userId || !filename || !compressedBase64) return;
     if (!isValidPhotoFilename(filename)) {
       showStatus('error', 'Nama file tidak valid.');
       return;
     }
-    payload = { nama, filename, imageBase64: compressedBase64 };
+    payload = { user_id: userId, filename, imageBase64: compressedBase64 };
   }
 
   const btn = this;
@@ -302,12 +311,7 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
   hideStatus();
 
   try {
-    const res = await fetch(SCRIPT_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-      body: JSON.stringify(payload)
-    });
-    const result = await res.json();
+    const result = await callApi("uploadPhoto", payload);
 
     if (result.success) {
       showStatus('success', result.message);

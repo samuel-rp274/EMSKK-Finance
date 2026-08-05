@@ -13,11 +13,10 @@ async function checkLogin(){
   document.getElementById("loginStatus").innerHTML = "⏳ Memeriksa tingkat otentikasi...";
 
   try{
-    const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
-    const data = await res.json();
+    const data = await callApi("verifyAdminGate", { password: pw });
 
     if(data.success){
-      sessionStorage.setItem(LOGIN_KEY, "true");
+      sessionStorage.setItem(ADMIN_GATE_KEY, "true");
       document.getElementById("loginCard").classList.add("hidden");
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("navbar").style.display = "flex";
@@ -46,8 +45,7 @@ async function loadData(){
     }
   }
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
-    const data = await res.json();
+    const data = await callApi("getTotalSalary", { weeks: 4 });
     allSalaryData = data || [];
     localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: allSalaryData, time: Date.now() }));
   } catch(e){
@@ -61,10 +59,9 @@ async function loadData(){
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL + "?action=getTotalSalary");
-    const fresh = await res.json();
-    allSalaryData = fresh;
-    localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: fresh, time: Date.now() }));
+    const data = await callApi("getTotalSalary", { weeks: 4 });
+    allSalaryData = data || [];
+    localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: allSalaryData, time: Date.now() }));
     requestAnimationFrame(() => { 
       populateWeeks(); 
       renderTable(); 
@@ -159,7 +156,7 @@ async function renderTable(){
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
         <td>
-          <input type="checkbox" onchange="markPaid('${x.nama}','${x.week}', this.checked, this)" ${x.paid === "PAID" ? "checked" : ""}>
+          <input type="checkbox" onchange="markPaid('${x.user_id}','${x.week}', this.checked, this)" ${x.paid === "PAID" ? "checked" : ""}>
         </td>
       </tr>
     `;
@@ -168,7 +165,7 @@ async function renderTable(){
 
 window.addEventListener("load", () => {
   lucide.createIcons();
-  const isLoggedIn = sessionStorage.getItem(LOGIN_KEY);
+  const isLoggedIn = sessionStorage.getItem(ADMIN_GATE_KEY);
   if(isLoggedIn === "true"){
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
@@ -177,18 +174,19 @@ window.addEventListener("load", () => {
   }
 });
 
-function markPaid(nama, week, checked, element){
+async function markPaid(userId, week, checked, element){
   if(element) element.disabled = true; 
 
-  fetch(SCRIPT_URL + "?action=updatePaidStatus&nama=" + encodeURIComponent(nama) + "&week=" + encodeURIComponent(week) + "&status=" + (checked ? "PAID" : "UNPAID"))
-  .then(() => {
+  try {
+    await callApi("updatePaidStatus", { user_id: userId, week: week, status: checked ? "PAID" : "UNPAID" });
+
     const cached = localStorage.getItem(CACHE_KEY_SALARY);
     if(cached){
       let parsed = null;
       try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_SALARY); }
       if(parsed?.data){
         parsed.data = parsed.data.map(i => 
-          (i.nama.toLowerCase().trim() === nama.toLowerCase().trim() && i.week === week) 
+          (String(i.user_id) === String(userId) && i.week === week) 
             ? { ...i, paid: checked ? "PAID" : "UNPAID" } 
             : i
         );
@@ -198,12 +196,11 @@ function markPaid(nama, week, checked, element){
       allSalaryData = parsed.data;
     }
     requestAnimationFrame(renderTable);
-  })
-  .catch((err) => {
+  } catch(err) {
     console.error("Gagal memperbarui status:", err);
     alert("Koneksi bermasalah. Gagal mengubah status pembayaran.");
     if(element) element.disabled = false; 
-  });
+  }
 }
 
 function copyTop3(){

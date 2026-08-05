@@ -8,8 +8,8 @@ function getWIBDate() {
 
 const CACHE_KEY_PRICE = "price_cache_v1";
 
+let currentUser = null; // { id, nama, jabatan, divisi }
 
-const emsData = {};
 const nama = document.getElementById("nama");
 const jabatan = document.getElementById("jabatan");
 const divisi = document.getElementById("divisi");
@@ -59,10 +59,9 @@ async function loadPriceList(){
 
 async function refreshPriceFromServer(){
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getPriceList");
-    const data = await res.json();
+    const data = await callApi("getPriceList");
     const safe = data || [];
-    
+
     localStorage.setItem(CACHE_KEY_PRICE, JSON.stringify({
       data: safe,
       time: Date.now()
@@ -127,70 +126,24 @@ function injectSpecialOptions() {
     tanggalInvoice.max = formatDate(end);
 })();
 
-async function loadEMS(){
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  if(cached){
-    try {
-      const parsed = JSON.parse(cached);
-      if(parsed && parsed.data?.length){
-        buildEMS(parsed.data);
-        if(isCacheValid(parsed.time)){
-          refreshEMSFromServer();
-          return;
-        }
-      }
-    } catch(e){
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-  }
-  await refreshEMSFromServer();
-}
-
-async function refreshEMSFromServer(){
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safe = data || [];
-    
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safe,
-      time: Date.now()
-    }));
-    buildEMS(safe);
-  } catch(e) {
-    console.error("Gagal refresh EMS dari server:", e);
-  }
-}
-
-function buildEMS(data){
-  data.forEach(item => {
-      if(item.nama){
-          emsData[item.nama] = {
-              jabatan: item.jabatan || "",
-              divisi: item.divisi || ""
-          };
-      }
-  });
-
-  applySessionIdentity();
-}
-
 async function applySessionIdentity(){
   if (!window.__guardSession) return;
   const session = await window.__guardSession;
-  if (!session || !session.nama) return;
-
-  const sessionNama = session.nama.trim();
-
-  if(!emsData[sessionNama]){
-    nama.innerText = sessionNama + " (data EMS tidak ditemukan)";
+  if (!session || !session.id) {
+    nama.innerText = "(data EMS tidak ditemukan)";
     return;
   }
 
-  nama.innerText = sessionNama;
-  jabatan.innerText = emsData[sessionNama].jabatan || "";
-  divisi.innerText = emsData[sessionNama].divisi || "";
+  currentUser = {
+    id: session.id,
+    nama: session.nama,
+    jabatan: session.jabatan || "",
+    divisi: session.divisi || ""
+  };
+
+  nama.innerText = currentUser.nama;
+  jabatan.innerText = currentUser.jabatan;
+  divisi.innerText = currentUser.divisi;
 }
 
 document.getElementById("bukti").addEventListener("keydown", function(e){
@@ -248,7 +201,7 @@ document.addEventListener("input", updateTotal);
 
 document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
-    if(!nama.innerText || !emsData[nama.innerText]){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
+    if(!currentUser){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
     if(!invoiceType.value){ status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
     if(!document.getElementById("tanggalInvoice").value){ status.innerHTML = "⚠️ Pilih Tanggal Invoice"; return; }
 
@@ -266,9 +219,9 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     else{ hargaFinal = Number(harga.value)||0; qtyFinal = Number(qty.value)||1; }
 
     const payload = {
-        nama: nama.innerText,
-        jabatan: jabatan.innerText,
-        divisi: divisi.innerText,
+        user_id: currentUser.id,
+        jabatan: currentUser.jabatan,
+        divisi: currentUser.divisi,
         tanggalInvoice: document.getElementById("tanggalInvoice").value,
         jenisInvoice: invoiceType.options[invoiceType.selectedIndex].text,
         jenisOperasi: document.getElementById("jenisOperasi")?.value || "",
@@ -284,17 +237,21 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
     status.innerHTML = "⏳ Mengirim...";
     try{
-        const yakin = confirm(`Nama: ${nama.innerText}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
+        const yakin = confirm(`Nama: ${currentUser.nama}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
         if(!yakin) { status.innerHTML = ""; return; }
-        
-        await fetch(SCRIPT_URL,{method:"POST",body:JSON.stringify(payload)});
+
+        const result = await callApi("submitInvoice", payload);
+
+        if (!result.success) {
+            status.innerHTML = "⚠️ " + (result.message || "Gagal menyimpan invoice");
+            return;
+        }
+
         status.innerHTML = "✅ Invoice berhasil disimpan";
 
         setTimeout(() => {
             status.textContent = "";
         }, 3000);
-		
-        const namaTerpilih = nama.innerText;
 
         document.getElementById("tanggalInvoice").value = "";
         document.getElementById("invoiceType").value = "";
@@ -319,9 +276,9 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
         document.getElementById("total").innerText = "$KK 0";
 
-        jabatan.innerText = emsData[namaTerpilih]?.jabatan || "";
-        divisi.innerText = emsData[namaTerpilih]?.divisi || "";
-		
+        jabatan.innerText = currentUser.jabatan;
+        divisi.innerText = currentUser.divisi;
+
     } catch(err){
         console.error(err);
         status.innerHTML = "❌ Gagal mengirim invoice";
@@ -329,6 +286,6 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 });
 
 document.addEventListener("DOMContentLoaded", async () => {
-    await loadEMS();
+    await applySessionIdentity();
     await loadPriceList();
 });

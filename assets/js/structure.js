@@ -280,8 +280,7 @@ function loadCache(){
 }
 
 async function fetchFromServer(){
-  const res = await fetch(SCRIPT_URL + "?action=getOrgChart");
-  const json = await res.json();
+  const json = await callApi("getOrgChart");
   if (!json.success) {
     throw new Error(json.message || "Gagal memuat data");
   }

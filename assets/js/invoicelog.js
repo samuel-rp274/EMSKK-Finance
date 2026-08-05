@@ -24,9 +24,7 @@ async function loadEMS(){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safeData = data || [];
+    const safeData = await callApi("getEMS") || [];
 
     localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
       data: safeData,
@@ -103,8 +101,7 @@ async function loadData(){
     }
 
     try {
-        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
-        const data = await res.json();
+        const data = await callApi("getInvoices", { scope: "all" });
         allInvoices = data || [];
         localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
             data: allInvoices,
@@ -119,8 +116,7 @@ async function loadData(){
 
 async function refreshFromServer(){
     try{
-        const res = await fetch(SCRIPT_URL+"?action=getInvoicesAll");
-        const fresh = await res.json();
+        const fresh = await callApi("getInvoices", { scope: "all" });
         allInvoices = fresh;
         localStorage.setItem(CACHE_KEY_INV, JSON.stringify({
             data: fresh,

@@ -4,17 +4,40 @@ const CACHE_KEY_PRICE_MANUAL = "price_cache_v1";
 
 let emsData = {};
 
-/* ---------- Admin password gate (shared with financeadmin/attendanceadmin/invoiceadmin) ---------- */
+/* ---------- Helper: Auto Fill Bulan & Tahun Lokal ---------- */
+function setMonthYearDefaults() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+
+  const startInput = document.getElementById("attStart");
+  const finishInput = document.getElementById("attFinish");
+  const invTanggalInput = document.getElementById("invTanggal");
+
+  // Untuk input datetime-local (Start & Finish Duty): format YYYY-MM-01T00:00
+  if (startInput && !startInput.value) {
+    startInput.value = `${year}-${month}-01T00:00`;
+  }
+  if (finishInput && !finishInput.value) {
+    finishInput.value = `${year}-${month}-01T00:00`;
+  }
+
+  // Untuk input date (Tanggal Invoice): format YYYY-MM-01
+  if (invTanggalInput && !invTanggalInput.value) {
+    invTanggalInput.value = `${year}-${month}-01`;
+  }
+}
+
+/* ---------- Admin password gate ---------- */
 async function checkLogin() {
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerHTML = "⏳ Memeriksa tingkat otentikasi...";
 
   try {
-    const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
-    const data = await res.json();
+    const result = await callApi("verifyAdminGate", { password: pw });
 
-    if (data.success) {
-      sessionStorage.setItem(LOGIN_KEY, "true");
+    if (result.success) {
+      sessionStorage.setItem(ADMIN_GATE_KEY, "true");
       document.getElementById("loginCard").classList.add("hidden");
       document.getElementById("adminPanel").classList.remove("hidden");
       requestAnimationFrame(initManualAdmin);
@@ -27,12 +50,13 @@ async function checkLogin() {
 }
 
 async function initManualAdmin() {
+  setMonthYearDefaults(); // Set default bulan & tahun untuk Attendance & Invoice
   await loadEMS();
   await loadPriceList();
 }
 
 window.addEventListener("load", () => {
-  const isLoggedIn = sessionStorage.getItem(LOGIN_KEY);
+  const isLoggedIn = sessionStorage.getItem(ADMIN_GATE_KEY);
   if (isLoggedIn === "true") {
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
@@ -47,10 +71,13 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
+    
+    // Setel ulang default tanggal ketika tab berpindah
+    setMonthYearDefaults();
   });
 });
 
-/* ---------- Load EMS (nama/jabatan/divisi) ---------- */
+/* ---------- Load EMS (nama/jabatan/divisi/id) ---------- */
 async function loadEMS() {
   const cached = localStorage.getItem(CACHE_KEY_EMS);
 
@@ -73,8 +100,7 @@ async function loadEMS() {
 
 async function refreshEMSFromServer() {
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
+    const data = await callApi("getEMS");
     const safe = Array.isArray(data) ? data : [];
 
     localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
@@ -97,19 +123,33 @@ function buildEMS(data) {
   fillNamaDropdown("invNama");
 }
 
+let attNamaTS = null;
+let invNamaTS = null;
+
 function fillNamaDropdown(selectId) {
   const select = document.getElementById(selectId);
-  const current = select.value;
-  select.innerHTML = `<option value="">Pilih Nama</option>`;
+  const options = Object.keys(emsData).sort().map(nama => ({ value: nama, text: nama }));
 
-  Object.keys(emsData).sort().forEach(nama => {
-    const opt = document.createElement("option");
-    opt.value = nama;
-    opt.textContent = nama;
-    select.appendChild(opt);
-  });
+  let instance = selectId === "attNama" ? attNamaTS : invNamaTS;
 
-  if (current && emsData[current]) select.value = current;
+  if (!instance) {
+    instance = new TomSelect(select, {
+      options: options,
+      valueField: "value",
+      labelField: "text",
+      searchField: "text",
+      placeholder: "Ketik atau pilih nama",
+      create: false
+    });
+    if (selectId === "attNama") attNamaTS = instance;
+    else invNamaTS = instance;
+  } else {
+    const current = instance.getValue();
+    instance.clearOptions();
+    instance.addOptions(options);
+    if (current && emsData[current]) instance.setValue(current, true);
+    else instance.clear(true);
+  }
 }
 
 /* ---------- Attendance tab: auto-fill jabatan/divisi ---------- */
@@ -151,8 +191,7 @@ async function loadPriceList() {
 
 async function refreshPriceFromServer() {
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getPriceList");
-    const data = await res.json();
+    const data = await callApi("getPriceList");
     const safe = data || [];
 
     localStorage.setItem(CACHE_KEY_PRICE_MANUAL, JSON.stringify({
@@ -177,7 +216,7 @@ function injectPrice(data) {
     invType.appendChild(opt);
   });
 
-  ["operasi", "surat", "lain"].forEach((val, i) => {
+  ["operasi", "surat", "lain"].forEach((val) => {
     const labels = { operasi: "OPERASI", surat: "SURAT", lain: "LAIN-LAIN" };
     const el = document.createElement("option");
     el.value = val;
@@ -275,16 +314,13 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
   status.innerHTML = "⏳ Menyimpan...";
 
   try {
-    const res = await fetch(
-      SCRIPT_URL +
-      "?action=addManualSession" +
-      "&nama=" + encodeURIComponent(nama) +
-      "&jabatan=" + encodeURIComponent(u.jabatan || "") +
-      "&divisi=" + encodeURIComponent(u.divisi || "") +
-      "&startTime=" + encodeURIComponent(startTime) +
-      "&finishTime=" + encodeURIComponent(finishTime)
-    );
-    const result = await res.json();
+    const result = await callApi("addManualSession", {
+      user_id: u.id,
+      jabatan: u.jabatan || "",
+      divisi: u.divisi || "",
+      startTime: startTime,
+      finishTime: finishTime
+    });
 
     if (!result.success) {
       status.innerHTML = "❌ " + (result.message || "Gagal menambah sesi");
@@ -293,6 +329,7 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
 
     status.innerHTML = "✅ Sesi duty berhasil ditambahkan (" + result.duration + ")";
     document.getElementById("attendanceManualForm").reset();
+    setMonthYearDefaults(); // Reset kembali ke default bulan-tahun lokal
     document.getElementById("attJabatan").innerText = "-";
     document.getElementById("attDivisi").innerText = "-";
 
@@ -337,8 +374,7 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
 
   const u = emsData[nama];
   const payload = {
-    action: "manualInvoice",
-    nama: nama,
+    user_id: u.id,
     jabatan: u.jabatan || "",
     divisi: u.divisi || "",
     tanggalInvoice: document.getElementById("invTanggal").value,
@@ -360,10 +396,17 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
   status.innerHTML = "⏳ Mengirim...";
 
   try {
-    await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(payload) });
+    const result = await callApi("manualInvoice", payload);
+
+    if (!result.success) {
+      status.innerHTML = "❌ " + (result.message || "Gagal menyimpan invoice");
+      return;
+    }
+
     status.innerHTML = "✅ Invoice berhasil disimpan";
 
     document.getElementById("invoiceManualForm").reset();
+    setMonthYearDefaults(); // Reset kembali ke default bulan-tahun lokal pada form Invoice
     invNormalSection.classList.remove("hidden");
     invOperasiSection.classList.add("hidden");
     invSuratSection.classList.add("hidden");
@@ -378,5 +421,3 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     status.innerHTML = "❌ Gagal mengirim invoice";
   }
 });
-
-

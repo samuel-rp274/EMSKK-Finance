@@ -4,7 +4,6 @@ const tutorialData = [
     icon: "clock",
     title: "1. Attendance",
     steps: [
-      "Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)",
       "Klik <span class='highlight'>START DUTY</span> → ON DUTY (cukup 1x klik)",
       "Klik <span class='highlight'>FINISH DUTY</span> → OFF DUTY (cukup 1x klik)",
       "Data durasi duty otomatis tersimpan"
@@ -37,8 +36,7 @@ const tutorialData = [
     icon: "file-text",
     title: "3. Invoice Input",
     steps: [
-      "Pilih atau Tulis Nama EMS (Jabatan & Divisi terisi otomatis)",
-      "Isi invoice",
+      "Pilih tanggal invoice",
       "Pilih jenis invoice",
       "Isi harga & qty (Khusus Operasi, Surat, Lain-lain)",
       "Upload link bukti invoice",
@@ -48,7 +46,7 @@ const tutorialData = [
       title: "Catatan",
       items: [
         "Link bukti wajib berupa link attachment resmi Discord (domain cdn atau media)",
-        "Format harga tanpa titik (contoh: 200000)",
+        "Format harga diisi dengan tidak menggunakan titik (contoh: 200000)",
         "Kesalahan input invoice silakan hubungi FINANCE"
       ]
     }

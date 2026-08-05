@@ -1,10 +1,9 @@
 lucide.createIcons();
-let emsData={};
-let currentUser=null;
+let currentUser = null; // { id, nama, jabatan, divisi }
 
-const preventClose = (e) => { 
-  e.preventDefault(); 
-  e.returnValue = 'Proses sedang berjalan, jangan tutup halaman ini!'; 
+const preventClose = (e) => {
+  e.preventDefault();
+  e.returnValue = 'Proses sedang berjalan, jangan tutup halaman ini!';
 };
 
 setInterval(()=>{
@@ -56,95 +55,32 @@ function handleDutyClick(){
   }
 }
 
-async function loadEMS(){
-  const cached = localStorage.getItem(CACHE_KEY_EMS);
-
-  if(cached){
-    let parsed = null;
-    try {
-      parsed = JSON.parse(cached);
-    } catch(e){
-      console.warn("Cache EMS rusak, dihapus");
-      localStorage.removeItem(CACHE_KEY_EMS);
-    }
-
-    if(parsed && parsed.data && Array.isArray(parsed.data) && parsed.data.length){
-      buildEMSData(parsed.data);
-
-      if(isCacheValid(parsed.time)){
-        refreshEMSFromServer();
-        return;
-      }
-    }
-  }
-
-  await refreshEMSFromServer();
-}
-
-async function refreshEMSFromServer(){
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getEMS");
-    const data = await res.json();
-    const safeData = Array.isArray(data) ? data : [];
-
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safeData,
-      time: Date.now()
-    }));
-
-    buildEMSData(safeData);
-  } catch(err){
-    console.error("EMS gagal sinkronisasi dari server:", err);
-    const fallback = localStorage.getItem(CACHE_KEY_EMS);
-    if(fallback && Object.keys(emsData).length === 0){
-      try {
-        const parsed = JSON.parse(fallback);
-        buildEMSData(parsed.data || []);
-      } catch(e){
-        buildEMSData([]);
-      }
-    }
-  }
-}
-
-function buildEMSData(emsList){
-  emsData = {};
-
-  emsList
-    .filter(u => u && u.nama && u.nama.trim().toUpperCase() !== "NAMA")
-    .forEach(u=>{
-      const namaTrimmed = u.nama.trim();
-      emsData[namaTrimmed] = u;
-    });
-
-  applySessionIdentity();
-}
-
 async function applySessionIdentity(){
   if (!window.__guardSession) return;
   const session = await window.__guardSession;
-  if (!session || !session.nama) return;
-
-  const nama = session.nama.trim();
-
-  if(!emsData[nama]){
-    document.getElementById("nama").innerText = nama + " (data EMS tidak ditemukan)";
+  if (!session || !session.id) {
     setStatus("off","DATA EMS TIDAK DITEMUKAN");
     return;
   }
 
-  currentUser = nama;
-  document.getElementById("nama").innerText = nama;
-  document.getElementById("jabatan").innerText = emsData[nama].jabatan || "";
-  document.getElementById("divisi").innerText = emsData[nama].divisi || "";
+  currentUser = {
+    id: session.id,
+    nama: session.nama,
+    jabatan: session.jabatan || "",
+    divisi: session.divisi || ""
+  };
 
-  checkSession(nama);
+  document.getElementById("nama").innerText = currentUser.nama;
+  document.getElementById("jabatan").innerText = currentUser.jabatan;
+  document.getElementById("divisi").innerText = currentUser.divisi;
+
+  checkSession();
 }
 
-async function checkSession(nama){
+async function checkSession(){
+  if (!currentUser) return;
   try {
-    const res=await fetch(SCRIPT_URL+"?action=getActiveSession&nama="+encodeURIComponent(nama));
-    const data=await res.json();
+    const data = await callApi("getActiveSession", { user_id: currentUser.id });
 
     if(data.active){
       setStatus("on","ON DUTY ACTIVE");
@@ -194,40 +130,24 @@ async function startDuty(){
   window.addEventListener('beforeunload', preventClose);
   setStatus("loading","MEMERIKSA DATA...");
 
-  let freshData;
   try {
-    const checkRes = await fetch(SCRIPT_URL + "?action=getEMS");
-    const checkList = await checkRes.json();
-    const safeCheckList = Array.isArray(checkList) ? checkList : [];
+    // Re-validasi session dulu, biar jabatan/divisi yang dipakai selalu yang terbaru
+    const session = JSON.parse(localStorage.getItem(LOGIN_KEY));
+    const fresh = await callApi("validateSession", { token: session.token });
 
-    const found = safeCheckList.find(
-      u => u && u.nama && u.nama.trim() === currentUser
-    );
-
-    if(!found){
+    if (!fresh.valid) {
       setStatus("off","Silahkan refresh halaman terlebih dahulu");
       setDutyBtn("start");
       window.removeEventListener('beforeunload', preventClose);
       return;
     }
 
-    freshData = found;
-
-    localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
-      data: safeCheckList,
-      time: Date.now()
-    }));
-
-    const updatedEmsData = {};
-    safeCheckList
-      .filter(u => u && u.nama && u.nama.trim().toUpperCase() !== "NAMA")
-      .forEach(u => {
-        updatedEmsData[u.nama.trim()] = u;
-      });
-    emsData = updatedEmsData;
-
+    currentUser.jabatan = fresh.jabatan || "";
+    currentUser.divisi = fresh.divisi || "";
+    document.getElementById("jabatan").innerText = currentUser.jabatan;
+    document.getElementById("divisi").innerText = currentUser.divisi;
   } catch(err){
-    console.error("Gagal memeriksa data EMS terbaru:", err);
+    console.error("Gagal memeriksa data terbaru:", err);
     setStatus("off","Silahkan refresh halaman terlebih dahulu");
     setDutyBtn("start");
     window.removeEventListener('beforeunload', preventClose);
@@ -237,15 +157,11 @@ async function startDuty(){
   setStatus("loading","STARTING...");
 
   try {
-    const res = await fetch(
-      SCRIPT_URL +
-      "?action=startDuty" +
-      "&nama=" + encodeURIComponent(currentUser) +
-      "&jabatan=" + encodeURIComponent(freshData.jabatan || "") +
-      "&divisi=" + encodeURIComponent(freshData.divisi || "")
-    );
-
-    const result = await res.json();
+    const result = await callApi("startDuty", {
+      user_id: currentUser.id,
+      jabatan: currentUser.jabatan,
+      divisi: currentUser.divisi
+    });
 
     if(!result.success){
       setStatus("off", result.message || "FAILED START DUTY");
@@ -253,7 +169,7 @@ async function startDuty(){
       return;
     }
 
-    await checkSession(currentUser);
+    await checkSession();
 
   } catch (err) {
     console.error(err);
@@ -276,15 +192,14 @@ async function finishDuty(){
     timer = null;
   }
 
-  const preventClose = (e) => { e.preventDefault(); e.returnValue = ''; };
-  window.addEventListener('beforeunload', preventClose);
+  const preventCloseFinish = (e) => { e.preventDefault(); e.returnValue = ''; };
+  window.addEventListener('beforeunload', preventCloseFinish);
 
   setStatus("loading", "FINISHING...");
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=finishDuty&nama=" + encodeURIComponent(currentUser));
-    const data = await res.json();
-    
+    const data = await callApi("finishDuty", { user_id: currentUser.id });
+
     setStatus("off", data.message || "DUTY FINISHED");
     setDutyBtn("start");
 
@@ -294,8 +209,8 @@ async function finishDuty(){
     setStatus("off", "OFF DUTY");
     setDutyBtn("start");
   } finally {
-    window.removeEventListener('beforeunload', preventClose);
+    window.removeEventListener('beforeunload', preventCloseFinish);
   }
 }
 
-document.addEventListener("DOMContentLoaded", loadEMS);
+document.addEventListener("DOMContentLoaded", applySessionIdentity);

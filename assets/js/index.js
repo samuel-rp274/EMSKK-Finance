@@ -1,6 +1,5 @@
 lucide.createIcons();
 
-const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyM0aOVZwPSu2Pz0gn-DljKMm6FXmGgpxhu2fOZV9_HOG87WdsEbGmf7Bq18sdRIZ2kgg/exec";
 const CACHE_KEY = "emskk_index_cache_v1";
 const REFRESH_MS = 5 * 60 * 1000;
 const ROTATE_MS = 3000;
@@ -51,8 +50,7 @@ function saveCache(data){
 }
 
 async function fetchSummary(){
-  const res = await fetch(SCRIPT_URL + "?action=getIndexSummary");
-  return await res.json();
+  return await callApi("getIndexSummary");
 }
 
 function formatHours(h){

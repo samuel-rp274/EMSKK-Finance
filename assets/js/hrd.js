@@ -1,7 +1,5 @@
 lucide.createIcons();
 
-let allData = [];
-
 function parseDate(str){
   if(!str) return null;
   return new Date(str.replace(" ","T"));
@@ -14,33 +12,11 @@ function getDurationHours(s,f){
   return (b - a) / (1000 * 60 * 60);
 }
 
-async function loadData(){
-  const btn = document.getElementById("btnGenerate");
-  const btnText = document.getElementById("btnText");
-  const infoText = document.getElementById("infoText");
-  
-  try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
-    allData = await res.json() || [];
+document.addEventListener("DOMContentLoaded", () => {
+  document.getElementById("infoText").innerText = "Silakan masukkan rentang tanggal di atas.";
+});
 
-    btn.disabled = false;
-    btnText.innerText = "Generate";
-    infoText.innerText = "Silakan masukkan rentang tanggal di atas.";
-
-    const iconContainer = document.getElementById("btnIcon");
-    iconContainer.setAttribute("data-lucide", "activity");
-    lucide.createIcons();
-    
-  } catch (error) {
-    console.error("Gagal memuat data:", error);
-    infoText.innerText = "Gagal memuat data dari server. Silakan refresh halaman.";
-    btnText.innerText = "Error";
-  }
-}
-
-loadData();
-
-function generate(){
+async function generate(){
   const startVal = document.getElementById("startDate").value;
   const endVal = document.getElementById("endDate").value;
 
@@ -49,11 +25,33 @@ function generate(){
     return;
   }
 
-  const startDate = new Date(startVal + "T00:00:00");
-  const endDate = new Date(endVal + "T23:59:59");
-
-  if(startDate > endDate){
+  if(new Date(startVal) > new Date(endVal)){
     alert("Start harus <= End");
+    return;
+  }
+
+  const btn = document.getElementById("btnGenerate");
+  const btnText = document.getElementById("btnText");
+  const btnIcon = document.getElementById("btnIcon");
+  const infoText = document.getElementById("infoText");
+
+  btn.disabled = true;
+  btnIcon.classList.add("animate-spin");
+  btnText.innerText = "Memuat...";
+  infoText.innerText = "Mengambil data dari server...";
+
+  let allData = [];
+  try {
+    allData = await callApi("getAttendanceLog", {
+      startDate: startVal + " 00:00:00",
+      endDate: endVal + " 23:59:59"
+    }) || [];
+  } catch (error) {
+    console.error("Gagal memuat data:", error);
+    infoText.innerText = "Gagal memuat data dari server. Silakan coba lagi.";
+    btn.disabled = false;
+    btnIcon.classList.remove("animate-spin");
+    btnText.innerText = "Generate";
     return;
   }
 
@@ -61,11 +59,6 @@ function generate(){
 
   allData.forEach(r => {
     if(!r.Start || r.Status !== "VALID") return;
-
-    const d = parseDate(r.Start);
-    if(!d) return;
-
-    if(d < startDate || d > endDate) return;
 
     const name = (r.Nama || "").trim();
     if(!name) return;
@@ -78,9 +71,13 @@ function generate(){
   const tb = document.getElementById("tableBody");
   tb.innerHTML = "";
 
+  btn.disabled = false;
+  btnIcon.classList.remove("animate-spin");
+  btnText.innerText = "Generate";
+
   if(sorted.length === 0){
     tb.innerHTML = `<tr><td colspan="3" class="empty-state">Tidak ada data ditemukan pada rentang ini</td></tr>`;
-    document.getElementById("infoText").innerText = "Total user: 0";
+    infoText.innerText = "Total user: 0";
     return;
   }
 
@@ -102,5 +99,5 @@ function generate(){
     `;
   });
 
-  document.getElementById("infoText").innerText = `Total user: ${sorted.length}`;
+  infoText.innerText = `Total user: ${sorted.length}`;
 }

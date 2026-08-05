@@ -13,17 +13,15 @@ function safeGet(obj, key){
   return obj[key] ?? obj[key?.trim?.()] ?? obj[key?.toUpperCase?.()] ?? obj[key?.toLowerCase?.()] ?? null;
 }
 
-
 async function checkLogin(){
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerText = "⏳ Memeriksa tingkat otentikasi...";
 
   try{
-    const res = await fetch(`${SCRIPT_URL}?action=verifyAdmin&password=${encodeURIComponent(pw)}`);
-    const data = await res.json();
+    const data = await callApi("verifyAdminGate", { password: pw });
 
     if(data.success){
-      sessionStorage.setItem(LOGIN_KEY, "true");
+      sessionStorage.setItem(ADMIN_GATE_KEY, "true");
       document.getElementById("loginCard").classList.add("hidden");
       document.getElementById("adminPanel").classList.remove("hidden");
       document.getElementById("navbar").style.display = "flex";
@@ -40,6 +38,11 @@ async function checkLogin(){
   }
 }
 
+function fmtDateTime(v){
+  if(!v) return "-";
+  return String(v).replace("T", " ").slice(0, 19);
+}
+
 async function loadAttendanceData(){
   const cached = localStorage.getItem(CACHE_KEY_ATT);
   if(cached){
@@ -53,16 +56,14 @@ async function loadAttendanceData(){
     }
   }
 
-  const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogMonthly");
-  allAttendance = await res.json();
+  allAttendance = await callApi("getAttendanceLog", { weeks: 2 });
   localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: allAttendance, time: Date.now() }));
   if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
 }
 
 async function refreshFromServer(){
   try{
-    const res = await fetch(SCRIPT_URL+"?action=getAttendanceLogMonthly");
-    const fresh = await res.json();
+    const fresh = await callApi("getAttendanceLog", { weeks: 2 });
     allAttendance = fresh;
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: fresh, time: Date.now() }));
     if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
@@ -72,8 +73,7 @@ async function refreshFromServer(){
 }
 
 async function loadRates(){
-  const res = await fetch(SCRIPT_URL + "?action=getRatesAPI");
-  const data = await res.json();
+  const data = await callApi("getRatesAPI");
   if(!data || !data.divisi || !data.jabatan){
     ratesReady = false;
     return;
@@ -85,19 +85,19 @@ async function loadRates(){
 
 function mapRates(data){
   rateDivisiMap = {}; rateJabatanMap = {};
-  data.divisi.forEach(r => { rateDivisiMap[String(r[0]).trim().toUpperCase()] = Number(r[1]); });
-  data.jabatan.forEach(r => { rateJabatanMap[String(r[0]).trim().toUpperCase()] = Number(r[1]); });
+  data.divisi.forEach(r => { rateDivisiMap[String(r.divisi).trim().toUpperCase()] = Number(r.rate_per_hour); });
+  data.jabatan.forEach(r => { rateJabatanMap[String(r.jabatan).trim().toUpperCase()] = Number(r.rate_per_hour); });
 }
 
 function normalizeDate(d){ const x = new Date(d); x.setHours(0,0,0,0); return x; }
 
 function parseWIB(dateStr){
   if(!dateStr) return null;
-  const [date, time] = dateStr.split(" ");
+  const [date, time] = dateStr.split(/[T ]/);
   if(!date || !time) return null;
   const [y,m,d] = date.split("-").map(Number);
   const [hh,mm,ss] = time.split(":").map(Number);
-  return new Date(y, m-1, d, hh, mm, ss);
+  return new Date(y, m-1, d, hh, mm, ss||0);
 }
 
 function parseKeyDate(str){
@@ -107,9 +107,7 @@ function parseKeyDate(str){
 
 function populateWeeks(){
   const select = document.getElementById("weekSelect");
-  
   const previousSelectedValue = select.value;
-  
   select.innerHTML = "";
   const weeks = {};
 
@@ -246,7 +244,7 @@ function renderAttendanceTable(){
     const rateHour = priorityDivisi.includes(v.divisi) ? (rateDivisiMap[v.divisi] || 0) : (rateJabatanMap[v.jabatan] || 0);
     const hasPending = v.sessions.some(s => normalize(s.Status) === "PENDING");
     return `
-      <tr data-row="${v.sessions[0]?.RowIndex}" class="${hasPending ? "row-pending" : ""}">
+      <tr data-row="${v.sessions[0]?.ID}" class="${hasPending ? "row-pending" : ""}">
         <td style="font-weight:600; color:#ffffff;">${v.nama}</td>
         <td>${v.jabatan}</td>
         <td>${v.divisi}</td>
@@ -261,9 +259,9 @@ function renderAttendanceTable(){
           ${v.sessions.map((s, sIdx) => `
             <div class="session-item">
               <div style="font-weight:700; color:var(--muted); text-align:center;">${sIdx + 1}</div>
-              
-              <div><span style="color:var(--muted); font-size:11px; display:block;">START</span><span class="start">${s.Start || "-"}</span></div>
-              <div><span style="color:var(--muted); font-size:11px; display:block;">FINISH</span><span class="finish">${s.Finish || "-"}</span></div>  
+
+              <div><span style="color:var(--muted); font-size:11px; display:block;">START</span><span class="start">${fmtDateTime(s.Start)}</span></div>
+              <div><span style="color:var(--muted); font-size:11px; display:block;">FINISH</span><span class="finish">${fmtDateTime(s.Finish)}</span></div>              
               <div style="font-weight:600;">${s.Durasi || "-"}</div>
               <div>
                 <span class="status-badge" style="
@@ -275,9 +273,9 @@ function renderAttendanceTable(){
                 </span>
               </div>
               <div class="btn-group-actions">
-                <button class="btn-green" onclick="setStatus('${s.RowIndex}','VALID')">V</button>
-                <button class="btn-red" onclick="setStatus('${s.RowIndex}','INVALID')">X</button>
-                <button class="btn-orange" onclick="editTime('${s.RowIndex}','${s.Start}','${s.Finish}')">EDIT</button>
+                <button class="btn-green" onclick="setStatus('${s.ID}','VALID')">V</button>
+                <button class="btn-red" onclick="setStatus('${s.ID}','INVALID')">X</button>
+                <button class="btn-orange" onclick="editTime('${s.ID}','${s.Start}','${s.Finish}')">EDIT</button>
               </div>
             </div>
           `).join("")}
@@ -308,40 +306,38 @@ function copyTop3(){
 }
 
 async function loadPotonganCache(){
-  const res = await fetch(SCRIPT_URL+"?action=getAllPotongan");
-  const data = await res.json();
+  const data = await callApi("getAllPotongan");
   data.forEach(i=>{ potonganCache[i.divisi] = Number(i.potongan || 0); });
 }
 
-function setStatus(rowIndex, status) {
-  fetch(`${SCRIPT_URL}?action=updateAttendanceStatus&rowIndex=${rowIndex}&status=${status}`)
-    .then(res => res.json())
-    .then(data => {
-      if(!data.success){ throw new Error("Gagal update status"); }
-      updateStatusLocal(rowIndex, status);
-      allAttendance = allAttendance.map(item => {
-        if(String(item.RowIndex) === String(rowIndex)){ return { ...item, Status: status }; }
+async function setStatus(logId, status) {
+  try {
+    const data = await callApi("updateAttendanceStatus", { log_id: logId, status });
+    if(!data.success){ throw new Error("Gagal update status"); }
+
+    updateStatusLocal(logId, status);
+    allAttendance = allAttendance.map(item => {
+      if(String(item.ID) === String(logId)){ return { ...item, Status: status }; }
+      return item;
+    });
+    const cached = localStorage.getItem(CACHE_KEY_ATT);
+    if(cached){
+      let parsed = null;
+      try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_ATT); }
+      parsed.data = parsed.data.map(item => {
+        if(String(item.ID) === String(logId)){ return { ...item, Status: status }; }
         return item;
       });
-      const cached = localStorage.getItem(CACHE_KEY_ATT);
-      if(cached){
-        let parsed = null;
-        try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_ATT); }
-        parsed.data = parsed.data.map(item => {
-          if(String(item.RowIndex) === String(rowIndex)){ return { ...item, Status: status }; }
-          return item;
-        });
-        parsed.time = Date.now();
-        localStorage.setItem(CACHE_KEY_ATT, JSON.stringify(parsed));
-      }
-      if(ratesReady && allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
-    })
-    .catch(err => { alert("Error koneksi server"); });
+      parsed.time = Date.now();
+      localStorage.setItem(CACHE_KEY_ATT, JSON.stringify(parsed));
+    }
+    if(ratesReady && allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
+  } catch(err) { alert("Error koneksi server"); }
 }
 
 let currentEditId = null;
-function editTime(rowIndex, start, finish){
-  currentEditId = rowIndex;
+function editTime(logId, start, finish){
+  currentEditId = logId;
   document.getElementById("editStart").value = convertToInputDate(start);
   document.getElementById("editFinish").value = convertToInputDate(finish);
   document.getElementById("editModal").style.display = "flex";
@@ -349,7 +345,7 @@ function editTime(rowIndex, start, finish){
 
 function closeModal(){ document.getElementById("editModal").style.display = "none"; }
 
-function saveEdit(){
+async function saveEdit(){
   const start = document.getElementById("editStart").value;
   const finish = document.getElementById("editFinish").value;
   
@@ -358,27 +354,20 @@ function saveEdit(){
 
   closeModal();
 
-  let newGaji = null;
+  try {
+    const data = await callApi("updateSessionTime", { log_id: currentEditId, start, finish });
+    if(!data.success){ throw new Error("Gagal update waktu"); }
 
-  fetch(`${SCRIPT_URL}?action=updateSessionTime&rowIndex=${currentEditId}&start=${start}&finish=${finish}`)
-    .then(res => res.json())
-    .then(data => {
-      if(!data.success){ throw new Error("Gagal update waktu"); }
-      newGaji = data.gaji;
-      return fetch(`${SCRIPT_URL}?action=updateAttendanceStatus&rowIndex=${currentEditId}&status=VALID`);
-    })
-    .then(res => res.json())
-    .then(data => {
-      if(!data.success){ throw new Error("Gagal set VALID"); }
-      
-      updateTimeLocal(currentEditId, formattedStart, formattedFinish, "VALID", newGaji);
-    })
-    .catch(err => { 
-      alert("Server error atau gagal menyimpan perubahan. Silakan refresh halaman."); 
-    });
+    const statusRes = await callApi("updateAttendanceStatus", { log_id: currentEditId, status: "VALID" });
+    if(!statusRes.success){ throw new Error("Gagal set VALID"); }
+
+    updateTimeLocal(currentEditId, formattedStart, formattedFinish, "VALID", data.gaji);
+  } catch(err) {
+    alert("Server error atau gagal menyimpan perubahan. Silakan refresh halaman.");
+  }
 }
 
-function updateTimeLocal(rowIndex, newStart, newFinish, newStatus, newGaji){
+function updateTimeLocal(logId, newStart, newFinish, newStatus, newGaji){
   let newDurasi = "-";
   if (newStart && newFinish) {
     const d1 = new Date(newStart.replace(" ", "T"));
@@ -398,7 +387,7 @@ function updateTimeLocal(rowIndex, newStart, newFinish, newStatus, newGaji){
   }
 
   allAttendance = allAttendance.map(item => {
-    if(String(item.RowIndex) === String(rowIndex)){
+    if(String(item.ID) === String(logId)){
       return { 
         ...item, 
         Start: newStart, 
@@ -428,8 +417,8 @@ function updateTimeLocal(rowIndex, newStart, newFinish, newStatus, newGaji){
   }
 }
 
-function updateStatusLocal(rowIndex, status){
-  const row = document.querySelector(`[data-row='${rowIndex}']`); if(!row) return;
+function updateStatusLocal(logId, status){
+  const row = document.querySelector(`[data-row='${logId}']`); if(!row) return;
   const badge = row.querySelector(".status-badge");
   if(badge){
     badge.innerText = status;
@@ -440,14 +429,14 @@ function updateStatusLocal(rowIndex, status){
 
 function convertToInputDate(str){
   if(!str) return "";
-  const d = new Date(str); if(isNaN(d.getTime())) return "";
+  const d = new Date(str.replace(" ", "T")); if(isNaN(d.getTime())) return "";
   const pad = n => String(n).padStart(2,"0");
   return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
 }
 
 window.addEventListener("load", () => {
   lucide.createIcons();
-  if(sessionStorage.getItem(LOGIN_KEY) === "true"){
+  if(sessionStorage.getItem(ADMIN_GATE_KEY) === "true"){
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
     document.getElementById("navbar").style.display = "flex";
@@ -458,6 +447,7 @@ window.addEventListener("load", () => {
 
 let activeDutyList = [];
 let stopMode = null;
+let stopTargetId = null;
 let stopTargetNama = null;
 
 async function loadActiveDuty(){
@@ -465,8 +455,7 @@ async function loadActiveDuty(){
   tbody.innerHTML = `<tr><td colspan="6" class="empty">Memuat...</td></tr>`;
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getActiveDutyList");
-    const data = await res.json();
+    const data = await callApi("getActiveDutyList");
     activeDutyList = Array.isArray(data) ? data : [];
     renderActiveDutyTable();
   } catch(e){
@@ -505,19 +494,20 @@ function renderActiveDutyTable(){
       <td style="font-weight:600; color:#ffffff;">${u.nama}</td>
       <td>${u.jabatan || "-"}</td>
       <td>${u.divisi || "-"}</td>
-      <td style="font-family:monospace;">${u.start}</td>
+      <td style="font-family:monospace;">${fmtDateTime(u.start)}</td>
       <td style="font-weight:500;">${formatElapsed(u.start)}</td>
       <td>
         <div class="btn-group-actions">
-          <button class="btn-red" onclick="confirmStopSingle('${String(u.nama).replace(/'/g, "\\'")}')">STOP</button>
+          <button class="btn-red" onclick="confirmStopSingle('${u.id}','${String(u.nama).replace(/'/g, "\\'")}')">STOP</button>
         </div>
       </td>
     </tr>
   `).join("");
 }
 
-function confirmStopSingle(nama){
+function confirmStopSingle(id, nama){
   stopMode = "single";
+  stopTargetId = id;
   stopTargetNama = nama;
   document.getElementById("stopModalText").innerHTML = `Yakin ingin menghentikan duty <b>${nama}</b> sekarang?`;
   document.getElementById("stopModal").style.display = "flex";
@@ -527,6 +517,7 @@ function confirmStopAll(){
   if(!activeDutyList.length) return;
 
   stopMode = "all";
+  stopTargetId = null;
   stopTargetNama = null;
   const names = activeDutyList.map(u => u.nama).join(", ");
   document.getElementById("stopModalText").innerHTML =
@@ -537,6 +528,7 @@ function confirmStopAll(){
 function closeStopModal(){
   document.getElementById("stopModal").style.display = "none";
   stopMode = null;
+  stopTargetId = null;
   stopTargetNama = null;
 }
 
@@ -548,12 +540,10 @@ async function executeStop(){
 
   try {
     if(stopMode === "single"){
-      const res = await fetch(SCRIPT_URL + "?action=adminStopDuty&nama=" + encodeURIComponent(stopTargetNama));
-      const data = await res.json();
+      const data = await callApi("adminStopDuty", { target_user_id: stopTargetId });
       if(!data.success){ alert(data.message || "Gagal stop duty"); }
     } else if(stopMode === "all"){
-      const res = await fetch(SCRIPT_URL + "?action=adminStopAllDuty");
-      const data = await res.json();
+      const data = await callApi("adminStopAllDuty");
       if(!data.success){ alert("Gagal stop semua duty"); }
     }
 

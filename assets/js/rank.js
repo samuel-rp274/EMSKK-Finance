@@ -49,11 +49,10 @@ async function loadData(isClick = false){
   }
 
   try {
-    const res = await fetch(SCRIPT_URL + "?action=getAttendanceLogAll");
-    allData = await res.json() || [];
+    const params = mode === "weekly" ? { weeks: 10 } : { months: 3 };
+    allData = await callApi("getAttendanceLog", params) || [];
 
-    const res2 = await fetch(SCRIPT_URL + "?action=getEMSList");
-    const raw = await res2.json() || [];
+    const raw = await callApi("getEMSList") || [];
 
     masterData = raw
       .map(x => {
@@ -219,11 +218,11 @@ function render(){
 }
 
 function setMode(m){
+  if (mode === m) return;
   mode=m;
   document.getElementById("weeklyBtn").classList.toggle("active",m==="weekly");
   document.getElementById("monthlyBtn").classList.toggle("active",m==="monthly");
-  buildPeriods();
-  render();
+  loadData();
 }
 
 function exportTXT(){
