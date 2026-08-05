@@ -11,15 +11,23 @@ function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
 }
 
-// Helper standar buat manggil Edge Function dari halaman mana pun
 async function callApi(action, payload = {}) {
+  let token = payload.token;
+  if (!token) {
+    try {
+      const session = JSON.parse(localStorage.getItem(LOGIN_KEY));
+      if (session && session.token) token = session.token;
+    } catch (e) {
+    }
+  }
+
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + SUPABASE_ANON_KEY
     },
-    body: JSON.stringify({ action, ...payload })
+    body: JSON.stringify({ action, ...payload, token })
   });
   return await res.json();
 }
