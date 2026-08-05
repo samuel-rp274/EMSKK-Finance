@@ -125,7 +125,7 @@ function populateWeeks(){
         if (previousSelectedValue && keys.includes(previousSelectedValue)) {
           select.value = previousSelectedValue;
         } else {
-          select.selectedIndex = select.options.length - 1;
+          select.selectedIndex = 0;
         }
         select.dispatchEvent(new Event("change"));
       }
