@@ -5,7 +5,8 @@ const CACHE_KEY_INV = "invoice_cache_v1";
 async function loadPotonganCache(){
   const data = await callApi("getAllPotongan");
   potonganCache = {};
-  data.forEach(item => {
+  const safe = Array.isArray(data) ? data : [];
+  safe.forEach(item => {
     potonganCache[item.divisi] = Number(item.potongan || 0);
   });
 }
@@ -40,7 +41,7 @@ async function loadData(){
   if(cached){
     const parsed = JSON.parse(cached);
     if(isCacheValid(parsed.time)){
-      allInvoices = parsed.data;
+      allInvoices = Array.isArray(parsed.data) ? parsed.data : [];
       requestAnimationFrame(() => {
         populateWeeks();
         renderTable();
@@ -54,7 +55,7 @@ async function loadData(){
   }
 
   const data = await callApi("getInvoices", { weeks: 2 });
-  allInvoices = data;
+  allInvoices = Array.isArray(data) ? data : [];
   localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: allInvoices, time: Date.now() }));
 
   requestAnimationFrame(() => {
@@ -69,8 +70,8 @@ async function loadData(){
 async function refreshFromServer(){
   try{
     const fresh = await callApi("getInvoices", { weeks: 2 });
-    allInvoices = fresh;
-    localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: fresh, time: Date.now() }));
+    allInvoices = Array.isArray(fresh) ? fresh : [];
+    localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: allInvoices, time: Date.now() }));
     requestAnimationFrame(() => {
       populateWeeks();
       renderTable();
@@ -88,7 +89,8 @@ function populateWeeks(){
   select.innerHTML = "";
   const weeks = {};
 
-  allInvoices.forEach(i => {
+  const safeInvoices = Array.isArray(allInvoices) ? allInvoices : [];
+  safeInvoices.forEach(i => {
     const date = parseDateSafe(i["Tanggal Invoice"]);
     date.setHours(0,0,0,0);
     const start = new Date(date);

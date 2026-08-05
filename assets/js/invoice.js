@@ -60,7 +60,7 @@ async function loadPriceList(){
 async function refreshPriceFromServer(){
   try {
     const data = await callApi("getPriceList");
-    const safe = data || [];
+    const safe = Array.isArray(data) ? data : [];
 
     localStorage.setItem(CACHE_KEY_PRICE, JSON.stringify({
       data: safe,
@@ -76,7 +76,8 @@ function injectPrice(data){
     const currentSelection = invoiceType.value;
     invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 
-    data.forEach(item => {
+    const safe = Array.isArray(data) ? data : [];
+    safe.forEach(item => {
         const opt = document.createElement("option");
         opt.value = item.label;
         opt.textContent = item.label;

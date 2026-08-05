@@ -49,14 +49,15 @@ async function loadAttendanceData(){
     let parsed = null;
     try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_ATT); }
     if(parsed && isCacheValid(parsed.time)){
-      allAttendance = parsed.data;
+      allAttendance = Array.isArray(parsed.data) ? parsed.data : [];
       if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
       setTimeout(() => { if(ratesReady){ refreshFromServer(); } }, 1000);
       return;
     }
   }
 
-  allAttendance = await callApi("getAttendanceLog", { weeks: 2 });
+  const data = await callApi("getAttendanceLog", { weeks: 2 });
+  allAttendance = Array.isArray(data) ? data : [];
   localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: allAttendance, time: Date.now() }));
   if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
 }
@@ -64,8 +65,8 @@ async function loadAttendanceData(){
 async function refreshFromServer(){
   try{
     const fresh = await callApi("getAttendanceLog", { weeks: 2 });
-    allAttendance = fresh;
-    localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: fresh, time: Date.now() }));
+    allAttendance = Array.isArray(fresh) ? fresh : [];
+    localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({ data: allAttendance, time: Date.now() }));
     if(ratesReady && allAttendance.length){ requestAnimationFrame(() => populateWeeks()); }
   } catch(e){
     console.log("sync gagal, pakai cache");
@@ -111,7 +112,8 @@ function populateWeeks(){
   select.innerHTML = "";
   const weeks = {};
 
-  allAttendance.forEach(i => {
+  const safeAttendance = Array.isArray(allAttendance) ? allAttendance : [];
+  safeAttendance.forEach(i => {
     if(!i.Start) return;
     const d = parseWIB(i.Start);
     if(!d) return;

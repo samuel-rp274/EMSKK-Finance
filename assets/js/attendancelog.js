@@ -24,7 +24,8 @@ async function loadEMS(){
   }
 
   try {
-    const safeData = await callApi("getEMS") || [];
+    const raw = await callApi("getEMS");
+    const safeData = Array.isArray(raw) ? raw : [];
 
     localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
       data: safeData,
@@ -52,7 +53,9 @@ function buildEMS(data){
   const select = document.getElementById("searchEMS");
   select.innerHTML = "";
 
-  data
+  const safe = Array.isArray(data) ? data : [];
+
+  safe
     .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
     .sort((a,b)=>a.nama.localeCompare(b.nama))
     .forEach(d=>{
