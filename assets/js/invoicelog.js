@@ -255,10 +255,10 @@ function renderTable(){
         <tr>
             <td>${idx + 1}</td>
             <td>${formattedDate}</td>
-            <td>${i["Jenis Invoice"] || ""}</td>
+            <td>${escapeHtml(i["Jenis Invoice"] || "")}</td>
             <td>${i["Qty"] || 0}</td>
             <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
-            <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
+            <td><a href="${safeUrl(i["Bukti"])}" target="_blank" rel="noopener"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
         </tr>
         `;
     }).join("") : `<tr><td colspan="6" class="empty">Tidak ada invoice minggu ini</td></tr>`;
