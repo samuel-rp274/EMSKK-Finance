@@ -72,6 +72,7 @@ async function refreshFromServer(){
 }
 
 function populateWeeks(){
+  if (!Array.isArray(allSalaryData)) allSalaryData = [];
   const select = document.getElementById("weekSelect");
 
   const previousSelectedValue = select.value;

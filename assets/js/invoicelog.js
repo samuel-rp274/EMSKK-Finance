@@ -49,6 +49,7 @@ async function loadEMS(){
 }
 
 function buildEMS(data){
+    if (!Array.isArray(data)) data = [];
     const select = document.getElementById("searchEMS");
     select.innerHTML = "";
 

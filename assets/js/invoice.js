@@ -73,6 +73,7 @@ async function refreshPriceFromServer(){
 }
 
 function injectPrice(data){
+    if (!Array.isArray(data)) data = [];
     const currentSelection = invoiceType.value;
     invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
 

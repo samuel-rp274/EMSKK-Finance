@@ -106,6 +106,7 @@ function parseKeyDate(str){
 }
 
 function populateWeeks(){
+  if (!Array.isArray(allAttendance)) allAttendance = [];
   const select = document.getElementById("weekSelect");
   const previousSelectedValue = select.value;
   select.innerHTML = "";

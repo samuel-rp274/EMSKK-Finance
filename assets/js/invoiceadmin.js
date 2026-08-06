@@ -81,6 +81,7 @@ async function refreshFromServer(){
 }
 
 function populateWeeks(){
+  if (!Array.isArray(allInvoices)) allInvoices = [];
   const select = document.getElementById("weekSelect");
   
   const previousSelectedValue = select.value;
