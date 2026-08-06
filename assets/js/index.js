@@ -39,7 +39,6 @@ function loadCache(){
 }
 
 function saveCache(data){
-  if (!data || data.success === false || !data.week) return; // jangan cache response gagal/rusak
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
       data: data,
@@ -309,16 +308,8 @@ async function initIndex(){
 
   const cached = loadCache();
   if (cached) {
-    try {
-      renderAll(cached.data);
-      refreshInBackground();
-    } catch (err) {
-      console.error("Cache index rusak, fetch ulang:", err);
-      localStorage.removeItem(CACHE_KEY);
-      document.getElementById('loadingState').style.display = 'flex';
-      document.getElementById('contentWrap').style.display = 'none';
-      await refreshInBackground();
-    }
+    renderAll(cached.data);
+    refreshInBackground();
   } else {
     document.getElementById('loadingState').style.display = 'flex';
     document.getElementById('contentWrap').style.display = 'none';

@@ -11,44 +11,15 @@ function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
 }
 
-// Escape teks bebas dari user sebelum ditaro ke innerHTML, biar nggak bisa
-// "kabur" dari tag/atribut HTML dan nyuntik script (stored XSS).
-function escapeHtml(str){
-  return String(str ?? "").replace(/[&<>"']/g, (c) => ({
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#39;"
-  }[c]));
-}
-
-// Buat link (href) dari input user — cuma izinin http/https, selain itu
-// (javascript:, data:, dll) di-block dan diganti "#" biar nggak bisa dipake
-// buat XSS lewat href.
-function safeUrl(url){
-  const s = String(url ?? "").trim();
-  if (/^https?:\/\//i.test(s)) return s;
-  return "#";
-}
-
+// Helper standar buat manggil Edge Function dari halaman mana pun
 async function callApi(action, payload = {}) {
-  let token = payload.token;
-  if (!token) {
-    try {
-      const session = JSON.parse(localStorage.getItem(LOGIN_KEY));
-      if (session && session.token) token = session.token;
-    } catch (e) {
-    }
-  }
-
   const res = await fetch(EDGE_FUNCTION_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "Authorization": "Bearer " + SUPABASE_ANON_KEY
     },
-    body: JSON.stringify({ action, ...payload, token })
+    body: JSON.stringify({ action, ...payload })
   });
   return await res.json();
 }

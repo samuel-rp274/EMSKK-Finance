@@ -35,7 +35,7 @@ async function loadData(){
     let parsed = null;
     try { parsed = JSON.parse(cached); } catch(e){ localStorage.removeItem(CACHE_KEY_SALARY); }
     if(parsed && isCacheValid(parsed.time)){
-      allSalaryData = Array.isArray(parsed.data) ? parsed.data : [];
+      allSalaryData = parsed.data || [];
       requestAnimationFrame(() => {
         populateWeeks();
         renderTable();
@@ -46,7 +46,7 @@ async function loadData(){
   }
   try {
     const data = await callApi("getTotalSalary", { weeks: 4 });
-    allSalaryData = Array.isArray(data) ? data : [];
+    allSalaryData = data || [];
     localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: allSalaryData, time: Date.now() }));
   } catch(e){
     allSalaryData = [];
@@ -60,7 +60,7 @@ async function loadData(){
 async function refreshFromServer(){
   try{
     const data = await callApi("getTotalSalary", { weeks: 4 });
-    allSalaryData = Array.isArray(data) ? data : [];
+    allSalaryData = data || [];
     localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify({ data: allSalaryData, time: Date.now() }));
     requestAnimationFrame(() => { 
       populateWeeks(); 
@@ -78,8 +78,7 @@ function populateWeeks(){
   
   select.innerHTML = "";
   const weeks = {};
-  const safeSalaryData = Array.isArray(allSalaryData) ? allSalaryData : [];
-  safeSalaryData.forEach(i => { if (!i.week) return; weeks[i.week] = true; });
+  allSalaryData.forEach(i => { if (!i.week) return; weeks[i.week] = true; });
   const weekKeys = Object.keys(weeks);
   const today = new Date();
   today.setHours(0,0,0,0);

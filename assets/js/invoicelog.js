@@ -24,8 +24,7 @@ async function loadEMS(){
   }
 
   try {
-    const raw = await callApi("getEMS");
-    const safeData = Array.isArray(raw) ? raw : [];
+    const safeData = await callApi("getEMS") || [];
 
     localStorage.setItem(CACHE_KEY_EMS, JSON.stringify({
       data: safeData,
@@ -53,9 +52,7 @@ function buildEMS(data){
     const select = document.getElementById("searchEMS");
     select.innerHTML = "";
 
-    const safe = Array.isArray(data) ? data : [];
-
-    safe
+    data
       .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
       .sort((a,b)=>a.nama.localeCompare(b.nama))
       .forEach(item=>{
@@ -255,10 +252,10 @@ function renderTable(){
         <tr>
             <td>${idx + 1}</td>
             <td>${formattedDate}</td>
-            <td>${escapeHtml(i["Jenis Invoice"] || "")}</td>
+            <td>${i["Jenis Invoice"] || ""}</td>
             <td>${i["Qty"] || 0}</td>
             <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
-            <td><a href="${safeUrl(i["Bukti"])}" target="_blank" rel="noopener"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
+            <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
         </tr>
         `;
     }).join("") : `<tr><td colspan="6" class="empty">Tidak ada invoice minggu ini</td></tr>`;

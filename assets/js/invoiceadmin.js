@@ -5,8 +5,7 @@ const CACHE_KEY_INV = "invoice_cache_v1";
 async function loadPotonganCache(){
   const data = await callApi("getAllPotongan");
   potonganCache = {};
-  const safe = Array.isArray(data) ? data : [];
-  safe.forEach(item => {
+  data.forEach(item => {
     potonganCache[item.divisi] = Number(item.potongan || 0);
   });
 }
@@ -41,7 +40,7 @@ async function loadData(){
   if(cached){
     const parsed = JSON.parse(cached);
     if(isCacheValid(parsed.time)){
-      allInvoices = Array.isArray(parsed.data) ? parsed.data : [];
+      allInvoices = parsed.data;
       requestAnimationFrame(() => {
         populateWeeks();
         renderTable();
@@ -55,7 +54,7 @@ async function loadData(){
   }
 
   const data = await callApi("getInvoices", { weeks: 2 });
-  allInvoices = Array.isArray(data) ? data : [];
+  allInvoices = data;
   localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: allInvoices, time: Date.now() }));
 
   requestAnimationFrame(() => {
@@ -70,8 +69,8 @@ async function loadData(){
 async function refreshFromServer(){
   try{
     const fresh = await callApi("getInvoices", { weeks: 2 });
-    allInvoices = Array.isArray(fresh) ? fresh : [];
-    localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: allInvoices, time: Date.now() }));
+    allInvoices = fresh;
+    localStorage.setItem(CACHE_KEY_INV, JSON.stringify({ data: fresh, time: Date.now() }));
     requestAnimationFrame(() => {
       populateWeeks();
       renderTable();
@@ -89,8 +88,7 @@ function populateWeeks(){
   select.innerHTML = "";
   const weeks = {};
 
-  const safeInvoices = Array.isArray(allInvoices) ? allInvoices : [];
-  safeInvoices.forEach(i => {
+  allInvoices.forEach(i => {
     const date = parseDateSafe(i["Tanggal Invoice"]);
     date.setHours(0,0,0,0);
     const start = new Date(date);
@@ -231,10 +229,10 @@ async function renderTable(){
               <tr>
                 <td style="font-weight:600; color:var(--muted);">${i + 1}</td>
                 <td style="font-family:monospace; white-space: nowrap;">${inv["Tanggal Invoice"]}</td>
-                <td>${escapeHtml(inv["Jenis Invoice"])}</td>
+                <td>${inv["Jenis Invoice"]}</td>
                 <td>${inv["Qty"]}</td>
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
-                <td><a href="${safeUrl(inv["Bukti"])}" target="_blank" rel="noopener" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a></td>
+                <td><a href="${inv["Bukti"]}" target="_blank" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a></td>
                 <td>
                   <select onchange="updateStatus('${inv["id"]}', this.value, this)">
                     <option value="PENDING" ${inv.Status==="PENDING"?'selected':''}>⏳ PENDING</option>
