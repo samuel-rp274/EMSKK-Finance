@@ -4,7 +4,6 @@ const CACHE_KEY_PRICE_MANUAL = "price_cache_v1";
 
 let emsData = {};
 
-/* ---------- Helper: Auto Fill Bulan & Tahun Lokal ---------- */
 function setMonthYearDefaults() {
   const now = new Date();
   const year = now.getFullYear();
@@ -14,7 +13,6 @@ function setMonthYearDefaults() {
   const finishInput = document.getElementById("attFinish");
   const invTanggalInput = document.getElementById("invTanggal");
 
-  // Untuk input datetime-local (Start & Finish Duty): format YYYY-MM-01T00:00
   if (startInput && !startInput.value) {
     startInput.value = `${year}-${month}-01T00:00`;
   }
@@ -22,13 +20,11 @@ function setMonthYearDefaults() {
     finishInput.value = `${year}-${month}-01T00:00`;
   }
 
-  // Untuk input date (Tanggal Invoice): format YYYY-MM-01
   if (invTanggalInput && !invTanggalInput.value) {
     invTanggalInput.value = `${year}-${month}-01`;
   }
 }
 
-/* ---------- Admin password gate ---------- */
 async function checkLogin() {
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerHTML = "⏳ Memeriksa tingkat otentikasi...";
@@ -50,7 +46,7 @@ async function checkLogin() {
 }
 
 async function initManualAdmin() {
-  setMonthYearDefaults(); // Set default bulan & tahun untuk Attendance & Invoice
+  setMonthYearDefaults(); 
   await loadEMS();
   await loadPriceList();
 }
@@ -64,7 +60,6 @@ window.addEventListener("load", () => {
   }
 });
 
-/* ---------- Tabs ---------- */
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -72,12 +67,10 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     btn.classList.add("active");
     document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
     
-    // Setel ulang default tanggal ketika tab berpindah
     setMonthYearDefaults();
   });
 });
 
-/* ---------- Load EMS (nama/jabatan/divisi/id) ---------- */
 async function loadEMS() {
   const cached = localStorage.getItem(CACHE_KEY_EMS);
 
@@ -152,21 +145,18 @@ function fillNamaDropdown(selectId) {
   }
 }
 
-/* ---------- Attendance tab: auto-fill jabatan/divisi ---------- */
 document.getElementById("attNama").addEventListener("change", function () {
   const u = emsData[this.value];
   document.getElementById("attJabatan").innerText = u?.jabatan || "-";
   document.getElementById("attDivisi").innerText = u?.divisi || "-";
 });
 
-/* ---------- Invoice tab: auto-fill jabatan/divisi ---------- */
 document.getElementById("invNama").addEventListener("change", function () {
   const u = emsData[this.value];
   document.getElementById("invJabatan").innerText = u?.jabatan || "-";
   document.getElementById("invDivisi").innerText = u?.divisi || "-";
 });
 
-/* ---------- Price list (jenis invoice) ---------- */
 const invType = document.getElementById("invType");
 
 async function loadPriceList() {
@@ -283,7 +273,6 @@ document.getElementById("panel-invoice").addEventListener("input", (e) => {
   updateInvTotal();
 });
 
-/* ---------- Attendance manual submit ---------- */
 document.getElementById("attendanceManualForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("attStatus");
@@ -291,7 +280,7 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
   const nama = document.getElementById("attNama").value;
   if (!nama || !emsData[nama]) { status.innerHTML = "⚠️ Pilih nama terlebih dahulu"; return; }
 
-  const attStartVal = document.getElementById("attStart").value;   // "yyyy-MM-ddTHH:mm"
+  const attStartVal = document.getElementById("attStart").value;
   const attFinishVal = document.getElementById("attFinish").value;
 
   if (!attStartVal || !attFinishVal) {
@@ -329,7 +318,7 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
 
     status.innerHTML = "✅ Sesi duty berhasil ditambahkan (" + result.duration + ")";
     document.getElementById("attendanceManualForm").reset();
-    setMonthYearDefaults(); // Reset kembali ke default bulan-tahun lokal
+    setMonthYearDefaults();
     document.getElementById("attJabatan").innerText = "-";
     document.getElementById("attDivisi").innerText = "-";
 
@@ -340,7 +329,6 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
   }
 });
 
-/* ---------- Invoice manual submit ---------- */
 document.getElementById("invoiceManualForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("invStatus");
@@ -406,7 +394,7 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     status.innerHTML = "✅ Invoice berhasil disimpan";
 
     document.getElementById("invoiceManualForm").reset();
-    setMonthYearDefaults(); // Reset kembali ke default bulan-tahun lokal pada form Invoice
+    setMonthYearDefaults(); 
     invNormalSection.classList.remove("hidden");
     invOperasiSection.classList.add("hidden");
     invSuratSection.classList.add("hidden");

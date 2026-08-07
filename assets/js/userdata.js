@@ -1,6 +1,5 @@
 let allMembers = [];
 
-// Urutan title di dalam tabel Petinggi & Pengurus
 const TIER_ORDER = ["CEO", "DIREKTUR", "WAKDIR Personalia", "WAKDIR Operasional", "HRD", "FINANCE", "KOMDIS"];
 
 const DOKTER_JABATAN = ["Dokter Umum", "Dokter Obgyn", "Dokter Oplas", "Dokter Lab"];

@@ -46,10 +46,9 @@ function finishLogin(session){
   window.location.href = redirectTarget;
 }
 
-// state carried between views
 let sessionUsername = null;
 let sessionPassword = null;
-let sessionResult = null; // hasil login lengkap (token, role, nama, dst), disimpen sampai step terakhir
+let sessionResult = null; 
 
 document.getElementById('loginForm').addEventListener('submit', async function(e){
   e.preventDefault();
@@ -102,6 +101,7 @@ document.getElementById('keepPasswordBtn').addEventListener('click', async funct
 
   try {
     const result = await callApi('updateCredentials', {
+      token: sessionResult.token,  
       currentUsername: sessionUsername,
       currentPassword: sessionPassword
     });
@@ -130,6 +130,7 @@ document.getElementById('changeForm').addEventListener('submit', async function(
 
   try {
     const result = await callApi('updateCredentials', {
+      token: sessionResult.token,
       currentUsername: sessionUsername,
       currentPassword: sessionPassword,
       newUsername: newUsername,

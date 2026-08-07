@@ -1,6 +1,5 @@
 lucide.createIcons();
 
-/* ---------- Admin password gate ---------- */
 async function checkLogin() {
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerHTML = "⏳ Memeriksa tingkat otentikasi...";
@@ -28,7 +27,6 @@ window.addEventListener("load", () => {
   }
 });
 
-/* ---------- Tabs ---------- */
 document.querySelectorAll(".tab-btn").forEach(btn => {
   btn.addEventListener("click", () => {
     document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
@@ -38,14 +36,12 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
   });
 });
 
-/* ---------- Helper escape ---------- */
 function escapeHtml(str) {
   return String(str || "").replace(/[&<>"']/g, (m) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
   }[m]));
 }
 
-/* ---------- Toggle Jabatan: dropdown (difilter per Divisi) <-> teks bebas ---------- */
 const TIER_DIVISI = ["PETINGGI", "PENGURUS", "SPESIALIS"];
 const JABATAN_BY_DIVISI = {
   OBGYN: ["Dokter Obgyn", "Ass. Obgyn"],
@@ -56,20 +52,15 @@ const JABATAN_BY_DIVISI = {
 
 function jabatanPlaceholder(divisi) {
   if (divisi === "SPESIALIS") return "Contoh: Dokter Spesialis Bedah Plastik";
-  return "Contoh: HRD - Dokter"; // PETINGGI / PENGURUS
+  return "Contoh: CEO - Dokter"; 
 }
 
-// Dipakai pas admin GANTI divisi secara interaktif -> selalu reset ke daftar default
-// divisi itu (nggak nyisain pilihan dari divisi sebelumnya yang udah gak relevan).
 function populateJabatanFresh(selectEl, divisi) {
   const list = JABATAN_BY_DIVISI[divisi] || [];
   selectEl.innerHTML = list.map(v => `<option value="${v}">${v}</option>`).join("");
   selectEl.value = divisi === "UMUM" ? "Probation" : (list[0] || "");
 }
 
-// Dipakai pas MUAT data member yang udah ada -> kalau jabatan tersimpan ternyata nggak
-// cocok sama daftar mapping (data lama/anomali), tetep ditampilin apa adanya (nggak
-// diam-diam diganti ke default), biar admin sadar dan bisa koreksi manual kalau perlu.
 function populateJabatanWithValue(selectEl, divisi, value) {
   const list = [...(JABATAN_BY_DIVISI[divisi] || [])];
   if (value && !list.includes(value)) list.push(value);
@@ -107,7 +98,6 @@ function getJabatanValue(jabatanSelectId, jabatanManualId) {
   return document.getElementById(jabatanSelectId).value;
 }
 
-// Dipakai buat set nilai awal Jabatan dari data yang udah ada (server) atau reset form.
 function setJabatanValue(divisiSelectId, jabatanSelectId, jabatanManualId, jabatan) {
   const divisiSelect = document.getElementById(divisiSelectId);
   const jabatanSelect = document.getElementById(jabatanSelectId);
@@ -131,7 +121,6 @@ function setJabatanValue(divisiSelectId, jabatanSelectId, jabatanManualId, jabat
 setupJabatanToggle("addDivisi", "addJabatanSelect", "addJabatanManual");
 setupJabatanToggle("editDivisi", "editJabatanSelect", "editJabatanManual");
 
-/* ==================== TAB 1: TAMBAH MEMBER BARU ==================== */
 document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("addStatus");
@@ -170,7 +159,6 @@ document.getElementById("addMemberForm").addEventListener("submit", async (e) =>
   }
 });
 
-/* ==================== TAB 2: UPDATE MEMBER LAMA ==================== */
 let searchDebounce = null;
 const searchInput = document.getElementById("memberSearch");
 const searchResults = document.getElementById("searchResults");

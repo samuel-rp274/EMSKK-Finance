@@ -10,7 +10,7 @@ const MODES = {
 let currentMode = 'profile';
 
 let compressedBase64 = null;
-let peopleData = {}; // nama -> id
+let peopleData = {}; 
 
 let cropNaturalW = 0, cropNaturalH = 0;
 let baseCropW = 0, baseCropH = 0;

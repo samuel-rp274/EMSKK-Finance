@@ -1,5 +1,5 @@
 lucide.createIcons();
-let currentUser = null; // { id, nama, jabatan, divisi }
+let currentUser = null;
 
 const preventClose = (e) => {
   e.preventDefault();
@@ -131,7 +131,6 @@ async function startDuty(){
   setStatus("loading","MEMERIKSA DATA...");
 
   try {
-    // Re-validasi session dulu, biar jabatan/divisi yang dipakai selalu yang terbaru
     const session = JSON.parse(localStorage.getItem(LOGIN_KEY));
     const fresh = await callApi("validateSession", { token: session.token });
 

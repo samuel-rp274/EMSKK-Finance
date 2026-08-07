@@ -8,7 +8,7 @@ function getWIBDate() {
 
 const CACHE_KEY_PRICE = "price_cache_v1";
 
-let currentUser = null; // { id, nama, jabatan, divisi }
+let currentUser = null;
 
 const nama = document.getElementById("nama");
 const jabatan = document.getElementById("jabatan");

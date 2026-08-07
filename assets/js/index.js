@@ -39,7 +39,7 @@ function loadCache(){
 }
 
 function saveCache(data){
-  if (!data || data.success === false || !data.week) return; // jangan cache response gagal/rusak
+  if (!data || data.success === false || !data.week) return; 
   try {
     localStorage.setItem(CACHE_KEY, JSON.stringify({
       data: data,
