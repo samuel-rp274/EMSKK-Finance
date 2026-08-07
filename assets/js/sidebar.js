@@ -75,7 +75,7 @@
     if (role === 'admin' || role === 'superadmin') {
       items.push({ type: 'divider' });
       items.push({ type: 'sectionLabel', label: 'Admin Menu' });
-      items.push({ type: 'link', label: 'Admin Dashboard', href: 'indexadminemskk.html', icon: 'layout-dashboard' });
+      items.push({ type: 'link', label: 'Member Profiles', href: 'userdata.html', icon: 'id-card' });
       items.push({ type: 'link', label: 'Finance', href: 'financeadmin.html', icon: 'wallet' });
       items.push({ type: 'link', label: 'Rank', href: 'rank.html', icon: 'trophy' });
       items.push({ type: 'link', label: 'HRD', href: 'hrd.html', icon: 'users' });
@@ -85,6 +85,7 @@
     if (role === 'superadmin') {
       items.push({ type: 'divider' });
       items.push({ type: 'sectionLabel', label: 'Super Admin Menu' });
+      items.push({ type: 'link', label: 'Member Management', href: 'changeuserdata.html', icon: 'user-cog' });
       items.push({ type: 'link', label: 'Manual Entry', href: 'manualadmin.html', icon: 'shield-check' });
     }
 
