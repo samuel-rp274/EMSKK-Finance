@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="3"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/manualadmin.css">
+<link rel="stylesheet" href="assets/css/changeuserdata.css">
+<script src="assets/js/changeuserdata.js" defer></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Member Management</title>
+
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+
+    <div class="card" id="loginCard">
+      <h1>Super Admin Entry</h1>
+      <div class="subtitle">Masukkan kredensial keamanan</div>
+      <input type="password" id="adminPassword" placeholder="Password Super Admin">
+      <button onclick="checkLogin()"><i data-lucide="lock" style="width:16px; height:16px"></i> Masuk</button>
+      <div id="loginStatus"></div>
+    </div>
+
+    <div class="card hidden" id="adminPanel">
+
+      <div class="card-header-icon">
+        <i data-lucide="user-cog"></i>
+      </div>
+
+      <h1><span class="white">EMSKK</span> <span class="gradient">MEMBER MANAGEMENT</span></h1>
+      <div class="subtitle">Superadmin tool — tambah member baru atau ubah data member yang sudah ada</div>
+
+      <div class="tab-switch">
+        <button type="button" class="tab-btn active" data-tab="tambah">NEW MEMBER</button>
+        <button type="button" class="tab-btn" data-tab="update">UPDATE MEMBER</button>
+      </div>
+
+      <!-- TAB 1: TAMBAH MEMBER BARU -->
+      <div class="tab-panel active" id="panel-tambah">
+        <form id="addMemberForm">
+
+          <div class="form-group">
+            <label>Angkatan</label>
+            <input type="number" id="addAngkatan" placeholder="Contoh: 62" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nama</label>
+            <input type="text" id="addNama" placeholder="Nama lengkap" required>
+          </div>
+
+          <div class="form-group">
+            <label>Divisi</label>
+            <select id="addDivisi" required>
+              <option value="PETINGGI">PETINGGI</option>
+              <option value="PENGURUS">PENGURUS</option>
+              <option value="SPESIALIS">SPESIALIS</option>
+              <option value="OBGYN">OBGYN</option>
+              <option value="LAB">LAB</option>
+              <option value="OPLAS">OPLAS</option>
+              <option value="UMUM" selected>UMUM</option>
+              </select>
+          </div>
+
+          <div class="form-group">
+            <label>Jabatan</label>
+            <select id="addJabatanSelect" required></select>
+            <input type="text" id="addJabatanManual" class="hidden" placeholder="Contoh: HRD - Dokter">
+          </div>
+
+          <div class="form-group">
+            <label>Passpor Hex</label>
+            <input type="text" id="addPassporHex" placeholder="steam:11000..." required>
+          </div>
+
+          <button type="submit">TAMBAH MEMBER BARU</button>
+          <div id="addStatus" class="status-msg"></div>
+        </form>
+      </div>
+
+      <!-- TAB 2: UPDATE MEMBER LAMA -->
+      <div class="tab-panel" id="panel-update">
+
+        <div class="form-group">
+          <label>Cari Nama Member</label>
+          <input type="text" id="memberSearch" placeholder="Ketik minimal 2 huruf nama..." autocomplete="off">
+          <div id="searchResults" class="search-results hidden"></div>
+        </div>
+
+        <div id="editMemberWrap" class="hidden">
+          <div class="identity-block">
+            <div class="field-label">Sedang mengedit</div>
+            <div class="field-value" id="editingName">-</div>
+          </div>
+
+          <form id="updateMemberForm">
+            <input type="hidden" id="editId">
+
+            <div class="form-group">
+              <label>Angkatan</label>
+              <input type="number" id="editAngkatan" required>
+            </div>
+
+            <div class="form-group">
+              <label>Nama</label>
+              <input type="text" id="editNama" required>
+            </div>
+
+            <div class="form-group">
+              <label>Divisi</label>
+              <select id="editDivisi" required>
+                <option value="PETINGGI">PETINGGI</option>
+              <option value="PENGURUS">PENGURUS</option>
+              <option value="SPESIALIS">SPESIALIS</option>
+              <option value="OBGYN">OBGYN</option>
+              <option value="LAB">LAB</option>
+              <option value="OPLAS">OPLAS</option>
+              <option value="UMUM">UMUM</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Jabatan</label>
+              <select id="editJabatanSelect" required></select>
+              <input type="text" id="editJabatanManual" class="hidden" placeholder="Contoh: HRD - Dokter">
+            </div>
+
+            <div class="form-group">
+              <label>Status</label>
+              <select id="editStatus" required>
+                <option value="AKTIF">Aktif</option>
+                <option value="TIDAK AKTIF">Tidak Aktif</option>
+                <option value="PENSIUN">Pensiun</option>
+                <option value="RESIGN">Resign</option>
+                <option value="PTDH">PTDH</option>
+                <option value="DEATH">Death</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+              <label>Ket. SP</label>
+              <select id="editKetSp">
+                <option value="">-</option>
+                <option value="SP 1">SP 1</option>
+                <option value="SP 2">SP 2</option>
+              </select>
+            </div>
+
+            <button type="submit">SIMPAN PERUBAHAN</button>
+            <div id="updateStatus" class="status-msg"></div>
+          </form>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

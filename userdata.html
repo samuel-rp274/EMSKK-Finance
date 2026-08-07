@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="2"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/basefinance.css">
+<link rel="stylesheet" href="assets/css/userdata.css">
+<script src="assets/js/userdata.js" defer></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Member Profiles</title>
+
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+
+    <div class="card" id="adminPanel">
+      <h1>EMSKK MEMBER PROFILES</h1>
+      <div class="subtitle">Daftar seluruh anggota ems kotakita.</div>
+
+      <div class="dir-tabs">
+        <button class="dir-tab-btn active" data-tab="aktif">
+          <i data-lucide="user-check" style="width:15px; height:15px"></i> Member Aktif
+          <span class="count-pill" id="countAktif">0</span>
+        </button>
+        <button class="dir-tab-btn" data-tab="keluar">
+          <i data-lucide="user-x" style="width:15px; height:15px"></i> Keluar
+          <span class="count-pill" id="countKeluar">0</span>
+        </button>
+      </div>
+
+      <div class="dir-panel active" id="panel-aktif">
+
+      <div class="dir-section" id="section-petinggi_pengurus" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="crown"></i> Petinggi & Pengurus</div>
+        <div class="dir-section-count" id="count-petinggi_pengurus">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-petinggi_pengurus">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-spesialis" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="stethoscope"></i> Dokter Spesialis</div>
+        <div class="dir-section-count" id="count-spesialis">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-spesialis">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-dokter" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="heart-pulse"></i> Dokter</div>
+        <div class="dir-section-count" id="count-dokter">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-dokter">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-coass" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="users"></i> Co. Ass</div>
+        <div class="dir-section-count" id="count-coass">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-coass">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-trainee" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="graduation-cap"></i> Trainee</div>
+        <div class="dir-section-count" id="count-trainee">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-trainee">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-probation" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="hourglass"></i> Probation</div>
+        <div class="dir-section-count" id="count-probation">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-probation">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="dir-section" id="section-lainnya" style="display:none;">
+        <div class="dir-section-title"><i data-lucide="help-circle"></i> Lainnya</div>
+        <div class="dir-section-count" id="count-lainnya">0 orang</div>
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-lainnya">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      </div>
+
+      <div class="dir-panel" id="panel-keluar">
+        <div class="table-responsive">
+          <table class="dir-table">
+            <thead>
+              <tr>
+                <th>Angkatan</th>
+                <th>Nama</th>
+                <th>Jabatan</th>
+                <th>Divisi</th>
+                <th>Status</th>
+                <th>Ket. SP</th>
+              </tr>
+            </thead>
+            <tbody id="body-keluar">
+              <tr><td colspan="6" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>
