@@ -11,6 +11,17 @@ function isCacheValid(time){
   return (Date.now() - time) < CACHE_TTL;
 }
 
+function safeHref(raw){
+  if (!raw) return null;
+  try {
+    const url = new URL(raw, window.location.href);
+    if (url.protocol !== "https:" && url.protocol !== "http:") return null;
+    return url.href;
+  } catch (e) {
+    return null;
+  }
+}
+
 async function callApi(action, payload = {}) {
   let token = payload.token;
   if (!token) {

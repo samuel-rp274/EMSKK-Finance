@@ -233,7 +233,7 @@ async function renderTable(){
                 <td>${inv["Jenis Invoice"]}</td>
                 <td>${inv["Qty"]}</td>
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
-                <td><a href="${inv["Bukti"]}" target="_blank" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a></td>
+                <td>${(() => { const h = safeHref(inv["Bukti"]); return h ? `<a href="${h}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a>` : "-"; })()}</td>
                 <td>
                   <select onchange="updateStatus('${inv["id"]}', this.value, this)">
                     <option value="PENDING" ${inv.Status==="PENDING"?'selected':''}>⏳ PENDING</option>

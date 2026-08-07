@@ -4,7 +4,6 @@ let allInvoices = [];
 let tomSelectInstance = null;
 const CACHE_KEY_INV = "invoice_cache_v1";
 
-
 async function loadEMS(){
   const cached = localStorage.getItem(CACHE_KEY_EMS);
 
@@ -249,6 +248,7 @@ function renderTable(){
     document.getElementById("tbody").innerHTML = weekInvoices.length ? weekInvoices.map((i, idx)=>{
         const dateObj = safeDate(i["Tanggal Invoice"]);
         const formattedDate = !isNaN(dateObj.getTime()) ? dateObj.toLocaleDateString("id-ID") : i["Tanggal Invoice"];
+        const buktiHref = safeHref(i["Bukti"]);
         return `
         <tr>
             <td>${idx + 1}</td>
@@ -256,7 +256,7 @@ function renderTable(){
             <td>${i["Jenis Invoice"] || ""}</td>
             <td>${i["Qty"] || 0}</td>
             <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
-            <td><a href="${i["Bukti"] || '#'}" target="_blank"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a></td>
+            <td>${buktiHref ? `<a href="${buktiHref}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a>` : "-"}</td>
         </tr>
         `;
     }).join("") : `<tr><td colspan="6" class="empty">Tidak ada invoice minggu ini</td></tr>`;
