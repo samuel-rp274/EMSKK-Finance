@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<script src="assets/js/config.js"></script>
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/guard.css">
+<script src="assets/js/guard.js" data-level="3"></script>
+<link rel="stylesheet" href="assets/css/sidebar.css">
+<script src="assets/js/sidebar.js" defer></script>
+<link rel="stylesheet" href="assets/css/manualadmin.css">
+<link rel="stylesheet" href="assets/css/changeuserdata.css">
+<link rel="stylesheet" href="assets/css/ratesettings.css">
+<script src="assets/js/ratesettings.js" defer></script>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EMSKK Price & Rate</title>
+
+<link rel="icon" href="assets/images/logo.png" type="image/png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="blob top-left"></div>
+  <div class="blob bottom-right"></div>
+
+  <div class="container">
+
+    <div class="card" id="loginCard">
+      <h1>Super Admin Entry</h1>
+      <div class="subtitle">Masukkan kredensial keamanan</div>
+      <input type="password" id="adminPassword" placeholder="Password Super Admin">
+      <button onclick="checkLogin()"><i data-lucide="lock" style="width:16px; height:16px"></i> Masuk</button>
+      <div id="loginStatus"></div>
+    </div>
+
+    <div class="card hidden" id="adminPanel">
+
+      <div class="card-header-icon">
+        <i data-lucide="banknote"></i>
+      </div>
+
+      <h1><span class="white">EMSKK</span> <span class="gradient">PRICE &amp; RATE</span></h1>
+      <div class="subtitle">Superadmin tool — atur rate per jam, potongan, dan price list invoice. Perubahan hanya berlaku untuk sesi duty / invoice baru, tidak mengubah data yang sudah tercatat.</div>
+
+      <div class="tab-switch tab-switch-4col">
+        <button type="button" class="tab-btn active" data-tab="rateDivisi">RATE DIVISI</button>
+        <button type="button" class="tab-btn" data-tab="rateJabatan">RATE JABATAN</button>
+        <button type="button" class="tab-btn" data-tab="potongan">POTONGAN</button>
+        <button type="button" class="tab-btn" data-tab="priceList">PRICE LIST</button>
+      </div>
+
+      <!-- TAB 1: RATE DIVISI -->
+      <div class="tab-panel active" id="panel-rateDivisi">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Divisi</th><th>Rate / Jam ($KK)</th><th style="width:130px;">Aksi</th></tr>
+            </thead>
+            <tbody id="rateDivisiBody">
+              <tr><td colspan="3" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 2: RATE JABATAN -->
+      <div class="tab-panel" id="panel-rateJabatan">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Jabatan</th><th>Rate / Jam ($KK)</th><th style="width:130px;">Aksi</th></tr>
+            </thead>
+            <tbody id="rateJabatanBody">
+              <tr><td colspan="3" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 3: POTONGAN DIVISI -->
+      <div class="tab-panel" id="panel-potongan">
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Divisi</th><th>Potongan (%)</th><th style="width:130px;">Aksi</th></tr>
+            </thead>
+            <tbody id="potonganBody">
+              <tr><td colspan="3" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- TAB 4: PRICE LIST -->
+      <div class="tab-panel" id="panel-priceList">
+        <button type="button" id="addPriceItemBtn" class="btn-add-item">
+          <i data-lucide="plus" style="width:16px; height:16px"></i> Tambah Item
+        </button>
+        <div class="table-responsive">
+          <table>
+            <thead>
+              <tr><th>Jenis Invoice</th><th>Harga ($KK)</th><th style="width:170px;">Aksi</th></tr>
+            </thead>
+            <tbody id="priceListBody">
+              <tr><td colspan="3" class="empty">Memuat...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- MODAL: KONFIRMASI HAPUS -->
+  <div id="deleteModal" class="rs-modal-backdrop">
+    <div class="card rs-modal-card">
+      <h2 class="rs-modal-title">
+        <i data-lucide="alert-triangle" style="width:20px; height:20px; color:var(--accent-red);"></i> Konfirmasi Hapus
+      </h2>
+      <div id="deleteModalText" class="rs-modal-text"></div>
+      <div class="rs-modal-actions">
+        <button id="deleteModalConfirmBtn" class="btn-red-solid">Ya, Hapus</button>
+        <button id="deleteModalCancelBtn" class="btn-ghost">Batal</button>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
