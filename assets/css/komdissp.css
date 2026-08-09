@@ -1,0 +1,106 @@
+.blob.top-left { background: var(--accent-green); }
+.blob.bottom-right { background: var(--accent-green-glow); }
+
+.card::before {
+  background: var(--accent-green);
+  box-shadow: 0 0 15px var(--accent-green-glow);
+}
+
+.card-header-icon {
+  background: rgba(var(--green-rgb), 0.15);
+  color: var(--accent-green);
+  box-shadow: inset 0 0 12px rgba(var(--green-rgb), 0.2);
+}
+
+h1 span.gradient {
+  background: linear-gradient(to right, var(--accent-green), var(--accent-green-glow));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.field-label {
+  color: var(--accent-green);
+}
+
+label {
+  color: var(--accent-green);
+}
+
+input:focus, select:focus {
+  border-color: rgba(var(--green-rgb), 0.4);
+  box-shadow: 0 0 10px rgba(var(--green-rgb), 0.1);
+}
+
+.search-results {
+  margin-top: -10px;
+  margin-bottom: 20px;
+  background: rgba(var(--surface-rgb), 0.8);
+  border: 1px solid rgba(var(--white-rgb), 0.08);
+  border-radius: 14px;
+  overflow: hidden;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.search-result-item {
+  padding: 12px 16px;
+  cursor: pointer;
+  border-bottom: 1px solid rgba(var(--white-rgb), 0.04);
+  transition: background 0.15s;
+}
+.search-result-item:last-child { border-bottom: none; }
+.search-result-item:hover {
+  background: rgba(var(--green-rgb), 0.1);
+}
+
+.search-result-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-secondary);
+}
+.search-result-meta {
+  font-size: 12px;
+  color: var(--muted-2);
+  margin-top: 2px;
+}
+
+.search-result-empty {
+  padding: 14px 16px;
+  font-size: 13px;
+  color: var(--muted-2);
+  text-align: center;
+}
+
+#spName {
+  font-size: 16px;
+  color: var(--accent-emerald-light);
+}
+
+.field-sub {
+  font-size: 12px;
+  color: var(--muted-2);
+  margin-top: 4px;
+}
+
+#spForm button[type="submit"] {
+  width: 100%;
+  padding: 16px;
+  border: none;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--accent-green), var(--accent-emerald-dark));
+  color: white;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(var(--green-rgb), 0.2);
+  transition: all 0.2s;
+}
+
+#spForm button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(var(--green-rgb), 0.3);
+}
+
+#spForm button[type="submit"]:active {
+  transform: translateY(1px);
+}
