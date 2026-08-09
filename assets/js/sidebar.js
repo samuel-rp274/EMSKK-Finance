@@ -75,9 +75,10 @@
     if (role === 'admin' || role === 'superadmin') {
       items.push({ type: 'divider' });
       items.push({ type: 'sectionLabel', label: 'Admin Menu' });
-      items.push({ type: 'link', label: 'Member Profiles', href: 'userdata.html', icon: 'id-card' });
       items.push({ type: 'link', label: 'Finance', href: 'financeadmin.html', icon: 'wallet' });
+      items.push({ type: 'link', label: 'Member Profiles', href: 'userdata.html', icon: 'id-card' });
       items.push({ type: 'link', label: 'Rank', href: 'rank.html', icon: 'trophy' });
+      items.push({ type: 'link', label: 'Komdis', href: 'komdissp.html', icon: 'shield-alert' });      
       items.push({ type: 'link', label: 'HRD', href: 'hrd.html', icon: 'users' });
       items.push({ type: 'link', label: 'Photo Upload', href: 'photoupload.html', icon: 'image-plus' });
     }
