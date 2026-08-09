@@ -44,8 +44,9 @@
       <h1><span class="white">EMSKK</span> <span class="gradient">MEMBER MANAGEMENT</span></h1>
       <div class="subtitle">Superadmin tool — tambah member baru atau ubah data member yang sudah ada</div>
 
-      <div class="tab-switch">
-        <button type="button" class="tab-btn active" data-tab="tambah">NEW MEMBER</button>
+      <div class="tab-switch tab-switch-3col">
+        <button type="button" class="tab-btn" data-tab="reset">RESET PASSWORD</button>
+        <button type="button" class="tab-btn active" data-tab="tambah">ADD MEMBER</button>
         <button type="button" class="tab-btn" data-tab="update">UPDATE MEMBER</button>
       </div>
 
@@ -163,6 +164,34 @@
             <button type="submit">SIMPAN PERUBAHAN</button>
             <div id="updateStatus" class="status-msg"></div>
           </form>
+        </div>
+      </div>
+
+      <!-- TAB 3: RESET PASSWORD -->
+      <div class="tab-panel" id="panel-reset">
+
+        <div class="form-group">
+          <label>Cari Nama Member</label>
+          <input type="text" id="resetSearch" placeholder="Ketik minimal 2 huruf nama..." autocomplete="off">
+          <div id="resetSearchResults" class="search-results hidden"></div>
+        </div>
+
+        <div id="resetMemberWrap" class="hidden">
+          <div class="identity-block">
+            <div class="field-label">Member terpilih</div>
+            <div class="field-value" id="resetName">-</div>
+            <div class="field-sub" id="resetMeta">-</div>
+          </div>
+
+          <button type="button" id="resetPasswordBtn">RESET PASSWORD KE DEFAULT</button>
+          <div id="resetStatus" class="status-msg"></div>
+
+          <div id="resetResultBox" class="reset-result-box hidden">
+            <div class="reset-result-title"><i data-lucide="key-round" style="width:16px; height:16px"></i> Password Berhasil Direset</div>
+            <div class="reset-result-row"><span>Username</span><strong id="resetResultUsername">-</strong></div>
+            <div class="reset-result-row"><span>Password</span><strong id="resetResultPassword">-</strong></div>
+            <div class="reset-result-note">Segera sampaikan ke member yang bersangkutan. Member akan diminta ganti password saat login berikutnya.</div>
+          </div>
         </div>
       </div>
 
