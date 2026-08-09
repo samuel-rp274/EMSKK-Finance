@@ -159,47 +159,51 @@ document.getElementById("addMemberForm").addEventListener("submit", async (e) =>
   }
 });
 
-let searchDebounce = null;
-const searchInput = document.getElementById("memberSearch");
-const searchResults = document.getElementById("searchResults");
+function setupMemberSearch(inputEl, resultsEl, onSelect) {
+  let debounce = null;
 
-searchInput.addEventListener("input", () => {
-  const q = searchInput.value.trim();
-  clearTimeout(searchDebounce);
+  inputEl.addEventListener("input", () => {
+    const q = inputEl.value.trim();
+    clearTimeout(debounce);
 
-  if (q.length < 2) {
-    searchResults.classList.add("hidden");
-    searchResults.innerHTML = "";
-    return;
-  }
+    if (q.length < 2) {
+      resultsEl.classList.add("hidden");
+      resultsEl.innerHTML = "";
+      return;
+    }
 
-  searchDebounce = setTimeout(() => runSearch(q), 350);
-});
+    debounce = setTimeout(() => runMemberSearch(q, resultsEl, onSelect), 350);
+  });
+}
 
-async function runSearch(q) {
+async function runMemberSearch(q, resultsEl, onSelect) {
   try {
     const result = await callApi("searchActiveMembers", { q });
     const list = (result && result.data) || [];
 
     if (list.length === 0) {
-      searchResults.innerHTML = `<div class="search-result-empty">Tidak ada member ditemukan</div>`;
+      resultsEl.innerHTML = `<div class="search-result-empty">Tidak ada member ditemukan</div>`;
     } else {
-      searchResults.innerHTML = list.map(p => `
+      resultsEl.innerHTML = list.map(p => `
         <div class="search-result-item" data-id="${escapeHtml(p.id)}">
           <div class="search-result-name">${escapeHtml(p.nama)}</div>
           <div class="search-result-meta">Angkatan ${escapeHtml(p.angkatan)} · ${escapeHtml(p.jabatan)} · ${escapeHtml(p.divisi)}</div>
         </div>
       `).join("");
     }
-    searchResults.classList.remove("hidden");
+    resultsEl.classList.remove("hidden");
 
-    searchResults.querySelectorAll(".search-result-item").forEach(item => {
-      item.addEventListener("click", () => selectMember(item.dataset.id));
+    resultsEl.querySelectorAll(".search-result-item").forEach(item => {
+      item.addEventListener("click", () => onSelect(item.dataset.id));
     });
   } catch (err) {
     console.error("Gagal search member:", err);
   }
 }
+
+const searchInput = document.getElementById("memberSearch");
+const searchResults = document.getElementById("searchResults");
+setupMemberSearch(searchInput, searchResults, (id) => selectMember(id));
 
 async function selectMember(id) {
   const status = document.getElementById("updateStatus");
@@ -268,6 +272,70 @@ document.getElementById("updateMemberForm").addEventListener("submit", async (e)
     status.innerHTML = "✅ Perubahan berhasil disimpan";
     document.getElementById("editMemberWrap").classList.add("hidden");
     searchInput.value = "";
+  } catch (err) {
+    console.error(err);
+    status.innerHTML = "❌ Gagal mengirim data (network error)";
+  }
+});
+
+let resetSelectedId = null;
+
+const resetSearchInput = document.getElementById("resetSearch");
+const resetSearchResults = document.getElementById("resetSearchResults");
+setupMemberSearch(resetSearchInput, resetSearchResults, (id) => selectResetMember(id));
+
+async function selectResetMember(id) {
+  const status = document.getElementById("resetStatus");
+  status.innerHTML = "";
+  document.getElementById("resetResultBox").classList.add("hidden");
+  resetSearchResults.classList.add("hidden");
+
+  try {
+    const result = await callApi("getMemberForEdit", { id });
+    if (!result.success) {
+      alert(result.message || "Gagal memuat data member");
+      return;
+    }
+
+    const p = result.data;
+    resetSelectedId = p.id;
+    document.getElementById("resetName").innerText = p.nama;
+    document.getElementById("resetMeta").innerText = `Angkatan ${p.angkatan} · ${p.jabatan} · ${p.divisi} · ${p.status}`;
+
+    document.getElementById("resetMemberWrap").classList.remove("hidden");
+    resetSearchInput.value = p.nama;
+  } catch (err) {
+    console.error(err);
+    alert("Gagal memuat data member (network error)");
+  }
+}
+
+document.getElementById("resetPasswordBtn").addEventListener("click", async () => {
+  if (!resetSelectedId) return;
+
+  const status = document.getElementById("resetStatus");
+  const resultBox = document.getElementById("resetResultBox");
+  const nama = document.getElementById("resetName").innerText;
+
+  const yakin = confirm(`Reset password ${nama} ke default (angkatan)?\n\nSesi login member ini akan otomatis logout dan wajib login ulang.`);
+  if (!yakin) return;
+
+  status.innerHTML = "⏳ Memproses reset password...";
+  resultBox.classList.add("hidden");
+
+  try {
+    const result = await callApi("resetPasswordToDefault", { id: resetSelectedId });
+
+    if (!result.success) {
+      status.innerHTML = "❌ " + (result.message || "Gagal reset password");
+      return;
+    }
+
+    status.innerHTML = "";
+    document.getElementById("resetResultUsername").innerText = result.username;
+    document.getElementById("resetResultPassword").innerText = result.password;
+    resultBox.classList.remove("hidden");
+    lucide.createIcons();
   } catch (err) {
     console.error(err);
     status.innerHTML = "❌ Gagal mengirim data (network error)";
