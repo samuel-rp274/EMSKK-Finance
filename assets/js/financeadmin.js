@@ -122,7 +122,7 @@ async function renderTable(){
   document.getElementById("totalInvoice").innerText = "$KK " + totalInvoice.toLocaleString("id-ID");
 
   const totalWeek = totalDuty + totalInvoice;
-  const paidAmount = filtered.filter(x => x.paid === "PAID").reduce((a,b)=>a + (Number(b.duty) || 0) + (Number(b.invoice) || 0), 0);
+  const paidAmount = filtered.filter(x => x.paid && x.paid !== "UNPAID").reduce((a,b)=>a + (Number(b.duty) || 0) + (Number(b.invoice) || 0), 0);
   const sisaWeek = totalWeek - paidAmount;
 
   document.getElementById("totalWeek").innerText = "$KK " + totalWeek.toLocaleString("id-ID");
@@ -140,16 +140,22 @@ async function renderTable(){
 
   const tbody = document.getElementById("tbody");
   const sorted = [...filtered].sort((a, b) => {
-    const aPaid = a.paid === "PAID"; const bPaid = b.paid === "PAID";
-    if (!aPaid && bPaid) return -1; if (aPaid && !bPaid) return 1;
+    const aUnpaid = !a.paid || a.paid === "UNPAID"; const bUnpaid = !b.paid || b.paid === "UNPAID";
+    if (aUnpaid && !bUnpaid) return -1; if (!aUnpaid && bUnpaid) return 1;
     return a.nama.localeCompare(b.nama);
   });
+
+  const STATUS_OPTIONS = ["UNPAID", "SAMUEL", "ARIEL"];
 
   tbody.innerHTML = sorted.map(x=>{
     const duty = Number(x.duty) || 0;
     const invoice = Number(x.invoice) || 0;
     const total = duty + invoice;
-    const rowClass = x.paid === "PAID" ? "" : "row-unpaid";
+    const currentStatus = STATUS_OPTIONS.includes(x.paid) ? x.paid : "UNPAID";
+    const rowClass = currentStatus === "UNPAID" ? "row-unpaid" : "";
+    const optionsHtml = STATUS_OPTIONS.map(opt =>
+      `<option value="${opt}" ${opt === currentStatus ? "selected" : ""}>${opt === "UNPAID" ? "Unpaid" : opt.charAt(0) + opt.slice(1).toLowerCase()}</option>`
+    ).join("");
     return `
       <tr class="${rowClass}">
         <td style="font-weight:600; color:#ffffff;">${x.nama}</td>
@@ -157,7 +163,7 @@ async function renderTable(){
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
         <td>
-          <input type="checkbox" onchange="markPaid('${x.user_id}','${x.week}', this.checked, this)" ${x.paid === "PAID" ? "checked" : ""}>
+          <select data-prev-value="${currentStatus}" onchange="markPaid('${x.user_id}','${x.week}', this.value, this)">${optionsHtml}</select>
         </td>
       </tr>
     `;
@@ -175,11 +181,12 @@ window.addEventListener("load", () => {
   }
 });
 
-async function markPaid(userId, week, checked, element){
-  if(element) element.disabled = true; 
+async function markPaid(userId, week, status, element){
+  if(element) element.disabled = true;
+  const previousValue = element ? element.dataset.prevValue || "UNPAID" : null;
 
   try {
-    await callApi("updatePaidStatus", { user_id: userId, week: week, status: checked ? "PAID" : "UNPAID" });
+    await callApi("updatePaidStatus", { user_id: userId, week: week, status: status });
 
     const cached = localStorage.getItem(CACHE_KEY_SALARY);
     if(cached){
@@ -188,7 +195,7 @@ async function markPaid(userId, week, checked, element){
       if(parsed?.data){
         parsed.data = parsed.data.map(i => 
           (String(i.user_id) === String(userId) && i.week === week) 
-            ? { ...i, paid: checked ? "PAID" : "UNPAID" } 
+            ? { ...i, paid: status } 
             : i
         );
       }
@@ -200,7 +207,7 @@ async function markPaid(userId, week, checked, element){
   } catch(err) {
     console.error("Gagal memperbarui status:", err);
     alert("Koneksi bermasalah. Gagal mengubah status pembayaran.");
-    if(element) element.disabled = false; 
+    if(element){ element.disabled = false; element.value = previousValue; }
   }
 }
 
