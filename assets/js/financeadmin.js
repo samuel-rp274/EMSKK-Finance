@@ -5,7 +5,17 @@ if ('serviceWorker' in navigator) {
 }
 
 let allSalaryData = [];
+let financeStaffList = []; // [{id, name}], fetched dynamically from finance_staff table
 const CACHE_KEY_SALARY = "salary_cache_v1";
+
+async function loadFinanceStaff(){
+  try {
+    const res = await callApi("getFinanceStaff", {});
+    financeStaffList = (res && res.success && Array.isArray(res.data)) ? res.data : [];
+  } catch(e){
+    financeStaffList = [];
+  }
+}
 
 
 async function checkLogin(){
@@ -19,7 +29,9 @@ async function checkLogin(){
       sessionStorage.setItem(ADMIN_GATE_KEY, "true");
       document.getElementById("loginCard").classList.add("hidden");
       document.getElementById("adminPanel").classList.remove("hidden");
+      document.getElementById("fabStaff").classList.add("show");
       document.getElementById("navbar").style.display = "flex";
+      await loadFinanceStaff();
       requestAnimationFrame(loadData);
     } else {
       document.getElementById("loginStatus").innerHTML = "❌ Password salah, maksimal 3x salah maka IP akan di block";
@@ -80,7 +92,11 @@ function populateWeeks(){
   select.innerHTML = "";
   const weeks = {};
   allSalaryData.forEach(i => { if (!i.week) return; weeks[i.week] = true; });
-  const weekKeys = Object.keys(weeks);
+  const weekKeys = Object.keys(weeks).sort((a, b) => {
+    const startA = new Date(a.split("|")[0]);
+    const startB = new Date(b.split("|")[0]);
+    return startB - startA;
+  });
   const today = new Date();
   today.setHours(0,0,0,0);
   let defaultIndex = 0;
@@ -139,22 +155,32 @@ async function renderTable(){
   `).join("");
 
   const tbody = document.getElementById("tbody");
+  const staffNames = financeStaffList.map(s => s.name);
+  const STATUS_OPTIONS = ["UNPAID", ...staffNames];
+  const STATUS_ORDER = { "UNPAID": 0 };
+  staffNames.forEach((n, i) => { STATUS_ORDER[n] = i + 1; });
+  const STATUS_LABELS = { "UNPAID": "Unpaid" };
+  staffNames.forEach(n => { STATUS_LABELS[n] = n.charAt(0) + n.slice(1).toLowerCase(); });
+
   const sorted = [...filtered].sort((a, b) => {
-    const aUnpaid = !a.paid || a.paid === "UNPAID"; const bUnpaid = !b.paid || b.paid === "UNPAID";
-    if (aUnpaid && !bUnpaid) return -1; if (!aUnpaid && bUnpaid) return 1;
+    const rankA = STATUS_ORDER[a.paid] ?? 0;
+    const rankB = STATUS_ORDER[b.paid] ?? 0;
+    if (rankA !== rankB) return rankA - rankB;
     return a.nama.localeCompare(b.nama);
   });
-
-  const STATUS_OPTIONS = ["UNPAID", "SAMUEL", "ARIEL"];
 
   tbody.innerHTML = sorted.map(x=>{
     const duty = Number(x.duty) || 0;
     const invoice = Number(x.invoice) || 0;
     const total = duty + invoice;
-    const currentStatus = STATUS_OPTIONS.includes(x.paid) ? x.paid : "UNPAID";
+    // A status value that isn't UNPAID and isn't in the current active staff list
+    // (e.g. a deactivated name) is kept as-is so history stays readable, and it's
+    // added as an extra option so the <select> doesn't silently drop it.
+    const currentStatus = x.paid || "UNPAID";
+    const optionsForRow = STATUS_OPTIONS.includes(currentStatus) ? STATUS_OPTIONS : [...STATUS_OPTIONS, currentStatus];
     const rowClass = currentStatus === "UNPAID" ? "row-unpaid" : "";
-    const optionsHtml = STATUS_OPTIONS.map(opt =>
-      `<option value="${opt}" ${opt === currentStatus ? "selected" : ""}>${opt === "UNPAID" ? "Unpaid" : opt.charAt(0) + opt.slice(1).toLowerCase()}</option>`
+    const optionsHtml = optionsForRow.map(opt =>
+      `<option value="${opt}" ${opt === currentStatus ? "selected" : ""}>${STATUS_LABELS[opt] || (opt.charAt(0) + opt.slice(1).toLowerCase())}</option>`
     ).join("");
     return `
       <tr class="${rowClass}">
@@ -163,7 +189,7 @@ async function renderTable(){
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
         <td>
-          <select data-prev-value="${currentStatus}" onchange="markPaid('${x.user_id}','${x.week}', this.value, this)">${optionsHtml}</select>
+          <select class="status-select status-${currentStatus.toLowerCase()}" data-prev-value="${currentStatus}" onchange="markPaid('${x.user_id}','${x.week}', this.value, this)">${optionsHtml}</select>
         </td>
       </tr>
     `;
@@ -176,8 +202,9 @@ window.addEventListener("load", () => {
   if(isLoggedIn === "true"){
     document.getElementById("loginCard").classList.add("hidden");
     document.getElementById("adminPanel").classList.remove("hidden");
+    document.getElementById("fabStaff").classList.add("show");
     document.getElementById("navbar").style.display = "flex";
-    requestAnimationFrame(loadData);
+    loadFinanceStaff().then(() => requestAnimationFrame(loadData));
   }
 });
 
@@ -203,6 +230,11 @@ async function markPaid(userId, week, status, element){
       localStorage.setItem(CACHE_KEY_SALARY, JSON.stringify(parsed));
       allSalaryData = parsed.data;
     }
+    if(element){
+      element.className = `status-select status-${status.toLowerCase()}`;
+      element.dataset.prevValue = status;
+      element.disabled = false;
+    }
     requestAnimationFrame(renderTable);
   } catch(err) {
     console.error("Gagal memperbarui status:", err);
@@ -224,4 +256,94 @@ function copyTop3(){
       if(window.lucide) lucide.createIcons();
     }, 1500);
   });
+}
+// ==================== KELOLA STAFF FINANCE (FAB + modal) ====================
+
+function openStaffModal(){
+  document.getElementById("staffModal").classList.add("active");
+  document.getElementById("staffFormStatus").innerText = "";
+  document.getElementById("newStaffName").value = "";
+  renderStaffList();
+}
+
+function closeStaffModal(){
+  document.getElementById("staffModal").classList.remove("active");
+}
+
+function renderStaffList(){
+  const container = document.getElementById("staffList");
+  if(!financeStaffList.length){
+    container.innerHTML = `<div class="staff-empty">Belum ada staff finance aktif</div>`;
+    return;
+  }
+  container.innerHTML = financeStaffList.map(s => `
+    <div class="staff-item">
+      <span>${s.name.charAt(0) + s.name.slice(1).toLowerCase()}</span>
+      <button onclick="submitDeactivateFinanceStaff(${s.id}, this)">Nonaktifkan</button>
+    </div>
+  `).join("");
+}
+
+async function submitAddFinanceStaff(){
+  const input = document.getElementById("newStaffName");
+  const statusEl = document.getElementById("staffFormStatus");
+  const name = input.value.trim();
+
+  if(!name){
+    statusEl.style.color = "var(--accent-red-light)";
+    statusEl.innerText = "Nama tidak boleh kosong.";
+    return;
+  }
+  if(name.toUpperCase() === "UNPAID"){
+    statusEl.style.color = "var(--accent-red-light)";
+    statusEl.innerText = "Nama tidak boleh 'Unpaid'.";
+    return;
+  }
+  const alreadyActive = financeStaffList.some(s => s.name === name.toUpperCase());
+  if(alreadyActive){
+    statusEl.style.color = "var(--accent-red-light)";
+    statusEl.innerText = "Nama tersebut sudah ada dan masih aktif.";
+    return;
+  }
+
+  statusEl.style.color = "var(--muted)";
+  statusEl.innerText = "Menyimpan...";
+
+  try {
+    const res = await callApi("addFinanceStaff", { name });
+    if(res && res.success){
+      input.value = "";
+      statusEl.style.color = "var(--accent-emerald-light)";
+      statusEl.innerText = "Berhasil ditambahkan.";
+      await loadFinanceStaff();
+      renderStaffList();
+      renderTable();
+    } else {
+      statusEl.style.color = "var(--accent-red-light)";
+      statusEl.innerText = (res && res.message) || "Gagal menambahkan nama.";
+    }
+  } catch(e){
+    statusEl.style.color = "var(--accent-red-light)";
+    statusEl.innerText = "Koneksi bermasalah, coba lagi.";
+  }
+}
+
+async function submitDeactivateFinanceStaff(id, buttonEl){
+  if(!confirm("Nonaktifkan staff ini? Riwayat status bayar lama yang sudah pakai nama ini tidak akan berubah.")) return;
+
+  if(buttonEl) buttonEl.disabled = true;
+  try {
+    const res = await callApi("deactivateFinanceStaff", { id });
+    if(res && res.success){
+      await loadFinanceStaff();
+      renderStaffList();
+      renderTable();
+    } else {
+      alert((res && res.message) || "Gagal menonaktifkan staff.");
+      if(buttonEl) buttonEl.disabled = false;
+    }
+  } catch(e){
+    alert("Koneksi bermasalah, coba lagi.");
+    if(buttonEl) buttonEl.disabled = false;
+  }
 }
