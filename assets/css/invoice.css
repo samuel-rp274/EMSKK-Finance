@@ -86,6 +86,11 @@ input, select {
     transition: all 0.2s;
 }
 
+select#invoiceType + .ts-wrapper:not(.has-items) .ts-control::before {
+  content: "Pilih Invoice";
+  color: var(--muted-2);
+}
+
 input:focus, select:focus {
     outline: none;
     border-color: rgba(var(--green-rgb), 0.4);

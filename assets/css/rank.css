@@ -63,19 +63,15 @@ button.active {
   box-shadow: 0 4px 12px rgba(var(--amber-rgb), 0.2);
 }
 
-select {
-  padding: 10px 16px;
-  border-radius: 12px;
-  background: rgba(var(--surface-rgb), 0.8);
-  color: white;
-  border: 1px solid rgba(var(--white-rgb), 0.05);
-  font-size: 13px;
-  font-weight: 500;
-  outline: none;
-  cursor: pointer;
+select#periodSelect + .ts-wrapper .ts-control {
+  padding: 10px 16px !important;
+  border-radius: 12px !important;
+  background: rgba(var(--surface-rgb), 0.8) !important;
+  font-size: 13px !important;
+  font-weight: 500 !important;
 }
-select:focus {
-  border-color: rgba(var(--amber-rgb), 0.5);
+select#periodSelect + .ts-wrapper {
+  border-radius: 12px !important;
 }
 
 .section-title {
