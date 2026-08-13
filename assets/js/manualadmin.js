@@ -158,6 +158,9 @@ document.getElementById("invNama").addEventListener("change", function () {
 });
 
 const invType = document.getElementById("invType");
+let invTypeTS = null;       // TomSelect instance wrapping #invType
+let invRawatInapTS = null;  // TomSelect instance wrapping #invRawatInap
+let invPembayaranTS = null; // TomSelect instance wrapping #invPembayaran
 
 async function loadPriceList() {
   const cached = localStorage.getItem(CACHE_KEY_PRICE_MANUAL);
@@ -194,27 +197,64 @@ async function refreshPriceFromServer() {
   }
 }
 
+function ensureInvRawatInapPembayaranTS(){
+  if(!invRawatInapTS){
+    invRawatInapTS = new TomSelect("#invRawatInap", { create: false, controlInput: null });
+  }
+  if(!invPembayaranTS){
+    invPembayaranTS = new TomSelect("#invPembayaran", { create: false, controlInput: null });
+  }
+}
+
+function handleInvTypeChange(value){
+  invNormalSection.classList.add("hidden");
+  invOperasiSection.classList.add("hidden");
+  invSuratSection.classList.add("hidden");
+  invLainSection.classList.add("hidden");
+
+  const optionData = invTypeTS.options[value];
+  const price = optionData?.price;
+
+  if (value === "operasi") {
+    invOperasiSection.classList.remove("hidden");
+    ensureInvRawatInapPembayaranTS();
+    invHarga.value = "";
+  } else if (value === "surat") {
+    invSuratSection.classList.remove("hidden");
+    invHarga.value = "";
+  } else if (value === "lain") {
+    invLainSection.classList.remove("hidden");
+    invHarga.value = "";
+  } else {
+    invNormalSection.classList.remove("hidden");
+    invHarga.value = price || 0;
+  }
+  updateInvTotal();
+}
+
 function injectPrice(data) {
-  const currentSelection = invType.value;
-  invType.innerHTML = `<option value="">Pilih Invoice</option>`;
+  if(!invTypeTS){
+    invTypeTS = new TomSelect("#invType", {
+      create: false,
+      controlInput: null,
+      onChange: (value) => { handleInvTypeChange(value); }
+    });
+  }
+
+  const currentSelection = invTypeTS.getValue();
+  invTypeTS.clearOptions();
 
   data.forEach(item => {
-    const opt = document.createElement("option");
-    opt.value = item.label;
-    opt.textContent = item.label;
-    opt.dataset.price = item.price;
-    invType.appendChild(opt);
+    invTypeTS.addOption({ value: item.label, text: item.label, price: item.price });
   });
 
   ["operasi", "surat", "lain"].forEach((val) => {
     const labels = { operasi: "OPERASI", surat: "SURAT", lain: "LAIN-LAIN" };
-    const el = document.createElement("option");
-    el.value = val;
-    el.textContent = labels[val];
-    invType.appendChild(el);
+    invTypeTS.addOption({ value: val, text: labels[val] });
   });
 
-  if (currentSelection) invType.value = currentSelection;
+  invTypeTS.refreshOptions(false);
+  if (currentSelection) invTypeTS.setValue(currentSelection, true);
 }
 
 const invNormalSection = document.getElementById("invNormalSection");
@@ -223,34 +263,9 @@ const invSuratSection = document.getElementById("invSuratSection");
 const invLainSection = document.getElementById("invLainSection");
 const invHarga = document.getElementById("invHarga");
 
-invType.addEventListener("change", function () {
-  invNormalSection.classList.add("hidden");
-  invOperasiSection.classList.add("hidden");
-  invSuratSection.classList.add("hidden");
-  invLainSection.classList.add("hidden");
-
-  const selected = this.options[this.selectedIndex];
-  const price = selected?.dataset?.price;
-
-  if (this.value === "operasi") {
-    invOperasiSection.classList.remove("hidden");
-    invHarga.value = "";
-  } else if (this.value === "surat") {
-    invSuratSection.classList.remove("hidden");
-    invHarga.value = "";
-  } else if (this.value === "lain") {
-    invLainSection.classList.remove("hidden");
-    invHarga.value = "";
-  } else {
-    invNormalSection.classList.remove("hidden");
-    invHarga.value = price || 0;
-  }
-  updateInvTotal();
-});
-
 function updateInvTotal() {
   let total = 0;
-  const type = invType.value;
+  const type = invTypeTS ? invTypeTS.getValue() : "";
   if (type === "operasi") {
     total = (Number(document.getElementById("invHargaOperasi").value) || 0) * (Number(document.getElementById("invQtyOperasi").value) || 1);
   } else if (type === "surat") {
@@ -333,9 +348,10 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
   e.preventDefault();
   const status = document.getElementById("invStatus");
 
-  const nama = document.getElementById("invNama").value;
+  const nama = invNamaTS ? invNamaTS.getValue() : "";
   if (!nama || !emsData[nama]) { status.innerHTML = "⚠️ Pilih nama terlebih dahulu"; return; }
-  if (!invType.value) { status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
+  const invTypeValue = invTypeTS ? invTypeTS.getValue() : "";
+  if (!invTypeValue) { status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
   if (!document.getElementById("invTanggal").value) { status.innerHTML = "⚠️ Pilih Tanggal Invoice"; return; }
 
   const bukti = document.getElementById("invBukti").value;
@@ -344,7 +360,8 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     return;
   }
 
-  const jenis = invType.value;
+  const jenis = invTypeValue;
+  const invTypeText = invTypeTS.options[invTypeValue]?.text || "";
   let hargaFinal = 0, qtyFinal = 1;
   if (jenis === "operasi") {
     hargaFinal = Number(document.getElementById("invHargaOperasi").value) || 0;
@@ -366,10 +383,10 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     jabatan: u.jabatan || "",
     divisi: u.divisi || "",
     tanggalInvoice: document.getElementById("invTanggal").value,
-    jenisInvoice: invType.options[invType.selectedIndex].text,
+    jenisInvoice: invTypeText,
     jenisOperasi: document.getElementById("invJenisOperasi")?.value || "",
-    rawatInap: document.getElementById("invRawatInap")?.value || "",
-    pembayaran: document.getElementById("invPembayaran")?.value || "",
+    rawatInap: invRawatInapTS ? invRawatInapTS.getValue() : "",
+    pembayaran: invPembayaranTS ? invPembayaranTS.getValue() : "",
     jenisSurat: document.getElementById("invJenisSurat")?.value || "",
     keterangan: document.getElementById("invDeskripsiLain")?.value || "",
     harga: hargaFinal,
@@ -378,7 +395,7 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     bukti: bukti || ""
   };
 
-  const yakin = confirm(`Nama: ${nama}\nInvoice: ${invType.options[invType.selectedIndex].text}\nTotal: $KK ${hargaFinal * qtyFinal}\nLanjut simpan?`);
+  const yakin = confirm(`Nama: ${nama}\nInvoice: ${invTypeText}\nTotal: $KK ${hargaFinal * qtyFinal}\nLanjut simpan?`);
   if (!yakin) return;
 
   status.innerHTML = "⏳ Mengirim...";
@@ -394,6 +411,14 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     status.innerHTML = "✅ Invoice berhasil disimpan";
 
     document.getElementById("invoiceManualForm").reset();
+    // form.reset() only resets the underlying native <select> elements;
+    // it doesn't notify TomSelect, so each wrapped dropdown must be synced manually.
+    // For rawatInap/pembayaran, the native select's own value is already correctly
+    // reset to its default option by form.reset() itself — just mirror that into TomSelect.
+    if(invNamaTS) invNamaTS.setValue("", true);
+    if(invTypeTS) invTypeTS.setValue("", true);
+    if(invRawatInapTS) invRawatInapTS.setValue(document.getElementById("invRawatInap").value, true);
+    if(invPembayaranTS) invPembayaranTS.setValue(document.getElementById("invPembayaran").value, true);
     setMonthYearDefaults(); 
     invNormalSection.classList.remove("hidden");
     invOperasiSection.classList.add("hidden");

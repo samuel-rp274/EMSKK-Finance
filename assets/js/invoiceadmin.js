@@ -1,4 +1,5 @@
 let allInvoices=[], weekRanges=[];
+let weekSelectTS = null;
 let potonganCache = {};
 const CACHE_KEY_INV = "invoice_cache_v1";
 
@@ -82,11 +83,16 @@ async function refreshFromServer(){
 
 function populateWeeks(){
   if (!Array.isArray(allInvoices)) allInvoices = [];
-  const select = document.getElementById("weekSelect");
-  
-  const previousSelectedValue = select.value;
-  
-  select.innerHTML = "";
+
+  if(!weekSelectTS){
+    weekSelectTS = new TomSelect("#weekSelect", {
+      create: false,
+      controlInput: null,
+      onChange: () => { renderTable(); }
+    });
+  }
+
+  const previousSelectedValue = weekSelectTS.getValue();
   const weeks = {};
 
   allInvoices.forEach(i => {
@@ -106,37 +112,26 @@ function populateWeeks(){
   });
 
   const keys = Object.keys(weeks);
+  weekSelectTS.clearOptions();
 
   keys.forEach(key=>{
-    const opt = document.createElement("option");
-    opt.value = key;
     const [s,e] = key.split("|");
-    opt.textContent = `${s} s/d ${e}`;
-    select.appendChild(opt);
+    weekSelectTS.addOption({ value: key, text: `${s} s/d ${e}` });
   });
+  weekSelectTS.refreshOptions(false);
 
-  if(!select.dataset.bound){
-    select.addEventListener("change", renderTable);
-    select.dataset.bound = "1";
+  if (keys.length > 0) {
+    if (previousSelectedValue && keys.includes(previousSelectedValue)) {
+      weekSelectTS.setValue(previousSelectedValue, true);
+    } else {
+      weekSelectTS.setValue(keys[0], true);
+    }
+    renderTable();
   }
-
-  requestAnimationFrame(() => {
-    setTimeout(() => {
-      if (select.options.length > 0) {
-        if (previousSelectedValue && keys.includes(previousSelectedValue)) {
-          select.value = previousSelectedValue;
-        } else {
-          select.selectedIndex = 0;
-        }
-        select.dispatchEvent(new Event("change"));
-      }
-    }, 0);
-  });
 }
 
 async function renderTable(){
-  const select=document.getElementById("weekSelect");
-  const key=select.value;
+  const key = weekSelectTS ? weekSelectTS.getValue() : "";
   if(!key) return;
   const [startStr,endStr]=key.split("|");
   const start = new Date(startStr + "T00:00:00");

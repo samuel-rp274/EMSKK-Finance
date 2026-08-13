@@ -42,6 +42,8 @@ function escapeHtml(str) {
   }[m]));
 }
 
+const tomSelects = {}; // select id -> TomSelect instance, for lookup by helpers below
+
 const TIER_DIVISI = ["PETINGGI", "PENGURUS", "SPESIALIS"];
 const JABATAN_BY_DIVISI = {
   OBGYN: ["Dokter Obgyn", "Ass. Obgyn"],
@@ -55,71 +57,91 @@ function jabatanPlaceholder(divisi) {
   return "Contoh: CEO - Dokter"; 
 }
 
-function populateJabatanFresh(selectEl, divisi) {
+function populateJabatanFresh(jabatanTS, divisi) {
   const list = JABATAN_BY_DIVISI[divisi] || [];
-  selectEl.innerHTML = list.map(v => `<option value="${v}">${v}</option>`).join("");
-  selectEl.value = divisi === "UMUM" ? "Probation" : (list[0] || "");
+  jabatanTS.clearOptions();
+  list.forEach(v => jabatanTS.addOption({ value: v, text: v }));
+  jabatanTS.refreshOptions(false);
+  jabatanTS.setValue(divisi === "UMUM" ? "Probation" : (list[0] || ""), true);
 }
 
-function populateJabatanWithValue(selectEl, divisi, value) {
+function populateJabatanWithValue(jabatanTS, divisi, value) {
   const list = [...(JABATAN_BY_DIVISI[divisi] || [])];
   if (value && !list.includes(value)) list.push(value);
-  selectEl.innerHTML = list.map(v => `<option value="${v}">${v}</option>`).join("");
-  selectEl.value = value || (divisi === "UMUM" ? "Probation" : (list[0] || ""));
+  jabatanTS.clearOptions();
+  list.forEach(v => jabatanTS.addOption({ value: v, text: v }));
+  jabatanTS.refreshOptions(false);
+  jabatanTS.setValue(value || (divisi === "UMUM" ? "Probation" : (list[0] || "")), true);
 }
 
 function setupJabatanToggle(divisiSelectId, jabatanSelectId, jabatanManualId) {
-  const divisiSelect = document.getElementById(divisiSelectId);
-  const jabatanSelect = document.getElementById(jabatanSelectId);
+  const divisiTS = new TomSelect(`#${divisiSelectId}`, {
+    create: false,
+    controlInput: null, // no free-typing, dropdown-only selection
+    onChange: () => apply()
+  });
+  const jabatanTS = new TomSelect(`#${jabatanSelectId}`, {
+    create: false,
+    controlInput: null
+  });
+  const jabatanSelectEl = document.getElementById(jabatanSelectId);
   const jabatanManual = document.getElementById(jabatanManualId);
 
+  tomSelects[divisiSelectId] = divisiTS;
+  tomSelects[jabatanSelectId] = jabatanTS;
+
   function apply() {
-    const divisi = divisiSelect.value;
+    const divisi = divisiTS.getValue();
     const isTier = TIER_DIVISI.includes(divisi);
-    jabatanSelect.classList.toggle("hidden", isTier);
+    // The original <select> is hidden by TomSelect itself; toggle the visible
+    // .ts-wrapper (jabatanTS.wrapper) instead, or this has no visible effect.
+    jabatanTS.wrapper.classList.toggle("hidden", isTier);
     jabatanManual.classList.toggle("hidden", !isTier);
-    jabatanSelect.required = !isTier;
+    jabatanSelectEl.required = !isTier;
     jabatanManual.required = isTier;
 
     if (isTier) {
       jabatanManual.placeholder = jabatanPlaceholder(divisi);
     } else {
-      populateJabatanFresh(jabatanSelect, divisi);
+      populateJabatanFresh(jabatanTS, divisi);
     }
   }
 
-  divisiSelect.addEventListener("change", apply);
   apply();
 }
 
 function getJabatanValue(jabatanSelectId, jabatanManualId) {
   const jabatanManual = document.getElementById(jabatanManualId);
   if (!jabatanManual.classList.contains("hidden")) return jabatanManual.value.trim();
-  return document.getElementById(jabatanSelectId).value;
+  return tomSelects[jabatanSelectId].getValue();
 }
 
 function setJabatanValue(divisiSelectId, jabatanSelectId, jabatanManualId, jabatan) {
-  const divisiSelect = document.getElementById(divisiSelectId);
-  const jabatanSelect = document.getElementById(jabatanSelectId);
+  const divisiTS = tomSelects[divisiSelectId];
+  const jabatanTS = tomSelects[jabatanSelectId];
+  const jabatanSelectEl = document.getElementById(jabatanSelectId);
   const jabatanManual = document.getElementById(jabatanManualId);
-  const divisi = divisiSelect.value;
+  const divisi = divisiTS.getValue();
   const isTier = TIER_DIVISI.includes(divisi);
 
-  jabatanSelect.classList.toggle("hidden", isTier);
+  jabatanTS.wrapper.classList.toggle("hidden", isTier);
   jabatanManual.classList.toggle("hidden", !isTier);
-  jabatanSelect.required = !isTier;
+  jabatanSelectEl.required = !isTier;
   jabatanManual.required = isTier;
 
   if (isTier) {
     jabatanManual.placeholder = jabatanPlaceholder(divisi);
     jabatanManual.value = jabatan || "";
   } else {
-    populateJabatanWithValue(jabatanSelect, divisi, jabatan);
+    populateJabatanWithValue(jabatanTS, divisi, jabatan);
   }
 }
 
 setupJabatanToggle("addDivisi", "addJabatanSelect", "addJabatanManual");
 setupJabatanToggle("editDivisi", "editJabatanSelect", "editJabatanManual");
+
+tomSelects["editStatus"] = new TomSelect("#editStatus", { create: false, controlInput: null });
+tomSelects["editKetSp"] = new TomSelect("#editKetSp", { create: false, controlInput: null });
 
 document.getElementById("addMemberForm").addEventListener("submit", async (e) => {
   e.preventDefault();
@@ -127,7 +149,7 @@ document.getElementById("addMemberForm").addEventListener("submit", async (e) =>
 
   const angkatan = document.getElementById("addAngkatan").value.trim();
   const nama = document.getElementById("addNama").value.trim();
-  const divisi = document.getElementById("addDivisi").value;
+  const divisi = tomSelects["addDivisi"].getValue();
   const jabatan = getJabatanValue("addJabatanSelect", "addJabatanManual");
   const passporHex = document.getElementById("addPassporHex").value.trim();
 
@@ -151,7 +173,7 @@ document.getElementById("addMemberForm").addEventListener("submit", async (e) =>
 
     status.innerHTML = `✅ Member berhasil ditambahkan (username: ${result.username}, password: ${angkatan})`;
     document.getElementById("addMemberForm").reset();
-    document.getElementById("addDivisi").value = "UMUM";
+    tomSelects["addDivisi"].setValue("UMUM", true);
     setJabatanValue("addDivisi", "addJabatanSelect", "addJabatanManual", "Probation");
   } catch (err) {
     console.error(err);
@@ -222,10 +244,10 @@ async function selectMember(id) {
     document.getElementById("editingName").innerText = p.nama;
     document.getElementById("editAngkatan").value = p.angkatan;
     document.getElementById("editNama").value = p.nama;
-    document.getElementById("editDivisi").value = p.divisi;
+    tomSelects["editDivisi"].setValue(p.divisi, true);
     setJabatanValue("editDivisi", "editJabatanSelect", "editJabatanManual", p.jabatan);
-    document.getElementById("editStatus").value = p.status;
-    document.getElementById("editKetSp").value = p.ket_sp || "";
+    tomSelects["editStatus"].setValue(p.status, true);
+    tomSelects["editKetSp"].setValue(p.ket_sp || "", true);
 
     document.getElementById("editMemberWrap").classList.remove("hidden");
     searchInput.value = p.nama;
@@ -242,10 +264,10 @@ document.getElementById("updateMemberForm").addEventListener("submit", async (e)
   const id = document.getElementById("editId").value;
   const angkatan = document.getElementById("editAngkatan").value.trim();
   const nama = document.getElementById("editNama").value.trim();
-  const divisi = document.getElementById("editDivisi").value;
+  const divisi = tomSelects["editDivisi"].getValue();
   const jabatan = getJabatanValue("editJabatanSelect", "editJabatanManual");
-  const newStatus = document.getElementById("editStatus").value;
-  const ketSp = document.getElementById("editKetSp").value;
+  const newStatus = tomSelects["editStatus"].getValue();
+  const ketSp = tomSelects["editKetSp"].getValue();
 
   if (!angkatan || isNaN(Number(angkatan))) { status.innerHTML = "⚠️ Angkatan harus berupa angka"; return; }
   if (!nama) { status.innerHTML = "⚠️ Nama wajib diisi"; return; }

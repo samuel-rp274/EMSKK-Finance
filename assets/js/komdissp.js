@@ -1,5 +1,10 @@
 lucide.createIcons();
 
+const spKetSpTS = new TomSelect("#spKetSp", {
+  create: false,
+  controlInput: null // no free-typing, dropdown-only selection
+});
+
 function escapeHtml(str) {
   return String(str || "").replace(/[&<>"']/g, (m) => ({
     "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
@@ -68,7 +73,7 @@ async function selectSpMember(id) {
     document.getElementById("spId").value = p.id;
     document.getElementById("spName").innerText = p.nama;
     document.getElementById("spMeta").innerText = `Angkatan ${p.angkatan} · ${p.jabatan} · ${p.divisi} · ${p.status}`;
-    document.getElementById("spKetSp").value = p.ket_sp || "";
+    spKetSpTS.setValue(p.ket_sp || "", true); // silent: not a user-initiated change
 
     document.getElementById("spMemberWrap").classList.remove("hidden");
     spSearchInput.value = p.nama;
@@ -84,7 +89,7 @@ document.getElementById("spForm").addEventListener("submit", async (e) => {
 
   const id = document.getElementById("spId").value;
   const nama = document.getElementById("spName").innerText;
-  const ketSp = document.getElementById("spKetSp").value;
+  const ketSp = spKetSpTS.getValue();
 
   const label = ketSp ? ketSp : "tidak ada SP (bersih)";
   const yakin = confirm(`Simpan status SP untuk ${nama}?\n\nKet. SP baru: ${label}`);

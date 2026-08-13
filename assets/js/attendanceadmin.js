@@ -1,6 +1,7 @@
 const CACHE_KEY_ATT = "attendance_cache_v1";
 
 let allAttendance = [];
+let weekSelectTS = null;
 let rateDivisiCache = {};
 let rateJabatanCache = {};
 let potonganCache = {};
@@ -107,9 +108,16 @@ function parseKeyDate(str){
 
 function populateWeeks(){
   if (!Array.isArray(allAttendance)) allAttendance = [];
-  const select = document.getElementById("weekSelect");
-  const previousSelectedValue = select.value;
-  select.innerHTML = "";
+
+  if(!weekSelectTS){
+    weekSelectTS = new TomSelect("#weekSelect", {
+      create: false,
+      controlInput: null,
+      onChange: () => { if(ratesReady){ requestAnimationFrame(() => renderAttendanceTable()); } }
+    });
+  }
+
+  const previousSelectedValue = weekSelectTS.getValue();
   const weeks = {};
 
   allAttendance.forEach(i => {
@@ -129,17 +137,23 @@ function populateWeeks(){
   });
 
   const keys = Object.keys(weeks);
-  if(keys.length === 0){ select.innerHTML = `<option>Tidak ada data</option>`; return; }
+  weekSelectTS.clearOptions();
 
+  if(keys.length === 0){
+    weekSelectTS.addOption({ value: "", text: "Tidak ada data" });
+    weekSelectTS.refreshOptions(false);
+    weekSelectTS.disable();
+    return;
+  }
+
+  weekSelectTS.enable();
   keys.forEach(k => {
-    const opt = document.createElement("option");
-    opt.value = k;
-    opt.textContent = k.replace("|"," s/d ");
-    select.appendChild(opt);
+    weekSelectTS.addOption({ value: k, text: k.replace("|", " s/d ") });
   });
+  weekSelectTS.refreshOptions(false);
 
   if (previousSelectedValue && keys.includes(previousSelectedValue)) {
-    select.value = previousSelectedValue;
+    weekSelectTS.setValue(previousSelectedValue, true);
   } else {
     const now = new Date();
     now.setHours(0,0,0,0);
@@ -152,16 +166,14 @@ function populateWeeks(){
     });
 
     if(!currentWeek){ currentWeek = keys[keys.length - 1]; }
-    select.value = currentWeek;
+    weekSelectTS.setValue(currentWeek, true);
   }
 
-  select.onchange = () => { if(ratesReady){ requestAnimationFrame(() => renderAttendanceTable()); } };
   if(ratesReady && allAttendance.length){ requestAnimationFrame(() => renderAttendanceTable()); }
 }
 
 function renderAttendanceTable(){
-  const select = document.getElementById("weekSelect");
-  const key = select.value;
+  const key = weekSelectTS ? weekSelectTS.getValue() : "";
   if(!key){ document.getElementById("tbody").innerHTML = `<tr><td colspan="7">Pilih minggu dulu</td></tr>`; return; }
 
   const [startStr, endStr] = key.split("|");

@@ -5,7 +5,8 @@ if ('serviceWorker' in navigator) {
 }
 
 let allSalaryData = [];
-let financeStaffList = []; // [{id, name}], fetched dynamically from finance_staff table
+let weekSelectTS = null;
+let financeStaffList = [];
 const CACHE_KEY_SALARY = "salary_cache_v1";
 
 async function loadFinanceStaff(){
@@ -85,11 +86,17 @@ async function refreshFromServer(){
 
 function populateWeeks(){
   if (!Array.isArray(allSalaryData)) allSalaryData = [];
-  const select = document.getElementById("weekSelect");
 
-  const previousSelectedValue = select.value;
-  
-  select.innerHTML = "";
+  if(!weekSelectTS){
+    weekSelectTS = new TomSelect("#weekSelect", {
+      create: false,
+      controlInput: null,
+      onChange: () => { renderTable(); }
+    });
+  }
+
+  const previousSelectedValue = weekSelectTS.getValue();
+
   const weeks = {};
   allSalaryData.forEach(i => { if (!i.week) return; weeks[i.week] = true; });
   const weekKeys = Object.keys(weeks).sort((a, b) => {
@@ -101,33 +108,26 @@ function populateWeeks(){
   today.setHours(0,0,0,0);
   let defaultIndex = 0;
 
+  weekSelectTS.clearOptions();
   weekKeys.forEach((key, index) => {
-    const opt = document.createElement("option");
-    opt.value = key;
     const [startStr, endStr] = key.split("|");
-    opt.textContent = `${startStr} s/d ${endStr}`;
+    weekSelectTS.addOption({ value: key, text: `${startStr} s/d ${endStr}` });
     if (today >= new Date(startStr) && today <= new Date(endStr)) { defaultIndex = index; }
-    select.appendChild(opt);
   });
+  weekSelectTS.refreshOptions(false);
 
-  if(!select.dataset.bound){
-    select.addEventListener("change", renderTable);
-    select.dataset.bound = "1";
-  }
-
-  if (select.options.length > 0) {
+  if (weekKeys.length > 0) {
     if (previousSelectedValue && weekKeys.includes(previousSelectedValue)) {
-      select.value = previousSelectedValue;
+      weekSelectTS.setValue(previousSelectedValue, true);
     } else {
-      select.selectedIndex = defaultIndex;
+      weekSelectTS.setValue(weekKeys[defaultIndex], true);
     }
-    select.dispatchEvent(new Event("change"));
+    renderTable();
   }
 }
 
 async function renderTable(){
-  const select = document.getElementById("weekSelect");
-  const week = select.value;
+  const week = weekSelectTS ? weekSelectTS.getValue() : "";
   if(!week) return;
 
   const filtered = allSalaryData.filter(x => x.week === week);
@@ -173,9 +173,7 @@ async function renderTable(){
     const duty = Number(x.duty) || 0;
     const invoice = Number(x.invoice) || 0;
     const total = duty + invoice;
-    // A status value that isn't UNPAID and isn't in the current active staff list
-    // (e.g. a deactivated name) is kept as-is so history stays readable, and it's
-    // added as an extra option so the <select> doesn't silently drop it.
+
     const currentStatus = x.paid || "UNPAID";
     const optionsForRow = STATUS_OPTIONS.includes(currentStatus) ? STATUS_OPTIONS : [...STATUS_OPTIONS, currentStatus];
     const rowClass = currentStatus === "UNPAID" ? "row-unpaid" : "";
@@ -257,7 +255,6 @@ function copyTop3(){
     }, 1500);
   });
 }
-// ==================== KELOLA STAFF FINANCE (FAB + modal) ====================
 
 function openStaffModal(){
   document.getElementById("staffModal").classList.add("active");

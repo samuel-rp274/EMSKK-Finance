@@ -7,6 +7,7 @@ let lastNever = [];
 let mode = "weekly";
 let periods = [];
 let selectedPeriod = "";
+let periodSelectTS = null; // TomSelect instance wrapping #periodSelect
 
 function parseDate(str){
   if(!str) return null;
@@ -102,33 +103,37 @@ function buildPeriods(){
     ? Object.keys(weekMap).sort().reverse()
     : Array.from(monthSet).sort().reverse();
 
-  const sel=document.getElementById("periodSelect");
-  sel.innerHTML="";
+  if(!periodSelectTS){
+    periodSelectTS = new TomSelect("#periodSelect", {
+      create: false,
+      controlInput: null, // no free-typing, dropdown-only selection
+      onChange: () => { render(); }
+    });
+  }
 
-  periods.forEach(p=>{
-    const o=document.createElement("option");
-    o.value=p;
-    o.textContent=p;
-    sel.appendChild(o);
+  periodSelectTS.clearOptions();
+  periods.forEach(p => {
+    periodSelectTS.addOption({ value: p, text: p });
   });
+  periodSelectTS.refreshOptions(false);
 
   if(periods.length){
     selectedPeriod = periods[0];
-    sel.value = selectedPeriod;
+    periodSelectTS.setValue(selectedPeriod, true); // silent: caller runs render() explicitly after buildPeriods()
   } else {
     selectedPeriod = "";
   }
 }
 
 function render(){
-  const selElement = document.getElementById("periodSelect");
-  if (!selElement || !selElement.value) {
+  const currentValue = periodSelectTS ? periodSelectTS.getValue() : "";
+  if (!currentValue) {
     document.getElementById("tableBody").innerHTML = `<tr><td colspan="3">Tidak ada data untuk ditampilkan</td></tr>`;
     document.getElementById("neverDutyTable").innerHTML = `<tr><td colspan="2">Tidak ada data</td></tr>`;
     return;
   }
   
-  selectedPeriod = selElement.value;
+  selectedPeriod = currentValue;
   const map = {};
 
   allData.forEach(r => {

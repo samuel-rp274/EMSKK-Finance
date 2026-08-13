@@ -16,6 +16,9 @@ const divisi = document.getElementById("divisi");
 const harga = document.getElementById("harga");
 
 const invoiceType = document.getElementById("invoiceType");
+let invoiceTypeTS = null;   // TomSelect instance wrapping #invoiceType
+let rawatInapTS = null;     // TomSelect instance wrapping #rawatInap
+let pembayaranTS = null;    // TomSelect instance wrapping #pembayaran
 const status = document.getElementById("status");
 const normalSection = document.getElementById("normalSection");
 const operasiSection = document.getElementById("operasiSection");
@@ -35,7 +38,14 @@ const jenisOperasi = document.getElementById("jenisOperasi");
 const jenisSurat = document.getElementById("jenisSurat");
 const deskripsiLain = document.getElementById("deskripsiLain");
 
-invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
+function ensureRawatInapPembayaranTS(){
+  if(!rawatInapTS){
+    rawatInapTS = new TomSelect("#rawatInap", { create: false, controlInput: null });
+  }
+  if(!pembayaranTS){
+    pembayaranTS = new TomSelect("#pembayaran", { create: false, controlInput: null });
+  }
+}
 
 async function loadPriceList(){
   const cached = localStorage.getItem(CACHE_KEY_PRICE);
@@ -72,21 +82,56 @@ async function refreshPriceFromServer(){
   }
 }
 
+function handleInvoiceTypeChange(value){
+    normalSection.classList.add("hidden");
+    operasiSection.classList.add("hidden");
+    suratSection.classList.add("hidden");
+    lainSection.classList.add("hidden");
+
+    const optionData = invoiceTypeTS.options[value];
+    const price = optionData?.price;
+
+    if (value === "operasi") {
+        operasiSection.classList.remove("hidden");
+        ensureRawatInapPembayaranTS();
+        harga.value = "";
+    }
+    else if (value === "surat") {
+        suratSection.classList.remove("hidden");
+        harga.value = "";
+    }
+    else if (value === "lain") {
+        lainSection.classList.remove("hidden");
+        harga.value = "";
+    }
+    else {
+        normalSection.classList.remove("hidden");
+        harga.value = price || 0;
+    }
+    updateTotal();
+}
+
 function injectPrice(data){
     if (!Array.isArray(data)) data = [];
-    const currentSelection = invoiceType.value;
-    invoiceType.innerHTML = `<option value="">Pilih Invoice</option>`;
+
+    if(!invoiceTypeTS){
+      invoiceTypeTS = new TomSelect("#invoiceType", {
+        create: false,
+        controlInput: null,
+        onChange: (value) => { handleInvoiceTypeChange(value); }
+      });
+    }
+
+    const currentSelection = invoiceTypeTS.getValue();
+    invoiceTypeTS.clearOptions();
 
     data.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item.label;
-        opt.textContent = item.label;
-        opt.dataset.price = item.price;
-        invoiceType.appendChild(opt);
+        invoiceTypeTS.addOption({ value: item.label, text: item.label, price: item.price });
     });
 
     injectSpecialOptions();
-    if(currentSelection) invoiceType.value = currentSelection;
+    invoiceTypeTS.refreshOptions(false);
+    if(currentSelection) invoiceTypeTS.setValue(currentSelection, true);
 }
 
 function injectSpecialOptions() {
@@ -96,12 +141,7 @@ function injectSpecialOptions() {
     { value: "lain", text: "LAIN-LAIN" }
   ];
 
-  specialOptions.forEach(opt => {
-    const el = document.createElement("option");
-    el.value = opt.value;
-    el.textContent = opt.text;
-    invoiceType.appendChild(el);
-  });
+  specialOptions.forEach(opt => invoiceTypeTS.addOption(opt));
 }
 
 (function(){
@@ -162,7 +202,7 @@ document.addEventListener("input", (e) => {
 
 function updateTotal(){
     let total = 0;
-    const type = invoiceType.value;
+    const type = invoiceTypeTS ? invoiceTypeTS.getValue() : "";
     if(type==="operasi") total = (Number(hargaOperasi.value)||0)*(Number(qtyOperasi.value)||1);
     else if(type==="surat") total = (Number(hargaSurat.value)||0)*(Number(qtySurat.value)||1);
     else if(type==="lain") total = (Number(hargaLain.value)||0)*(Number(qtyLain.value)||1);
@@ -170,40 +210,13 @@ function updateTotal(){
     document.getElementById("total").innerText = "$KK "+Number(total).toLocaleString("id-ID");
 }
 
-invoiceType.addEventListener("change", function () {
-    normalSection.classList.add("hidden");
-    operasiSection.classList.add("hidden");
-    suratSection.classList.add("hidden");
-    lainSection.classList.add("hidden");
-
-    const selected = this.options[this.selectedIndex];
-    const price = selected?.dataset?.price;
-
-    if (this.value === "operasi") {
-        operasiSection.classList.remove("hidden");
-        harga.value = "";
-    }
-    else if (this.value === "surat") {
-        suratSection.classList.remove("hidden");
-        harga.value = "";
-    }
-    else if (this.value === "lain") {
-        lainSection.classList.remove("hidden");
-        harga.value = "";
-    }
-    else {
-        normalSection.classList.remove("hidden");
-        harga.value = price || 0;
-    }
-    updateTotal();
-});
-
 document.addEventListener("input", updateTotal);
 
 document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
     if(!currentUser){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
-    if(!invoiceType.value){ status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
+    const invoiceTypeValue = invoiceTypeTS ? invoiceTypeTS.getValue() : "";
+    if(!invoiceTypeValue){ status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
     if(!document.getElementById("tanggalInvoice").value){ status.innerHTML = "⚠️ Pilih Tanggal Invoice"; return; }
 
     const bukti = document.getElementById("bukti").value;
@@ -211,7 +224,8 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         status.innerHTML = "⚠️ Bukti harus link Discord"; return;
     }
 
-    const jenis = invoiceType.value;
+    const jenis = invoiceTypeValue;
+    const invoiceTypeText = invoiceTypeTS.options[invoiceTypeValue]?.text || "";
     let hargaFinal = 0;
     let qtyFinal = 1;
     if(jenis==="operasi"){ hargaFinal = Number(hargaOperasi.value)||0; qtyFinal = Number(qtyOperasi.value)||1; }
@@ -224,10 +238,10 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         jabatan: currentUser.jabatan,
         divisi: currentUser.divisi,
         tanggalInvoice: document.getElementById("tanggalInvoice").value,
-        jenisInvoice: invoiceType.options[invoiceType.selectedIndex].text,
+        jenisInvoice: invoiceTypeText,
         jenisOperasi: document.getElementById("jenisOperasi")?.value || "",
-        rawatInap: document.getElementById("rawatInap")?.value || "",
-        pembayaran: document.getElementById("pembayaran")?.value || "",
+        rawatInap: rawatInapTS ? rawatInapTS.getValue() : "",
+        pembayaran: pembayaranTS ? pembayaranTS.getValue() : "",
         jenisSurat: document.getElementById("jenisSurat")?.value || "",
         keterangan: document.getElementById("deskripsiLain")?.value || "",
         harga: hargaFinal,
@@ -238,7 +252,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
 
     status.innerHTML = "⏳ Mengirim...";
     try{
-        const yakin = confirm(`Nama: ${currentUser.nama}\nInvoice: ${invoiceType.options[invoiceType.selectedIndex].text}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
+        const yakin = confirm(`Nama: ${currentUser.nama}\nInvoice: ${invoiceTypeText}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
         if(!yakin) { status.innerHTML = ""; return; }
 
         const result = await callApi("submitInvoice", payload);
@@ -255,7 +269,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         }, 3000);
 
         document.getElementById("tanggalInvoice").value = "";
-        document.getElementById("invoiceType").value = "";
+        if(invoiceTypeTS) invoiceTypeTS.setValue("", true);
         document.getElementById("bukti").value = "";
 
         normalSection.classList.remove("hidden");
