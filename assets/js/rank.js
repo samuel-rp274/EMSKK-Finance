@@ -7,7 +7,7 @@ let lastNever = [];
 let mode = "weekly";
 let periods = [];
 let selectedPeriod = "";
-let periodSelectTS = null; // TomSelect instance wrapping #periodSelect
+let periodSelectTS = null; 
 
 function parseDate(str){
   if(!str) return null;
@@ -50,7 +50,7 @@ async function loadData(isClick = false){
   }
 
   try {
-    const params = mode === "weekly" ? { weeks: 10 } : { months: 3 };
+    const params = mode === "weekly" ? { weeks: 6 } : { months: 2 };
     allData = await callApi("getAttendanceLog", params) || [];
 
     const raw = await callApi("getEMSList") || [];
@@ -106,7 +106,7 @@ function buildPeriods(){
   if(!periodSelectTS){
     periodSelectTS = new TomSelect("#periodSelect", {
       create: false,
-      controlInput: null, // no free-typing, dropdown-only selection
+      controlInput: null, 
       onChange: () => { render(); }
     });
   }
@@ -119,7 +119,7 @@ function buildPeriods(){
 
   if(periods.length){
     selectedPeriod = periods[0];
-    periodSelectTS.setValue(selectedPeriod, true); // silent: caller runs render() explicitly after buildPeriods()
+    periodSelectTS.setValue(selectedPeriod, true); 
   } else {
     selectedPeriod = "";
   }

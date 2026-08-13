@@ -2,6 +2,7 @@ lucide.createIcons();
 
 let allData = [];
 let ts;
+let nameToId = {};
 const CACHE_KEY_ATT = "attendance_cache_v1";
 
 
@@ -52,12 +53,14 @@ function buildEMS(data){
   if (!Array.isArray(data)) data = [];
   const select = document.getElementById("searchEMS");
   select.innerHTML = "";
+  nameToId = {};
 
   data
     .filter(d => d.nama && d.nama.trim().toUpperCase() !== "NAMA")
     .sort((a,b)=>a.nama.localeCompare(b.nama))
     .forEach(d=>{
       let clean = d.nama.trim();
+      nameToId[clean] = d.id;
       let opt = document.createElement("option");
       opt.value = clean;
       opt.textContent = clean;
@@ -105,7 +108,7 @@ async function loadData(){
   }
 
   try {
-    const data = await callApi("getAttendanceLog", { scope: "all" });
+    const data = await callApi("getAttendanceLog", getFetchRange());
     allData = data || [];
 
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
@@ -140,7 +143,7 @@ async function loadData(){
 
 async function refreshFromServer(){
   try{
-    const fresh = await callApi("getAttendanceLog", { scope: "all" });
+    const fresh = await callApi("getAttendanceLog", getFetchRange());
 
     localStorage.setItem(CACHE_KEY_ATT, JSON.stringify({
       data: fresh,
@@ -241,12 +244,33 @@ function getWeekRange(){
     return {start,end};
 }
 
+function pad2(n){ return String(n).padStart(2, "0"); }
+
+function fmtNaive(d){
+    return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())} ${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`;
+}
+
+function getFetchRange(){
+    const now = new Date();
+
+    const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    startOfMonth.setHours(0,0,0,0);
+
+    const { start: startOfWeek } = getWeekRange();
+    const cutoff = startOfWeek < startOfMonth ? startOfWeek : startOfMonth;
+
+    return {
+        startDate: fmtNaive(cutoff),
+        endDate: fmtNaive(now)
+    };
+}
+
 function fmtDateTime(v){
     if(!v) return "-";
     return String(v).replace("T", " ").slice(0, 19);
 }
 
-function render(selectedName){	
+async function render(selectedName){	
     const name = (selectedName || ts?.getValue() || "").toString().trim();
 	
     if(!name){
@@ -299,17 +323,22 @@ function render(selectedName){
     const mMinutes = Math.floor((monthTotal % 3600) / 60);
 
     document.getElementById("monthHours").innerText = `${mHours}h ${mMinutes}m`;
-	
-    const lastDuty = filtered.length
-        ? [...filtered]
-            .filter(i => i["Finish"])
-            .sort((a,b)=> safeDate(b["Finish"]) - safeDate(a["Finish"]))[0]
-        : null;
-	
-    document.getElementById("topDuty").innerText =
-    lastDuty && lastDuty["Finish"]
-        ? lastDuty["Finish"].replace("T", " ")
-        : "-";
+
+    document.getElementById("topDuty").innerText = "...";
+    const userId = nameToId[name];
+    if(userId){
+      try {
+        const res = await callApi("getLastDuty", { user_id: userId });
+        document.getElementById("topDuty").innerText =
+          res && res.success && res.finish
+            ? res.finish.replace("T", " ")
+            : "-";
+      } catch(e){
+        document.getElementById("topDuty").innerText = "-";
+      }
+    } else {
+      document.getElementById("topDuty").innerText = "-";
+    }
 
     document.getElementById("tbody").innerHTML =
     week.length ? week.map((i, idx)=>`	

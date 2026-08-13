@@ -323,6 +323,7 @@ async function selectResetMember(id) {
     resetSelectedId = p.id;
     document.getElementById("resetName").innerText = p.nama;
     document.getElementById("resetMeta").innerText = `Angkatan ${p.angkatan} · ${p.jabatan} · ${p.divisi} · ${p.status}`;
+    document.getElementById("resetUsername").innerText = `Username: ${p.username || "-"}`;
 
     document.getElementById("resetMemberWrap").classList.remove("hidden");
     resetSearchInput.value = p.nama;
