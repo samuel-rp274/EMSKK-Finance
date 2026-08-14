@@ -4,15 +4,15 @@
 <script src="assets/js/config.js"></script>
 <link rel="stylesheet" href="assets/css/base.css">
 <link rel="stylesheet" href="assets/css/guard.css">
-<script src="assets/js/guard.js" data-level="2"></script>
+<script src="assets/js/guard.js" data-level="3"></script>
 <link rel="stylesheet" href="assets/css/sidebar.css">
 <script src="assets/js/sidebar.js" defer></script>
-<link rel="stylesheet" href="assets/css/hrd.css">
-<script src="assets/js/hrd.js" defer></script>
+<link rel="stylesheet" href="assets/css/totalattendance.css">
+<script src="assets/js/totalattendance.js" defer></script>
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>EMSKK Total Duty (HRD)</title>
+<title>EMSKK Total Attendance Archive</title>
 
 <link rel="icon" href="assets/images/logo.png" type="image/png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -26,26 +26,20 @@
 
   <div class="container">
 
-    <div class="card">
+    <div class="card" id="loginCard">
+      <h1>Super Admin Entry</h1>
+      <div class="subtitle">Masukkan kredensial keamanan</div>
+      <input type="password" id="adminPassword" placeholder="Password Super Admin">
+      <button onclick="checkLogin()"><i data-lucide="lock" style="width:16px; height:16px"></i> Masuk</button>
+      <div id="loginStatus"></div>
+    </div>
+
+    <div class="card hidden" id="adminPanel">
       <div class="card-header-icon">
-        <i data-lucide="users"></i>
+        <i data-lucide="archive"></i>
       </div>
-      <h1><span class="white">EMSKK</span> <span class="gradient">TOTAL DUTY (HRD)</span></h1>
-      <div class="subtitle">HRD Tool — Total duty per member dengan custom range waktu</div>
-
-      <div class="form-group">
-        <label>Cari Nama Member</label>
-        <input type="text" id="memberSearch" placeholder="Ketik minimal 2 huruf nama..." autocomplete="off">
-        <div id="memberSearchResults" class="search-results hidden"></div>
-      </div>
-
-      <div id="memberWrap" class="hidden">
-        <div class="identity-block">
-          <div class="field-label">Member terpilih</div>
-          <div class="field-value" id="memberName">-</div>
-          <div class="field-sub" id="memberMeta">-</div>
-        </div>
-      </div>
+      <h1><span class="white">EMSKK</span> <span class="gradient">TOTAL ATTENDANCE ARCHIVE</span></h1>
+      <div class="subtitle">Super Admin Tool — Total duty seluruh member dengan custom range waktu</div>
 
       <div class="topbar">
         <input type="date" id="startDate">
@@ -56,20 +50,14 @@
         </button>        
       </div>
 
-      <div class="info" id="infoText">Silakan pilih member dan rentang tanggal di atas.</div>
-
-      <div class="summary-box hidden" id="summaryBox">
-        <div class="summary-label">Total Jam Duty</div>
-        <div class="summary-value" id="summaryTotal">0h 0m</div>
-        <div class="summary-range" id="summaryRange">-</div>
-      </div>
+      <div class="info" id="infoText">Silakan masukkan rentang tanggal di atas.</div>
 
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>Minggu</th>
-              <th>Periode</th>
+              <th style="width: 80px;">Rank</th>
+              <th>Nama</th>
               <th style="width: 180px;">Total Jam</th>
             </tr>
           </thead>
