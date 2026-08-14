@@ -160,7 +160,7 @@ h1 span.white { color: var(--white); }
   margin-bottom: 28px;
   line-height: 1.4;
 }
-/* ==================== Tom Select (shared across all pages) ==================== */
+
 .ts-wrapper {
   background: transparent !important;
   border-radius: 14px !important;

@@ -21,7 +21,6 @@ select:focus, input:focus {
   border-color: rgba(var(--red-rgb), 0.4);
 }
 
-/* ===== Tabs ===== */
 .dir-tabs {
   display: flex;
   gap: 8px;
@@ -65,7 +64,6 @@ select:focus, input:focus {
 .dir-panel { display: none; }
 .dir-panel.active { display: block; }
 
-/* ===== Section blocks (Tab 1) ===== */
 .dir-section {
   margin-bottom: 28px;
 }
@@ -92,7 +90,6 @@ select:focus, input:focus {
   margin-bottom: 12px;
 }
 
-/* ===== Status badges ===== */
 .status-pill {
   display: inline-flex;
   align-items: center;
@@ -118,7 +115,6 @@ select:focus, input:focus {
   color: var(--muted-2);
 }
 
-/* ===== Lebar & alignment kolom, sama persis di semua tabel ===== */
 table.dir-table {
   table-layout: fixed;
 }
