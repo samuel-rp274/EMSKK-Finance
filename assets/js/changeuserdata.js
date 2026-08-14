@@ -42,7 +42,7 @@ function escapeHtml(str) {
   }[m]));
 }
 
-const tomSelects = {}; // select id -> TomSelect instance, for lookup by helpers below
+const tomSelects = {}; 
 
 const TIER_DIVISI = ["PETINGGI", "PENGURUS", "SPESIALIS"];
 const JABATAN_BY_DIVISI = {
@@ -77,7 +77,7 @@ function populateJabatanWithValue(jabatanTS, divisi, value) {
 function setupJabatanToggle(divisiSelectId, jabatanSelectId, jabatanManualId) {
   const divisiTS = new TomSelect(`#${divisiSelectId}`, {
     create: false,
-    controlInput: null, // no free-typing, dropdown-only selection
+    controlInput: null, 
     onChange: () => apply()
   });
   const jabatanTS = new TomSelect(`#${jabatanSelectId}`, {
@@ -93,8 +93,7 @@ function setupJabatanToggle(divisiSelectId, jabatanSelectId, jabatanManualId) {
   function apply() {
     const divisi = divisiTS.getValue();
     const isTier = TIER_DIVISI.includes(divisi);
-    // The original <select> is hidden by TomSelect itself; toggle the visible
-    // .ts-wrapper (jabatanTS.wrapper) instead, or this has no visible effect.
+
     jabatanTS.wrapper.classList.toggle("hidden", isTier);
     jabatanManual.classList.toggle("hidden", !isTier);
     jabatanSelectEl.required = !isTier;

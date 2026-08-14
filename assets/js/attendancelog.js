@@ -5,7 +5,6 @@ let ts;
 let nameToId = {};
 const CACHE_KEY_ATT = "attendance_cache_v1";
 
-
 async function loadEMS(){
   const cached = localStorage.getItem(CACHE_KEY_EMS);
 

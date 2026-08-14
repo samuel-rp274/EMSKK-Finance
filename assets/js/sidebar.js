@@ -86,9 +86,11 @@
     if (role === 'superadmin') {
       items.push({ type: 'divider' });
       items.push({ type: 'sectionLabel', label: 'Super Admin Menu' });
+      items.push({ type: 'link', label: 'Manual Entry', href: 'manualadmin.html', icon: 'shield-check' });
       items.push({ type: 'link', label: 'Member Management', href: 'changeuserdata.html', icon: 'user-cog' });
       items.push({ type: 'link', label: 'Price & Rate', href: 'ratesettings.html', icon: 'banknote' });
-      items.push({ type: 'link', label: 'Manual Entry', href: 'manualadmin.html', icon: 'shield-check' });
+      items.push({ type: 'link', label: 'Total Attendance Archive', href: 'totalattendance.html', icon: 'archive' });
+
     }
 
     items.push({ type: 'divider' });

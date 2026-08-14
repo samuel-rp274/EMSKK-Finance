@@ -2,7 +2,7 @@ lucide.createIcons();
 
 const spKetSpTS = new TomSelect("#spKetSp", {
   create: false,
-  controlInput: null // no free-typing, dropdown-only selection
+  controlInput: null 
 });
 
 function escapeHtml(str) {
@@ -73,7 +73,7 @@ async function selectSpMember(id) {
     document.getElementById("spId").value = p.id;
     document.getElementById("spName").innerText = p.nama;
     document.getElementById("spMeta").innerText = `Angkatan ${p.angkatan} · ${p.jabatan} · ${p.divisi} · ${p.status}`;
-    spKetSpTS.setValue(p.ket_sp || "", true); // silent: not a user-initiated change
+    spKetSpTS.setValue(p.ket_sp || "", true); 
 
     document.getElementById("spMemberWrap").classList.remove("hidden");
     spSearchInput.value = p.nama;
