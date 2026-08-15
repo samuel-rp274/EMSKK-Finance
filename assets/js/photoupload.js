@@ -2,12 +2,16 @@ lucide.createIcons();
 
 const JPEG_QUALITY = 0.82;
 const STAGE_WIDTH = 280;
+const GALLERY_RAW_BASE = "https://raw.githubusercontent.com/samuel-rp274/EMSKK-Finance/main/assets/gallery/";
 
 const MODES = {
   profile: { aspect: 1, outputW: 500, outputH: 500 },
   gallery: { aspect: 16 / 9, outputW: 960, outputH: 540 }
 };
+
 let currentMode = 'profile';
+let gallerySubmode = 'new';
+let galleryOrderCache = [];
 
 let compressedBase64 = null;
 let peopleData = {}; 
@@ -20,11 +24,22 @@ let isDragging = false;
 let dragStartX = 0, dragStartY = 0, dragStartCropX = 0, dragStartCropY = 0;
 
 function updateModeUI(){
-  document.querySelectorAll('.mode-btn').forEach(btn => {
+  document.querySelectorAll('#modeToggle .mode-btn').forEach(btn => {
     btn.classList.toggle('active', btn.dataset.mode === currentMode);
   });
   document.getElementById('namaField').style.display = currentMode === 'profile' ? '' : 'none';
   document.getElementById('filenameField').style.display = currentMode === 'profile' ? '' : 'none';
+  document.getElementById('gallerySubmodeField').style.display = currentMode === 'gallery' ? '' : 'none';
+}
+
+function resetGallerySubmode(){
+  gallerySubmode = 'new';
+  document.querySelectorAll('#gallerySubmodeToggle .mode-btn').forEach(btn => {
+    btn.classList.toggle('active', btn.dataset.submode === 'new');
+  });
+  document.getElementById('gallerySlotField').style.display = 'none';
+  document.getElementById('gallerySlotSelect').innerHTML = '<option value="">Memuat slot...</option>';
+  document.getElementById('slotPreview').classList.remove('show');
 }
 
 function resetPhotoState(){
@@ -37,12 +52,31 @@ function resetPhotoState(){
   updateSubmitState();
 }
 
-document.querySelectorAll('.mode-btn').forEach(btn => {
+document.querySelectorAll('#modeToggle .mode-btn').forEach(btn => {
   btn.addEventListener('click', function(){
     if (this.dataset.mode === currentMode) return;
     currentMode = this.dataset.mode;
     updateModeUI();
     resetPhotoState();
+    resetGallerySubmode();
+  });
+});
+
+document.querySelectorAll('#gallerySubmodeToggle .mode-btn').forEach(btn => {
+  btn.addEventListener('click', function(){
+    if (this.dataset.submode === gallerySubmode) return;
+    gallerySubmode = this.dataset.submode;
+    document.querySelectorAll('#gallerySubmodeToggle .mode-btn').forEach(b => b.classList.toggle('active', b === this));
+
+    const slotField = document.getElementById('gallerySlotField');
+    if (gallerySubmode === 'replace') {
+      slotField.style.display = '';
+      loadGallerySlots();
+    } else {
+      slotField.style.display = 'none';
+      document.getElementById('slotPreview').classList.remove('show');
+    }
+    updateSubmitState();
   });
 });
 
@@ -75,7 +109,9 @@ function hideStatus(){
 
 function updateSubmitState(){
   if (currentMode === 'gallery') {
-    document.getElementById('submitBtn').disabled = !compressedBase64;
+    const slotVal = document.getElementById('gallerySlotSelect').value;
+    const slotOk = gallerySubmode !== 'replace' || !!slotVal;
+    document.getElementById('submitBtn').disabled = !(compressedBase64 && slotOk);
     return;
   }
 
@@ -130,6 +166,48 @@ async function loadNames(){
 }
 
 document.getElementById('filenameInput').addEventListener('input', updateSubmitState);
+
+async function loadGallerySlots(){
+  const select = document.getElementById('gallerySlotSelect');
+  select.innerHTML = '<option value="">Memuat slot...</option>';
+  try {
+    const result = await callApi("getGalleryList");
+    if (!result.success) throw new Error(result.message || "Gagal memuat galeri");
+
+    galleryOrderCache = result.data || [];
+    if (galleryOrderCache.length === 0) {
+      select.innerHTML = '<option value="">Belum ada foto galeri</option>';
+      return;
+    }
+    select.innerHTML = '<option value="">Pilih slot...</option>' +
+      galleryOrderCache.map((_, i) => `<option value="${i + 1}">Slot ${i + 1}</option>`).join('');
+  } catch (err) {
+    select.innerHTML = '<option value="">Gagal memuat slot</option>';
+    console.error(err);
+  }
+  updateSubmitState();
+}
+
+document.getElementById('gallerySlotSelect').addEventListener('change', function(){
+  const preview = document.getElementById('slotPreview');
+  const val = this.value;
+
+  if (!val) {
+    preview.classList.remove('show');
+    updateSubmitState();
+    return;
+  }
+
+  const filename = galleryOrderCache[parseInt(val, 10) - 1];
+  if (filename) {
+    document.getElementById('slotPreviewImg').src = `${GALLERY_RAW_BASE}${filename}?v=${Date.now()}`;
+    document.getElementById('slotPreviewLabel').textContent = `Foto saat ini di slot ${val}`;
+    preview.classList.add('show');
+  } else {
+    preview.classList.remove('show');
+  }
+  updateSubmitState();
+});
 
 const dropzone = document.getElementById('dropzone');
 const fileInput = document.getElementById('fileInput');
@@ -291,6 +369,12 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
   if (currentMode === 'gallery') {
     if (!compressedBase64) return;
     payload = { mode: 'gallery', imageBase64: compressedBase64 };
+
+    if (gallerySubmode === 'replace') {
+      const slotVal = document.getElementById('gallerySlotSelect').value;
+      if (!slotVal) return;
+      payload.targetSlot = parseInt(slotVal, 10);
+    }
   } else {
     const nama = document.getElementById('namaSelect').value;
     const filename = document.getElementById('filenameInput').value.trim();
@@ -315,7 +399,10 @@ document.getElementById('submitBtn').addEventListener('click', async function(){
 
     if (result.success) {
       showStatus('success', result.message);
-      if (currentMode === 'gallery') resetPhotoState();
+      if (currentMode === 'gallery') {
+        resetPhotoState();
+        resetGallerySubmode();
+      }
     } else {
       showStatus('error', result.message || 'Upload gagal.');
     }
