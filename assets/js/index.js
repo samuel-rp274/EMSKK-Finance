@@ -6,7 +6,6 @@ const ROTATE_MS = 3000;
 const FRESHNESS_TICK_MS = 30 * 1000;
 
 const GALLERY_RAW_BASE = "https://raw.githubusercontent.com/samuel-rp274/EMSKK-Finance/main/assets/gallery/";
-const GALLERY_SLOTS = 8;
 const GALLERY_ROTATE_MS = 2800;
 let galleryInterval = null;
 let galleryIndex = 0;
@@ -207,25 +206,18 @@ function renderFreshness(data){
   document.getElementById('freshnessText').textContent = "Diperbarui " + timeAgo(data.generatedAt);
 }
 
-function checkImageExists(url){
-  return new Promise(resolve => {
-    const img = new Image();
-    img.onload = () => resolve(true);
-    img.onerror = () => resolve(false);
-    img.src = url;
-  });
-}
-
 async function loadGallery(){
   const wrap = document.getElementById('galleryWrap');
-  const bust = Date.now();
-  const candidates = [];
-  for (let i = 1; i <= GALLERY_SLOTS; i++){
-    candidates.push(`${GALLERY_RAW_BASE}gallery-${i}.jpg?v=${bust}`);
+  let order = [];
+  try {
+    const result = await callApi("getGalleryList");
+    if (result.success) order = result.data || [];
+  } catch (err) {
+    console.error("Gagal memuat daftar galeri:", err);
   }
 
-  const results = await Promise.all(candidates.map(checkImageExists));
-  galleryUrls = candidates.filter((_, i) => results[i]);
+  const bust = Date.now();
+  galleryUrls = order.map(filename => `${GALLERY_RAW_BASE}${filename}?v=${bust}`);
 
   if (galleryUrls.length === 0){
     wrap.innerHTML = `<div class="gallery-empty">Belum ada foto galeri</div>`;
