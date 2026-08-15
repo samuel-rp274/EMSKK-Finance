@@ -41,6 +41,14 @@ select, input[type="text"] {
 }
 select:focus, input[type="text"]:focus { border-color: var(--accent-purple); }
 
+.slot-preview {
+  display:none; align-items:center; gap:12px; margin-top:12px; padding:10px 12px;
+  background: rgba(var(--surface-rgb), 0.5); border:1px solid rgba(var(--white-rgb), 0.08); border-radius:12px;
+}
+.slot-preview.show { display:flex; }
+.slot-preview img { width:72px; height:40px; object-fit:cover; border-radius:8px; border:1px solid rgba(var(--white-rgb), 0.1); flex-shrink:0; }
+.slot-preview span { font-size:12px; color:var(--muted-2); }
+
 .dropzone {
   border:2px dashed rgba(var(--white-rgb), 0.12); border-radius:16px; padding: 28px;
   text-align:center; cursor:pointer; transition: all 0.2s;
