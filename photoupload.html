@@ -37,6 +37,25 @@
         <button type="button" class="mode-btn" data-mode="gallery"><i data-lucide="images"></i> Foto Galeri</button>
       </div>
 
+      <div class="field" id="gallerySubmodeField" style="display:none;">
+        <label>Mode Upload Galeri</label>
+        <div class="mode-toggle" id="gallerySubmodeToggle">
+          <button type="button" class="mode-btn active" data-submode="new"><i data-lucide="plus"></i> Upload Baru</button>
+          <button type="button" class="mode-btn" data-submode="replace"><i data-lucide="repeat"></i> Ganti Slot Tertentu</button>
+        </div>
+      </div>
+
+      <div class="field" id="gallerySlotField" style="display:none;">
+        <label>Pilih Slot yang Diganti</label>
+        <select id="gallerySlotSelect">
+          <option value="">Memuat slot...</option>
+        </select>
+        <div class="slot-preview" id="slotPreview">
+          <img id="slotPreviewImg" src="" alt="preview slot">
+          <span id="slotPreviewLabel"></span>
+        </div>
+      </div>
+
       <div class="field" id="namaField">
         <label>Pilih Nama</label>
         <select id="namaSelect">
