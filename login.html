@@ -83,16 +83,17 @@ document.addEventListener('DOMContentLoaded', function () {
       <div class="view" id="changeView">
         <img src="assets/images/logo.png" alt="EMSKK" class="card-logo">
         <h2><span class="gradient">Ganti Password</span></h2>
-        <div class="subtitle">Username baru bersifat opsional. Kosongkan kalau tidak ingin diganti.</div>
+        <div class="subtitle">Masukkan password baru dan ketik ulang untuk konfirmasi.</div>
 
         <form id="changeForm">
           <div class="field">
-            <label>Username Baru (opsional)</label>
-            <input type="text" id="newUsernameInput" placeholder="Kosongkan jika tidak diganti" autocomplete="off">
-          </div>
-          <div class="field">
             <label>Password Baru</label>
             <input type="password" id="newPasswordInput" placeholder="Masukkan password baru">
+          </div>
+          <div class="field">
+            <label>Ketik Ulang Password Baru</label>
+            <input type="password" id="confirmPasswordInput" placeholder="Ketik ulang password baru">
+            <span class="match-hint" id="matchHint"></span>
           </div>
           <button type="submit" class="btn-submit" id="changeBtn">
             <i data-lucide="check"></i> Simpan
