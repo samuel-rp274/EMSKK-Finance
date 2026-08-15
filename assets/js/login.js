@@ -89,10 +89,34 @@ document.getElementById('wantChangeBtn').addEventListener('click', function(){
 
 document.getElementById('backToChoiceBtn').addEventListener('click', function(){
   hideStatus('changeStatus');
-  document.getElementById('newUsernameInput').value = '';
   document.getElementById('newPasswordInput').value = '';
+  document.getElementById('confirmPasswordInput').value = '';
+  const hint = document.getElementById('matchHint');
+  hint.className = 'match-hint';
+  hint.textContent = '';
   showView('choiceView');
 });
+
+function checkPasswordMatch(){
+  const newPassword = document.getElementById('newPasswordInput').value;
+  const confirmPassword = document.getElementById('confirmPasswordInput').value;
+  const hint = document.getElementById('matchHint');
+
+  if (!confirmPassword) {
+    hint.className = 'match-hint';
+    hint.textContent = '';
+    return;
+  }
+  if (newPassword === confirmPassword) {
+    hint.className = 'match-hint show match';
+    hint.textContent = 'Password sama.';
+  } else {
+    hint.className = 'match-hint show mismatch';
+    hint.textContent = 'Password berbeda.';
+  }
+}
+document.getElementById('newPasswordInput').addEventListener('input', checkPasswordMatch);
+document.getElementById('confirmPasswordInput').addEventListener('input', checkPasswordMatch);
 
 document.getElementById('keepPasswordBtn').addEventListener('click', async function(){
   hideStatus('choiceStatus');
@@ -120,9 +144,14 @@ document.getElementById('keepPasswordBtn').addEventListener('click', async funct
 
 document.getElementById('changeForm').addEventListener('submit', async function(e){
   e.preventDefault();
-  const newUsername = document.getElementById('newUsernameInput').value.trim();
   const newPassword = document.getElementById('newPasswordInput').value.trim();
+  const confirmPassword = document.getElementById('confirmPasswordInput').value.trim();
   if (!newPassword) return;
+
+  if (newPassword !== confirmPassword) {
+    showStatus('changeStatus', 'error', 'Ketik ulang password baru tidak cocok.');
+    return;
+  }
 
   hideStatus('changeStatus');
   const btn = document.getElementById('changeBtn');
@@ -133,7 +162,6 @@ document.getElementById('changeForm').addEventListener('submit', async function(
       token: sessionResult.token,
       currentUsername: sessionUsername,
       currentPassword: sessionPassword,
-      newUsername: newUsername,
       newPassword: newPassword
     });
 
