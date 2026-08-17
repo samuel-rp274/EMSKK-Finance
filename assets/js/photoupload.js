@@ -2,7 +2,7 @@ lucide.createIcons();
 
 const JPEG_QUALITY = 0.82;
 const STAGE_WIDTH = 280;
-const GALLERY_RAW_BASE = "https://raw.githubusercontent.com/samuel-rp274/EMSKK-Finance/main/assets/gallery/";
+const GALLERY_RAW_BASE = "https://cdn.jsdelivr.net/gh/samuel-rp274/EMSKK-Finance@main/assets/gallery/";
 
 const MODES = {
   profile: { aspect: 1, outputW: 500, outputH: 500 },
