@@ -188,7 +188,5 @@ tr:hover td {
 .hidden { display: none !important; }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
   .nav-container { flex-wrap: wrap; justify-content: center; }
 }

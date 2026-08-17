@@ -154,7 +154,5 @@ tr:nth-child(3) .rank { color: var(--accent-amber-dark); }
 }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
   .table-wrap { overflow-x: auto; }
 }

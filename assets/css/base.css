@@ -145,6 +145,26 @@ body {
   margin-bottom: 20px;
 }
 
+.identity-cols {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(var(--bg-rgb), 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 1200;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop.active { display: flex; }
+
 h1 {
   font-size: 30px;
   font-weight: 700;
@@ -218,3 +238,28 @@ h1 span.white { color: var(--white); }
   border-radius: 10px;
 }
 .ts-dropdown-content::-webkit-scrollbar-thumb:hover { background: rgba(var(--white-rgb), 0.22); }
+
+/* Shared scrollbar look — same values as .ts-dropdown-content above,
+   applied to other scrollable containers site-wide for consistency. */
+.table-responsive,
+.search-results {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(var(--white-rgb), 0.12) transparent;
+}
+.table-responsive::-webkit-scrollbar,
+.search-results::-webkit-scrollbar { width: 5px; height: 5px; }
+.table-responsive::-webkit-scrollbar-track,
+.search-results::-webkit-scrollbar-track { background: transparent; }
+.table-responsive::-webkit-scrollbar-thumb,
+.search-results::-webkit-scrollbar-thumb {
+  background: rgba(var(--white-rgb), 0.12);
+  border-radius: 10px;
+}
+.table-responsive::-webkit-scrollbar-thumb:hover,
+.search-results::-webkit-scrollbar-thumb:hover { background: rgba(var(--white-rgb), 0.22); }
+
+@media (max-width: 640px) {
+  body { padding-top: 80px; }
+  .card { padding: 24px; }
+  h1 { font-size: 22px; }
+}

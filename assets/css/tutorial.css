@@ -108,6 +108,5 @@
 }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  .header h1 { font-size: 24px; }
+  .header h1 { font-size: 22px; }
 }

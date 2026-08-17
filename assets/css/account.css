@@ -11,8 +11,9 @@
 }
 
 .card-header-icon {
-  width:56px; height:56px; background: rgba(var(--red-rgb), 0.15); color:var(--accent-red-glow);
-  border-radius:14px; display:flex; align-items:center; justify-content:center; margin-bottom:20px;
+  background: rgba(var(--red-rgb), 0.15);
+  color: var(--accent-red-glow);
+  box-shadow: inset 0 0 12px rgba(var(--red-rgb), 0.2);
 }
 
 h2 { font-size:22px; font-weight:700; margin-bottom:6px; }
@@ -67,7 +68,3 @@ input[type="text"]:focus, input[type="password"]:focus { border-color: var(--acc
 .view.active { display:block; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
-
-@media (max-width: 640px) {
-  .card { padding: 24px; }
-}

@@ -72,12 +72,6 @@ h1 span.gradient {
   color: var(--text-secondary);
 }
 
-.identity-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
 .field-value {
   font-size: 14px;
   font-weight: 600;
@@ -160,8 +154,6 @@ h1 span.gradient {
 }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
   .clock-time { font-size: 44px; }
   .identity-cols { gap: 12px; }
 }

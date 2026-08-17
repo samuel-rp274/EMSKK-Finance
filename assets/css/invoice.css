@@ -40,12 +40,6 @@ h1 span.gradient {
   color: var(--text-secondary);
 }
 
-.identity-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
 .field-label {
   font-size: 11px;
   color: var(--accent-green);
@@ -154,9 +148,4 @@ button:active {
     margin-top: 20px;
     font-size: 14px;
     font-weight: 600;
-}
-
-@media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
 }

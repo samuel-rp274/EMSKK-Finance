@@ -111,7 +111,5 @@ select:focus, input[type="text"]:focus { border-color: var(--accent-purple); }
 .status-box i { width:16px; height:16px; flex-shrink:0; margin-top:1px; }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
   .crop-stage { width: 100%; max-width: 280px; }
 }

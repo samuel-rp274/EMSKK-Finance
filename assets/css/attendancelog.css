@@ -110,8 +110,3 @@ tr:hover td {
     font-size: 14px;
     font-weight: 500;
 }
-
-@media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
-}

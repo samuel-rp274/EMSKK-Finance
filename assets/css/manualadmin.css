@@ -74,12 +74,6 @@ h1 span.gradient {
   margin-bottom: 20px;
 }
 
-.identity-cols {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 16px;
-}
-
 .field-label {
   font-size: 11px;
   color: var(--accent-purple);
@@ -236,8 +230,6 @@ button[type="submit"]:active {
 }
 
 @media (max-width: 640px) {
-  .card { padding: 24px; }
-  h1 { font-size: 22px; }
   .form-row { grid-template-columns: 1fr; gap: 0; }
   .tab-switch { grid-template-columns: 1fr; }
 }

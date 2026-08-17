@@ -184,6 +184,7 @@
 @media (max-width: 640px) {
   #__sbTopbarTitle { display: none; }
   .__sb-user-name { display: none; }
+  #__sbToggleBtn { width: 44px; height: 44px; }
 }
 
 #__sbBackdrop {
