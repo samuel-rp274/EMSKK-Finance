@@ -5,7 +5,7 @@ const REFRESH_MS = 15 * 60 * 1000;
 const ROTATE_MS = 3000;
 const FRESHNESS_TICK_MS = 30 * 1000;
 
-const GALLERY_RAW_BASE = "https://raw.githubusercontent.com/samuel-rp274/EMSKK-Finance/main/assets/gallery/";
+const GALLERY_RAW_BASE = "https://cdn.jsdelivr.net/gh/samuel-rp274/EMSKK-Finance@main/assets/gallery/";
 const GALLERY_ROTATE_MS = 2800;
 let galleryInterval = null;
 let galleryIndex = 0;
