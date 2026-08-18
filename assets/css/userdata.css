@@ -132,6 +132,17 @@ table.dir-table {
 .dir-table th:nth-child(6), .dir-table td:nth-child(6) { width: 14%; }
 
 @media (max-width: 640px) {
-  .dir-tabs { flex-direction: column; }
-  .dir-tab-btn { justify-content: flex-start; }
+  table.dir-table { table-layout: auto; }
+  .dir-table th, .dir-table td { white-space: nowrap; }
+
+  .dir-table th:nth-child(2), .dir-table td:nth-child(2),
+  .dir-table th:nth-child(3), .dir-table td:nth-child(3),
+  .dir-table th:nth-child(5), .dir-table td:nth-child(5) {
+    white-space: normal;
+    max-width: 140px;
+  }
+  .dir-table td:nth-child(5) .status-pill {
+    white-space: normal;
+    text-align: center;
+  }
 }

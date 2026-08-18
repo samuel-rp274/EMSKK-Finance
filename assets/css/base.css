@@ -165,6 +165,18 @@ body {
 }
 .modal-backdrop.active { display: flex; }
 
+.modal-card {
+  background: rgba(var(--surface-rgb), 0.95);
+  border: 1px solid rgba(var(--white-rgb), 0.08);
+  border-radius: 24px;
+  width: 100%;
+  max-width: 420px;
+  position: relative;
+  box-shadow: 0 25px 70px rgba(var(--black-rgb), 0.55);
+  animation: modalPop 0.18s ease;
+}
+@keyframes modalPop { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
 h1 {
   font-size: 30px;
   font-weight: 700;
@@ -239,8 +251,7 @@ h1 span.white { color: var(--white); }
 }
 .ts-dropdown-content::-webkit-scrollbar-thumb:hover { background: rgba(var(--white-rgb), 0.22); }
 
-/* Shared scrollbar look — same values as .ts-dropdown-content above,
-   applied to other scrollable containers site-wide for consistency. */
+/* Shared scrollbar look */
 .table-responsive,
 .search-results {
   scrollbar-width: thin;

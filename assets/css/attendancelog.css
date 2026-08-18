@@ -2,7 +2,7 @@
 .blob.bottom-right { background: var(--accent-amber-glow); }
 
 .container {
-  max-width: 800px; 
+  max-width: 1000px; 
 }
 
 .card::before {
@@ -28,7 +28,7 @@ h1 span.gradient {
 
 .stats {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 16px;
 }
 
