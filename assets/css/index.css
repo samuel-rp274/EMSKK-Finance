@@ -13,7 +13,7 @@ body {
 .page-header { display:flex; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom: 45px; }
 .page-header h1 { font-size: 52px; font-weight: 800; letter-spacing: 0.5px; }
 .page-header h1 span.white { color:var(--text); }
-.page-header h1 span.gradient { background: linear-gradient(to right, var(--accent-red), var(--accent-purple-glow)); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
+.page-header h1 span.gradient { background: linear-gradient(to right, var(--accent-red-glow), var(--accent-red)); -webkit-background-clip:text; -webkit-text-fill-color: transparent; }
 .page-subtitle { color:var(--muted-2); font-size:13px; margin-top:6px; }
 
 .freshness { display:flex; align-items:center; gap:6px; color:var(--muted-2); font-size:11px; background: rgba(var(--surface-rgb), 0.5); border:1px solid rgba(var(--white-rgb), 0.05); padding:7px 12px; border-radius:20px; }
