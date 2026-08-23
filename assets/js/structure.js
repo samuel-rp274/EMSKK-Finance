@@ -22,6 +22,19 @@ function colorFor(name){
   return DEFAULT_AVATAR_COLOR;
 }
 
+function angkatanNum(a){
+  const n = parseFloat(a);
+  return isNaN(n) ? Infinity : n;
+}
+
+function sortByAngkatanAbjad(list){
+  return list.slice().sort((a, b) => {
+    const da = angkatanNum(a.angkatan), db = angkatanNum(b.angkatan);
+    if (da !== db) return da - db;
+    return (a.nama || "").localeCompare(b.nama || "", "id", { sensitivity: "base" });
+  });
+}
+
 function avatarHtml(nama, size){
   const bg = colorFor(nama);
   const label = initials(nama);
@@ -146,6 +159,23 @@ function groupPeople(people){
       g.probation.push(p);
     }
   });
+
+  g.ceo = sortByAngkatanAbjad(g.ceo);
+  g.direktur = sortByAngkatanAbjad(g.direktur);
+  g.wakdirPersonalia = sortByAngkatanAbjad(g.wakdirPersonalia);
+  g.wakdirOperasional = sortByAngkatanAbjad(g.wakdirOperasional);
+  g.hrd = sortByAngkatanAbjad(g.hrd);
+  g.finance = sortByAngkatanAbjad(g.finance);
+  g.komdis = sortByAngkatanAbjad(g.komdis);
+  g.dokterSpesialis = sortByAngkatanAbjad(g.dokterSpesialis);
+  ['LAB','OPLAS','OBGYN'].forEach(key => {
+    g.divisi[key].dokter = sortByAngkatanAbjad(g.divisi[key].dokter);
+    g.divisi[key].asisten = sortByAngkatanAbjad(g.divisi[key].asisten);
+  });
+  g.dokterUmum = sortByAngkatanAbjad(g.dokterUmum);
+  g.coAss = sortByAngkatanAbjad(g.coAss);
+  g.trainee = sortByAngkatanAbjad(g.trainee);
+  g.probation = sortByAngkatanAbjad(g.probation);
 
   return g;
 }
