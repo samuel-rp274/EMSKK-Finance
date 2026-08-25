@@ -165,7 +165,7 @@ button[type="submit"] {
   padding: 16px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
   color: white;
   font-size: 15px;
   font-weight: 700;
@@ -200,7 +200,7 @@ button[type="submit"]:active {
   padding: 16px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
   color: white;
   font-size: 15px;
   font-weight: 700;
@@ -232,4 +232,5 @@ button[type="submit"]:active {
 @media (max-width: 640px) {
   .form-row { grid-template-columns: 1fr; gap: 0; }
   .tab-switch { grid-template-columns: 1fr; }
+  input, select { font-size: 16px; }
 }

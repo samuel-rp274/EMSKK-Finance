@@ -145,4 +145,5 @@ table.dir-table {
     white-space: normal;
     text-align: center;
   }
+  select, input[type="password"] { font-size: 16px; }
 }

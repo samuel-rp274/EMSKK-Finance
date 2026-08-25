@@ -112,4 +112,5 @@ select:focus, input[type="text"]:focus { border-color: var(--accent-purple); }
 
 @media (max-width: 640px) {
   .crop-stage { width: 100%; max-width: 280px; }
+  select, input[type="text"] { font-size: 16px; }
 }

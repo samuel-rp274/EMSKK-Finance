@@ -180,7 +180,7 @@ tr:nth-child(3) .rank { color: var(--accent-amber-dark); }
   padding: 16px;
   border: none;
   border-radius: 14px;
-  background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
   color: white;
   font-size: 15px;
   font-weight: 700;

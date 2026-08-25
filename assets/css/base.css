@@ -58,6 +58,7 @@
   --accent-amber-dark: #b45309;
   --accent-amber-alt: #facc15;
   --accent-purple-light: #e9d5ff;
+  --accent-purple-dark: #7e22ce;
   --accent-rose-light: #fbcfe8;
   --border-slate: #334155;
   --border-slate-light: #475569;
@@ -273,4 +274,5 @@ h1 span.white { color: var(--white); }
   body { padding-top: 80px; }
   .card { padding: 24px; }
   h1 { font-size: 22px; }
+  .ts-control input { font-size: 16px !important; }
 }

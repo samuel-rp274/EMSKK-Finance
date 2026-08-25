@@ -113,7 +113,7 @@ tr:hover td {
   margin-bottom: 16px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, var(--accent-purple), #7e22ce);
+  background: linear-gradient(135deg, var(--accent-purple), var(--accent-purple-dark));
   color: white;
   font-size: 13px;
   font-weight: 700;

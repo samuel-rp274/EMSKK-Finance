@@ -290,4 +290,5 @@ tr:nth-child(3) .rank { color: var(--accent-amber-dark); }
 
 @media (max-width: 640px) {
   .table-wrap { overflow-x: auto; }
+  .form-group input[type="text"], input[type="date"] { font-size: 16px; }
 }

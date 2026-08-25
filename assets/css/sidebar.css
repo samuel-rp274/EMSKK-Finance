@@ -242,7 +242,7 @@
   border-bottom: 1px solid rgba(var(--white-rgb), 0.06);
   text-decoration: none;
 }
-.__sb-brand img { width: 36x; height: 36px; border-radius: 8px; }
+.__sb-brand img { width: 36px; height: 36px; border-radius: 8px; }
 .__sb-brand span { font-size: 22px; font-weight: 700; color: var(--text); letter-spacing: 0.6px; }
 
 .__sb-section-label {

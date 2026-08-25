@@ -68,3 +68,6 @@ input[type="text"]:focus, input[type="password"]:focus { border-color: var(--acc
 .view.active { display:block; }
 
 @keyframes spin { to { transform: rotate(360deg); } }
+@media (max-width: 640px) {
+  input[type="text"], input[type="password"] { font-size: 16px; }
+}
