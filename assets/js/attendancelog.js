@@ -1,5 +1,11 @@
 lucide.createIcons();
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 let allData = [];
 let ts;
 let nameToId = {};
@@ -343,7 +349,7 @@ async function render(selectedName){
     week.length ? week.map((i, idx)=>`	
         <tr>
             <td>${idx + 1}</td>
-            <td>${i["Nama"]}</td>
+            <td>${escapeHtml(i["Nama"])}</td>
             <td>${fmtDateTime(i["Start"])}</td>
             <td>${fmtDateTime(i["Finish"])}</td>
             <td>${i["Durasi"]}</td>

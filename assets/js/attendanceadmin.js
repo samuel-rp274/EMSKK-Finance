@@ -1,5 +1,11 @@
 const CACHE_KEY_ATT = "attendance_cache_v1";
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 let allAttendance = [];
 let weekSelectTS = null;
 let rateDivisiCache = {};
@@ -32,7 +38,7 @@ async function checkLogin(){
       loadActiveDuty();
       requestIdleCallback(refreshFromServer);
     } else {
-      document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
+      document.getElementById("loginStatus").innerText = "❌ Password salah, kesalahan berulang secara beruntun akan mengunci akun sementara";
     }
   } catch(e){
     document.getElementById("loginStatus").innerText = "❌ Server error, silahkan hubungi FINANCE";
@@ -218,7 +224,7 @@ function renderAttendanceTable(){
       const h = Math.floor(u.minutes / 60); const m = u.minutes % 60;
       return `
         <div class="top-rank-item">
-          <span>${["🥇","🥈","🥉"][i]} ${u.nama}</span>
+          <span>${["🥇","🥈","🥉"][i]} ${escapeHtml(u.nama)}</span>
           <span style="font-weight:700; color:#facc15">${h}h ${m}m</span>
         </div>
       `;
@@ -502,27 +508,30 @@ function renderActiveDutyTable(){
 
   if(stopAllBtn) stopAllBtn.disabled = false;
 
-  tbody.innerHTML = activeDutyList.map(u => `
+  tbody.innerHTML = activeDutyList.map(u => {
+    const safeNamaAttr = escapeHtml(String(u.nama).replace(/\\/g, "\\\\").replace(/'/g, "\\'"));
+    return `
     <tr>
-      <td style="font-weight:600; color:#ffffff;">${u.nama}</td>
-      <td>${u.jabatan || "-"}</td>
-      <td>${u.divisi || "-"}</td>
+      <td style="font-weight:600; color:#ffffff;">${escapeHtml(u.nama)}</td>
+      <td>${escapeHtml(u.jabatan || "-")}</td>
+      <td>${escapeHtml(u.divisi || "-")}</td>
       <td style="font-family:monospace;">${fmtDateTime(u.start)}</td>
       <td style="font-weight:500;">${formatElapsed(u.start)}</td>
       <td>
         <div class="btn-group-actions">
-          <button class="btn-red" onclick="confirmStopSingle('${u.id}','${String(u.nama).replace(/'/g, "\\'")}')">STOP</button>
+          <button class="btn-red" onclick="confirmStopSingle('${u.id}','${safeNamaAttr}')">STOP</button>
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function confirmStopSingle(id, nama){
   stopMode = "single";
   stopTargetId = id;
   stopTargetNama = nama;
-  document.getElementById("stopModalText").innerHTML = `Yakin ingin menghentikan duty <b>${nama}</b> sekarang?`;
+  document.getElementById("stopModalText").innerHTML = `Yakin ingin menghentikan duty <b>${escapeHtml(nama)}</b> sekarang?`;
   document.getElementById("stopModal").style.display = "flex";
 }
 

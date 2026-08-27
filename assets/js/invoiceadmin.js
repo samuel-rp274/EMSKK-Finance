@@ -3,6 +3,12 @@ let weekSelectTS = null;
 let potonganCache = {};
 const CACHE_KEY_INV = "invoice_cache_v1";
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 async function loadPotonganCache(){
   const data = await callApi("getAllPotongan");
   potonganCache = {};
@@ -29,7 +35,7 @@ async function checkLogin(){
 		document.getElementById("navbar").style.display = "flex";
 		loadData();
 	} else {
-      document.getElementById("loginStatus").innerText = "❌ Password salah, maksimal 3x salah maka IP akan di block";
+      document.getElementById("loginStatus").innerText = "❌ Password salah, kesalahan berulang secara beruntun akan mengunci akun sementara";
     }
   }catch(e){
     document.getElementById("loginStatus").innerText = "❌ Server error, silahkan hubungi FINANCE";
@@ -175,7 +181,7 @@ async function renderTable(){
   document.getElementById("topGaji").innerHTML = 
     top3.map((x,i)=>`
       <div class="top-rank-item">
-        <span>${["🥇","🥈","🥉"][i]} ${x[0]}</span>
+        <span>${["🥇","🥈","🥉"][i]} ${escapeHtml(x[0])}</span>
         <span style="font-weight:700; color:#facc15">$KK ${x[1].gaji.toLocaleString("id-ID")}</span>
       </div>
   `).join("");
@@ -198,7 +204,7 @@ async function renderTable(){
     const hasPending = v.invoices.some(i => i.Status === "PENDING");
     return `
     <tr class="${hasPending ? "row-pending" : ""}">
-      <td style="font-weight:600; color:#ffffff;">${n}</td>
+      <td style="font-weight:600; color:#ffffff;">${escapeHtml(n)}</td>
       <td>${v.divisi}</td>
       <td>$KK ${v.total.toLocaleString("id-ID")}</td>
       <td>${((potonganCache[v.divisi] || 0) * 100).toFixed(0)}%</td>

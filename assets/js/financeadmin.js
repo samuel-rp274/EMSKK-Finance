@@ -9,6 +9,12 @@ let weekSelectTS = null;
 let financeStaffList = [];
 const CACHE_KEY_SALARY = "salary_cache_v1";
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 async function loadFinanceStaff(){
   try {
     const res = await callApi("getFinanceStaff", {});
@@ -35,7 +41,7 @@ async function checkLogin(){
       await loadFinanceStaff();
       requestAnimationFrame(loadData);
     } else {
-      document.getElementById("loginStatus").innerHTML = "❌ Password salah, maksimal 3x salah maka IP akan di block";
+      document.getElementById("loginStatus").innerHTML = "❌ Password salah, kesalahan berulang secara beruntun akan mengunci akun sementara";
     }
   }catch(e){
     document.getElementById("loginStatus").innerHTML = "❌ Server error, silahkan hubungi FINANCE";
@@ -149,7 +155,7 @@ async function renderTable(){
   
   document.getElementById("topGaji").innerHTML = top3.map((x,i)=>`
     <div class="top-rank-item">
-      <span>${["🥇","🥈","🥉"][i] || ""} ${x.nama}</span> 
+      <span>${["🥇","🥈","🥉"][i] || ""} ${escapeHtml(x.nama)}</span> 
       <span style="font-weight:700; color:#facc15">$KK ${(Number(x.duty) + Number(x.invoice)).toLocaleString("id-ID")}</span>
     </div>
   `).join("");
@@ -182,7 +188,7 @@ async function renderTable(){
     ).join("");
     return `
       <tr class="${rowClass}">
-        <td style="font-weight:600; color:#ffffff;">${x.nama}</td>
+        <td style="font-weight:600; color:#ffffff;">${escapeHtml(x.nama)}</td>
         <td>$KK ${duty.toLocaleString("id-ID")}</td>
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
@@ -275,7 +281,7 @@ function renderStaffList(){
   }
   container.innerHTML = financeStaffList.map(s => `
     <div class="staff-item">
-      <span>${s.name.charAt(0) + s.name.slice(1).toLowerCase()}</span>
+      <span>${escapeHtml(s.name.charAt(0) + s.name.slice(1).toLowerCase())}</span>
       <button onclick="submitDeactivateFinanceStaff(${s.id}, this)">Nonaktifkan</button>
     </div>
   `).join("");

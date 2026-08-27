@@ -12,7 +12,7 @@ async function checkLogin() {
       document.getElementById("loginCard").classList.add("hidden");
       document.getElementById("adminPanel").classList.remove("hidden");
     } else {
-      document.getElementById("loginStatus").innerHTML = "❌ Password salah, maksimal 3x salah maka IP akan di block";
+      document.getElementById("loginStatus").innerHTML = "❌ Password salah, kesalahan berulang secara beruntun akan mengunci akun sementara";
     }
   } catch (e) {
     document.getElementById("loginStatus").innerHTML = "❌ Server error, silahkan hubungi FINANCE";

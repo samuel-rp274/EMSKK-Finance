@@ -1,5 +1,11 @@
 lucide.createIcons();
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 async function checkLogin() {
   const pw = document.getElementById("adminPassword").value.trim();
   document.getElementById("loginStatus").innerHTML = "⏳ Memeriksa tingkat otentikasi...";
@@ -11,7 +17,7 @@ async function checkLogin() {
       sessionStorage.setItem(ADMIN_GATE_KEY, "true");
       openPanel();
     } else {
-      document.getElementById("loginStatus").innerHTML = "❌ Password salah, maksimal 3x salah maka IP akan di block";
+      document.getElementById("loginStatus").innerHTML = "❌ Password salah, kesalahan berulang secara beruntun akan mengunci akun sementara";
     }
   } catch (e) {
     document.getElementById("loginStatus").innerHTML = "❌ Server error, silahkan hubungi FINANCE";
@@ -118,7 +124,7 @@ async function generate(){
     tb.innerHTML += `
       <tr>
         <td class="rank">${trophy}</td>
-        <td>${x[0]}</td>
+        <td>${escapeHtml(x[0])}</td>
         <td>${totalHours}h ${totalMinutes}m</td>
       </tr>
     `;

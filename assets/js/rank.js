@@ -1,5 +1,11 @@
 lucide.createIcons();
 
+function escapeHtml(str) {
+  return String(str || "").replace(/[&<>"']/g, (m) => ({
+    "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+  }[m]));
+}
+
 let allData = [];
 let masterData = [];
 let lastSorted = [];
@@ -181,7 +187,7 @@ function render(){
       tableHtml += `
         <tr>
           <td class="rank">${trophy}</td>
-          <td>${x[0]}</td>
+          <td>${escapeHtml(x[0])}</td>
           <td>${formatHours(x[1])}</td>
         </tr>
       `;
@@ -207,7 +213,7 @@ function render(){
       neverHtml += `
         <tr>
           <td>${i + 1}</td>
-          <td>${u}</td>
+          <td>${escapeHtml(u)}</td>
         </tr>
       `;
     });
