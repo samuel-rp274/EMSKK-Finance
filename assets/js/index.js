@@ -6,6 +6,7 @@ const ROTATE_MS = 3000;
 const FRESHNESS_TICK_MS = 30 * 1000;
 
 const GALLERY_RAW_BASE = "https://cdn.jsdelivr.net/gh/samuel-rp274/EMSKK-Finance@main/assets/gallery/";
+const GALLERY_CACHE_KEY = "emskk_gallery_cache_v1";
 const GALLERY_ROTATE_MS = 2800;
 let galleryInterval = null;
 let galleryIndex = 0;
@@ -46,6 +47,25 @@ function saveCache(data){
     }));
   } catch (e) {
     console.warn("Gagal menyimpan cache index:", e);
+  }
+}
+
+function loadGalleryCache(){
+  try {
+    const raw = localStorage.getItem(GALLERY_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed.order) ? parsed.order : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function saveGalleryCache(order){
+  try {
+    localStorage.setItem(GALLERY_CACHE_KEY, JSON.stringify({ order: order }));
+  } catch (e) {
+    console.warn("Gagal menyimpan cache galeri:", e);
   }
 }
 
@@ -206,15 +226,10 @@ function renderFreshness(data){
   document.getElementById('freshnessText').textContent = "Diperbarui " + timeAgo(data.generatedAt);
 }
 
-async function loadGallery(){
+function renderGallery(order){
   const wrap = document.getElementById('galleryWrap');
-  let order = [];
-  try {
-    const result = await callApi("getGalleryList");
-    if (result.success) order = result.data || [];
-  } catch (err) {
-    console.error("Gagal memuat daftar galeri:", err);
-  }
+  clearInterval(galleryInterval);
+  galleryIndex = 0;
 
   const bust = Date.now();
   galleryUrls = order.map(filename => `${GALLERY_RAW_BASE}${filename}?v=${bust}`);
@@ -227,7 +242,11 @@ async function loadGallery(){
   const multi = galleryUrls.length > 1;
   wrap.innerHTML = `
     <div class="gallery-stage" id="galleryStage">
-      ${galleryUrls.map((url, i) => `<img class="gallery-img${i === 0 ? ' active' : ''}" src="${url}" alt="Galeri EMSKK">`).join('')}
+      ${galleryUrls.map((url, i) => `
+        <div class="gallery-slide${i === 0 ? ' active' : ''}">
+          <img class="gallery-img" src="${url}" alt="Galeri EMSKK">
+          <div class="gallery-fallback"><i data-lucide="image-off"></i><span>Gambar tidak tersedia</span></div>
+        </div>`).join('')}
     </div>
     ${multi ? `
     <div class="gallery-arrow prev" id="galleryPrev"><i data-lucide="chevron-left"></i></div>
@@ -236,12 +255,18 @@ async function loadGallery(){
   `;
   lucide.createIcons();
 
+  [...wrap.querySelectorAll('.gallery-img')].forEach(img => {
+    img.addEventListener('error', () => {
+      img.closest('.gallery-slide').classList.add('gallery-slide-broken');
+    }, { once: true });
+  });
+
   if (multi){
     const stage = document.getElementById('galleryStage');
     const dotsEl = document.getElementById('galleryDots');
 
     function show(i){
-      [...stage.children].forEach((img, idx) => img.classList.toggle('active', idx === i));
+      [...stage.children].forEach((slide, idx) => slide.classList.toggle('active', idx === i));
       [...dotsEl.children].forEach((d, idx) => d.classList.toggle('active', idx === i));
     }
     function startAuto(){
@@ -259,8 +284,31 @@ async function loadGallery(){
 
     document.getElementById('galleryPrev').onclick = () => goTo(galleryIndex - 1);
     document.getElementById('galleryNext').onclick = () => goTo(galleryIndex + 1);
+    wrap.addEventListener('mouseenter', () => clearInterval(galleryInterval));
+    wrap.addEventListener('mouseleave', () => startAuto());
     startAuto();
   }
+}
+
+async function loadGallery(){
+  const cachedOrder = loadGalleryCache();
+  if (cachedOrder) renderGallery(cachedOrder);
+
+  let order = [];
+  try {
+    const result = await callApi("getGalleryList");
+    if (result.success) order = result.data || [];
+  } catch (err) {
+    console.error("Gagal memuat daftar galeri:", err);
+    if (!cachedOrder) renderGallery([]);
+    return;
+  }
+
+  saveGalleryCache(order);
+
+  if (cachedOrder && JSON.stringify(cachedOrder) === JSON.stringify(order)) return;
+
+  renderGallery(order);
 }
 
 function renderDateSubtitle(){
@@ -320,7 +368,9 @@ async function initIndex(){
       renderAll(data);
     } catch (err) {
       console.error(err);
-      document.getElementById('loadingState').innerHTML = `
+      const loadingEl = document.getElementById('loadingState');
+      loadingEl.classList.remove('skeleton-wrap');
+      loadingEl.innerHTML = `
         <i data-lucide="alert-triangle" style="animation:none; color:#ef4444;"></i>
         Gagal memuat data. Silakan refresh halaman.`;
       lucide.createIcons();
