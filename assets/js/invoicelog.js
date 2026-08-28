@@ -1,5 +1,11 @@
 lucide.createIcons();
 
+function escapeHtml(str){
+  return String(str || "").replace(/[&<>"']/g, m => ({
+    '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;'
+  }[m]));
+}
+
 let allInvoices = [];
 let tomSelectInstance = null;
 const CACHE_KEY_INV = "invoice_cache_v1";
@@ -252,9 +258,9 @@ function renderTable(){
         return `
         <tr>
             <td>${idx + 1}</td>
-            <td>${formattedDate}</td>
-            <td>${i["Jenis Invoice"] || ""}</td>
-            <td>${i["Qty"] || 0}</td>
+            <td>${escapeHtml(formattedDate)}</td>
+            <td>${escapeHtml(i["Jenis Invoice"] || "")}</td>
+            <td>${escapeHtml(i["Qty"] || 0)}</td>
             <td>$KK ${Number(i["Total"] || 0).toLocaleString("id-ID")}</td>
             <td>${buktiHref ? `<a href="${buktiHref}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link" style="width: 14px; height: 14px;"></i> Lihat</a>` : "-"}</td>
         </tr>
