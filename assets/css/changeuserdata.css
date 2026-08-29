@@ -120,6 +120,37 @@
   line-height: 1.5;
 }
 
+.field-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.field-label-row label {
+  margin-bottom: 0;
+}
+
+.field-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border: none;
+  border-radius: 8px;
+  background: rgba(var(--purple-rgb), 0.12);
+  color: var(--accent-purple);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.field-edit-btn:hover {
+  background: rgba(var(--purple-rgb), 0.22);
+}
+.field-edit-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
 .tab-switch-3col {
   grid-template-columns: 1fr 1fr 1fr;
 }
