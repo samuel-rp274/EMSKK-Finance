@@ -226,6 +226,22 @@ const searchInput = document.getElementById("memberSearch");
 const searchResults = document.getElementById("searchResults");
 setupMemberSearch(searchInput, searchResults, (id) => selectMember(id));
 
+function relockEditableFields() {
+  document.getElementById("editAngkatan").readOnly = true;
+  document.getElementById("editNama").readOnly = true;
+}
+
+function makeFieldUnlockable(inputId, btnId) {
+  const input = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  btn.addEventListener("click", () => {
+    input.readOnly = false;
+    input.focus();
+  });
+}
+makeFieldUnlockable("editAngkatan", "editAngkatanLock");
+makeFieldUnlockable("editNama", "editNamaLock");
+
 async function selectMember(id) {
   const status = document.getElementById("updateStatus");
   status.innerHTML = "";
@@ -247,6 +263,7 @@ async function selectMember(id) {
     setJabatanValue("editDivisi", "editJabatanSelect", "editJabatanManual", p.jabatan);
     tomSelects["editStatus"].setValue(p.status, true);
     tomSelects["editKetSp"].setValue(p.ket_sp || "", true);
+    relockEditableFields();
 
     document.getElementById("editMemberWrap").classList.remove("hidden");
     searchInput.value = p.nama;
@@ -293,6 +310,7 @@ document.getElementById("updateMemberForm").addEventListener("submit", async (e)
     status.innerHTML = "✅ Perubahan berhasil disimpan";
     document.getElementById("editMemberWrap").classList.add("hidden");
     searchInput.value = "";
+    relockEditableFields();
   } catch (err) {
     console.error(err);
     status.innerHTML = "❌ Gagal mengirim data (network error)";
