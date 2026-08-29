@@ -114,13 +114,23 @@
             <input type="hidden" id="editId">
 
             <div class="form-group">
-              <label>Angkatan</label>
-              <input type="number" id="editAngkatan" required>
+              <div class="field-label-row">
+                <label>Angkatan</label>
+                <button type="button" class="field-edit-btn" id="editAngkatanLock" title="Ubah Angkatan" aria-label="Ubah Angkatan">
+                  <i data-lucide="pencil"></i>
+                </button>
+              </div>
+              <input type="number" id="editAngkatan" required readonly>
             </div>
 
             <div class="form-group">
-              <label>Nama</label>
-              <input type="text" id="editNama" required>
+              <div class="field-label-row">
+                <label>Nama</label>
+                <button type="button" class="field-edit-btn" id="editNamaLock" title="Ubah Nama" aria-label="Ubah Nama">
+                  <i data-lucide="pencil"></i>
+                </button>
+              </div>
+              <input type="text" id="editNama" required readonly>
             </div>
 
             <div class="form-group">
