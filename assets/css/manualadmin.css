@@ -118,6 +118,7 @@ input, select {
   color: white;
   font-size: 14px;
   transition: all 0.2s;
+  color-scheme: dark;
 }
 
 select#invType + .ts-wrapper:not(.has-items) .ts-control::before {
