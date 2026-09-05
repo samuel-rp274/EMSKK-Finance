@@ -236,11 +236,19 @@ async function renderTable(){
                 <td>${inv.Status==="INVALID"?'<s>$KK '+Number(inv["Total"]).toLocaleString("id-ID")+'</s>':'$KK '+Number(inv["Total"]).toLocaleString("id-ID")}</td>
                 <td>${(() => { const h = safeHref(inv["Bukti"]); return h ? `<a href="${h}" target="_blank" rel="noopener noreferrer" style="display:inline-flex; align-items:center; gap:4px;"><i data-lucide="external-link" style="width:12px;height:12px;"></i> Lihat Bukti</a>` : "-"; })()}</td>
                 <td>
-                  <select onchange="updateStatus('${inv["id"]}', this.value, this)">
-                    <option value="PENDING" ${inv.Status==="PENDING"?'selected':''}>⏳ PENDING</option>
-                    <option value="VALID" ${inv.Status==="VALID"?'selected':''}>🟢 VALID</option>
-                    <option value="INVALID" ${inv.Status==="INVALID"?'selected':''}>❌ INVALID</option>
-                  </select>
+                  <div class="status-cell">
+                    <div class="btn-group-actions">
+                      <button class="btn-green" onclick="updateStatus('${inv["id"]}','VALID', this)">V</button>
+                      <button class="btn-red" onclick="updateStatus('${inv["id"]}','INVALID', this)">X</button>
+                    </div>
+                    <span class="status-badge" style="
+                      padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700;
+                      background:${inv.Status==="VALID" ? "rgba(16, 185, 129, 0.15)" : inv.Status==="INVALID" ? "rgba(239, 68, 68, 0.15)" : "rgba(245, 158, 11, 0.15)"};
+                      color:${inv.Status==="VALID" ? "#10b981" : inv.Status==="INVALID" ? "#ef4444" : "#f59e0b"};
+                      border: 1px solid ${inv.Status==="VALID" ? "rgba(16, 185, 129, 0.3)" : inv.Status==="INVALID" ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)"};">
+                      ${inv.Status || "-"}
+                    </span>
+                  </div>
                 </td>
               </tr>`).join("")}
             </tbody>
@@ -261,13 +269,15 @@ function toggleDetail(idx){
 }
 
 async function updateStatus(invoiceId, status, element){
-  if(element) element.disabled = true;
+  const wrap = element ? element.closest(".status-cell") : null;
+  const buttons = wrap ? wrap.querySelectorAll("button") : [];
+  buttons.forEach(b => b.disabled = true);
 
   try {
     const data = await callApi("updateInvoiceStatus", { invoice_id: invoiceId, status });
     if(!data.success) {
       alert("Gagal memperbarui status di server.");
-      if(element) element.disabled = false;
+      buttons.forEach(b => b.disabled = false);
       return;
     }
     
@@ -296,7 +306,7 @@ async function updateStatus(invoiceId, status, element){
     requestAnimationFrame(() => { renderTable(); });
   } catch(err) { 
     alert("Gagal update status akibat gangguan jaringan."); 
-    if(element) element.disabled = false;
+    buttons.forEach(b => b.disabled = false);
   }
 }
 
