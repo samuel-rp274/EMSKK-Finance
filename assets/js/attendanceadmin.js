@@ -285,9 +285,9 @@ function renderAttendanceTable(){
               <div>
                 <span class="status-badge" style="
                   padding:4px 10px; border-radius:8px; font-size:11px; font-weight:700;
-                  background:${normalize(s.Status) === "VALID" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)"};
-                  color:${normalize(s.Status) === "VALID" ? "#10b981" : "#f59e0b"};
-                  border: 1px solid ${normalize(s.Status) === "VALID" ? "rgba(16, 185, 129, 0.3)" : "rgba(245, 158, 11, 0.3)"};">
+                  background:${normalize(s.Status) === "VALID" ? "rgba(16, 185, 129, 0.15)" : normalize(s.Status) === "INVALID" ? "rgba(239, 68, 68, 0.15)" : "rgba(245, 158, 11, 0.15)"};
+                  color:${normalize(s.Status) === "VALID" ? "#10b981" : normalize(s.Status) === "INVALID" ? "#ef4444" : "#f59e0b"};
+                  border: 1px solid ${normalize(s.Status) === "VALID" ? "rgba(16, 185, 129, 0.3)" : normalize(s.Status) === "INVALID" ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)"};">
                   ${s.Status || "-"}
                 </span>
               </div>
@@ -441,8 +441,9 @@ function updateStatusLocal(logId, status){
   const badge = row.querySelector(".status-badge");
   if(badge){
     badge.innerText = status;
-    badge.style.background = status === "VALID" ? "rgba(16, 185, 129, 0.15)" : "rgba(245, 158, 11, 0.15)";
-    badge.style.color = status === "VALID" ? "#10b981" : "#f59e0b";
+    badge.style.background = status === "VALID" ? "rgba(16, 185, 129, 0.15)" : status === "INVALID" ? "rgba(239, 68, 68, 0.15)" : "rgba(245, 158, 11, 0.15)";
+    badge.style.color = status === "VALID" ? "#10b981" : status === "INVALID" ? "#ef4444" : "#f59e0b";
+    badge.style.borderColor = status === "VALID" ? "rgba(16, 185, 129, 0.3)" : status === "INVALID" ? "rgba(239, 68, 68, 0.3)" : "rgba(245, 158, 11, 0.3)";
   }
 }
 
