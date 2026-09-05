@@ -208,6 +208,7 @@ function renderAttendanceTable(){
 
   const top3 = Object.values(topMap).sort((a,b) => b.minutes - a.minutes).slice(0,3);
   window._top3Cache = top3;
+  window._top3Range = { start, end };
   const pending = weekData.filter(i => normalize(i.Status) === "PENDING");
 
   document.getElementById("pendingDuty").innerText = pending.length;
@@ -306,12 +307,29 @@ function renderAttendanceTable(){
 
 function toggleDetail(idx){ document.getElementById("detail-"+idx).classList.toggle("hidden"); }
 
+function formatTopDutyHeader(start, end){
+  const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  if(!start || !end) return "TOP DUTY";
+
+  let header;
+  if(start.getFullYear() !== end.getFullYear()){
+    header = `Top Duty ${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  } else if(start.getMonth() !== end.getMonth()){
+    header = `Top Duty ${start.getDate()} ${months[start.getMonth()]} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  } else {
+    header = `Top Duty ${start.getDate()} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  }
+  return header.toUpperCase();
+}
+
 function copyTop3(){
   const top3 = window._top3Cache || [];
-  const text = top3.map((u, i) => {
+  const header = formatTopDutyHeader(window._top3Range?.start, window._top3Range?.end);
+  const lines = top3.map((u, i) => {
     const h = Math.floor(u.minutes / 60); const m = u.minutes % 60;
     return `${i+1}. ${u.nama} - ${h}h ${m}m`;
-  }).join("\n");
+  });
+  const text = [header, ...lines].join("\n");
 
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById("copyTop3Btn");
