@@ -152,6 +152,7 @@ async function renderTable(){
 
   const top3 = [...filtered].sort((a,b)=>(Number(b.duty) + Number(b.invoice)) - (Number(a.duty) + Number(a.invoice))).slice(0,3);
   window._top3Cache = top3;
+  window._top3Week = week;
   
   document.getElementById("topGaji").innerHTML = top3.map((x,i)=>`
     <div class="top-rank-item">
@@ -247,9 +248,31 @@ async function markPaid(userId, week, status, element){
   }
 }
 
+function formatTopSalaryHeader(weekKey){
+  const months = ["Januari","Februari","Maret","April","Mei","Juni","Juli","Agustus","September","Oktober","November","Desember"];
+  if(!weekKey || !weekKey.includes("|")) return "TOP SALARY";
+
+  const [startStr, endStr] = weekKey.split("|");
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  if(isNaN(start) || isNaN(end)) return "TOP SALARY";
+
+  let header;
+  if(start.getFullYear() !== end.getFullYear()){
+    header = `Top Salary ${start.getDate()} ${months[start.getMonth()]} ${start.getFullYear()} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  } else if(start.getMonth() !== end.getMonth()){
+    header = `Top Salary ${start.getDate()} ${months[start.getMonth()]} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  } else {
+    header = `Top Salary ${start.getDate()} - ${end.getDate()} ${months[end.getMonth()]} ${end.getFullYear()}`;
+  }
+  return header.toUpperCase();
+}
+
 function copyTop3(){
   const top3 = window._top3Cache || [];
-  const text = top3.map((x, i) => `${i+1}. ${x.nama}`).join("\n");
+  const header = formatTopSalaryHeader(window._top3Week);
+  const lines = top3.map((x, i) => `${i+1}. ${x.nama}`);
+  const text = [header, ...lines].join("\n");
 
   navigator.clipboard.writeText(text).then(() => {
     const btn = document.getElementById("copyTop3Btn");
