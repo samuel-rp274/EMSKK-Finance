@@ -16,9 +16,9 @@ const divisi = document.getElementById("divisi");
 const harga = document.getElementById("harga");
 
 const invoiceType = document.getElementById("invoiceType");
-let invoiceTypeTS = null;   // TomSelect instance wrapping #invoiceType
-let rawatInapTS = null;     // TomSelect instance wrapping #rawatInap
-let pembayaranTS = null;    // TomSelect instance wrapping #pembayaran
+let invoiceTypeTS = null;
+let rawatInapTS = null;
+let pembayaranTS = null;
 const status = document.getElementById("status");
 const normalSection = document.getElementById("normalSection");
 const operasiSection = document.getElementById("operasiSection");
@@ -117,7 +117,7 @@ function injectPrice(data){
     if(!invoiceTypeTS){
       invoiceTypeTS = new TomSelect("#invoiceType", {
         create: false,
-        controlInput: null,
+        placeholder: "Pilih Invoice",
         onChange: (value) => { handleInvoiceTypeChange(value); }
       });
     }
