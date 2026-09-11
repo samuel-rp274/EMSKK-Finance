@@ -69,7 +69,7 @@ label {
     letter-spacing: 0.5px;
 }
 
-input, select {
+input:not(.ts-wrapper input), select {
     width: 100%;
     padding: 14px 16px;
     border: 1px solid rgba(var(--white-rgb), 0.04);
@@ -81,12 +81,7 @@ input, select {
     color-scheme: dark;
 }
 
-select#invoiceType + .ts-wrapper:not(.has-items) .ts-control::before {
-  content: "Pilih Invoice";
-  color: var(--muted-2);
-}
-
-input:focus, select:focus {
+input:focus:not(.ts-wrapper input), select:focus {
     outline: none;
     border-color: rgba(var(--green-rgb), 0.4);
     box-shadow: 0 0 10px rgba(var(--green-rgb), 0.1);
@@ -152,5 +147,5 @@ button:active {
 }
 
 @media (max-width: 640px) {
-  input, select { font-size: 16px; }
+  input:not(.ts-wrapper input), select { font-size: 16px; }
 }
