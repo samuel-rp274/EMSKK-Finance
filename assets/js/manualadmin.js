@@ -66,7 +66,15 @@ document.querySelectorAll(".tab-btn").forEach(btn => {
     document.querySelectorAll(".tab-panel").forEach(p => p.classList.remove("active"));
     btn.classList.add("active");
     document.getElementById("panel-" + btn.dataset.tab).classList.add("active");
-    
+
+    if (attNamaTS) attNamaTS.clear(true);
+    document.getElementById("attJabatan").innerText = "-";
+    document.getElementById("attDivisi").innerText = "-";
+
+    if (invNamaTS) invNamaTS.clear(true);
+    document.getElementById("invJabatan").innerText = "-";
+    document.getElementById("invDivisi").innerText = "-";
+
     setMonthYearDefaults();
   });
 });
@@ -158,9 +166,9 @@ document.getElementById("invNama").addEventListener("change", function () {
 });
 
 const invType = document.getElementById("invType");
-let invTypeTS = null;       // TomSelect instance wrapping #invType
-let invRawatInapTS = null;  // TomSelect instance wrapping #invRawatInap
-let invPembayaranTS = null; // TomSelect instance wrapping #invPembayaran
+let invTypeTS = null;
+let invRawatInapTS = null;
+let invPembayaranTS = null;
 
 async function loadPriceList() {
   const cached = localStorage.getItem(CACHE_KEY_PRICE_MANUAL);
@@ -332,10 +340,10 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
     }
 
     status.innerHTML = "✅ Sesi duty berhasil ditambahkan (" + result.duration + ")";
-    document.getElementById("attendanceManualForm").reset();
+
+        document.getElementById("attStart").value = "";
+    document.getElementById("attFinish").value = "";
     setMonthYearDefaults();
-    document.getElementById("attJabatan").innerText = "-";
-    document.getElementById("attDivisi").innerText = "-";
 
     setTimeout(() => { status.innerHTML = ""; }, 3000);
   } catch (err) {
@@ -410,12 +418,11 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
 
     status.innerHTML = "✅ Invoice berhasil disimpan";
 
+    const namaBertahan = nama;
+
     document.getElementById("invoiceManualForm").reset();
-    // form.reset() only resets the underlying native <select> elements;
-    // it doesn't notify TomSelect, so each wrapped dropdown must be synced manually.
-    // For rawatInap/pembayaran, the native select's own value is already correctly
-    // reset to its default option by form.reset() itself — just mirror that into TomSelect.
-    if(invNamaTS) invNamaTS.setValue("", true);
+
+    if(invNamaTS) invNamaTS.setValue(namaBertahan, true);
     if(invTypeTS) invTypeTS.setValue("", true);
     if(invRawatInapTS) invRawatInapTS.setValue(document.getElementById("invRawatInap").value, true);
     if(invPembayaranTS) invPembayaranTS.setValue(document.getElementById("invPembayaran").value, true);
@@ -425,8 +432,10 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
     invSuratSection.classList.add("hidden");
     invLainSection.classList.add("hidden");
     document.getElementById("invTotal").innerText = "$KK 0";
-    document.getElementById("invJabatan").innerText = "-";
-    document.getElementById("invDivisi").innerText = "-";
+
+    const uBertahan = emsData[namaBertahan];
+    document.getElementById("invJabatan").innerText = uBertahan?.jabatan || "-";
+    document.getElementById("invDivisi").innerText = uBertahan?.divisi || "-";
 
     setTimeout(() => { status.innerHTML = ""; }, 3000);
   } catch (err) {
