@@ -229,18 +229,24 @@ setupMemberSearch(searchInput, searchResults, (id) => selectMember(id));
 function relockEditableFields() {
   document.getElementById("editAngkatan").readOnly = true;
   document.getElementById("editNama").readOnly = true;
+  document.getElementById("editRole").disabled = true;
 }
 
 function makeFieldUnlockable(inputId, btnId) {
   const input = document.getElementById(inputId);
   const btn = document.getElementById(btnId);
   btn.addEventListener("click", () => {
-    input.readOnly = false;
+    if (input.tagName === "SELECT") {
+      input.disabled = false;
+    } else {
+      input.readOnly = false;
+    }
     input.focus();
   });
 }
 makeFieldUnlockable("editAngkatan", "editAngkatanLock");
 makeFieldUnlockable("editNama", "editNamaLock");
+makeFieldUnlockable("editRole", "editRoleLock");
 
 async function selectMember(id) {
   const status = document.getElementById("updateStatus");
@@ -259,6 +265,7 @@ async function selectMember(id) {
     document.getElementById("editingName").innerText = p.nama;
     document.getElementById("editAngkatan").value = p.angkatan;
     document.getElementById("editNama").value = p.nama;
+    document.getElementById("editRole").value = p.role;
     tomSelects["editDivisi"].setValue(p.divisi, true);
     setJabatanValue("editDivisi", "editJabatanSelect", "editJabatanManual", p.jabatan);
     tomSelects["editStatus"].setValue(p.status, true);
@@ -280,6 +287,7 @@ document.getElementById("updateMemberForm").addEventListener("submit", async (e)
   const id = document.getElementById("editId").value;
   const angkatan = document.getElementById("editAngkatan").value.trim();
   const nama = document.getElementById("editNama").value.trim();
+  const role = document.getElementById("editRole").value;
   const divisi = tomSelects["editDivisi"].getValue();
   const jabatan = getJabatanValue("editJabatanSelect", "editJabatanManual");
   const newStatus = tomSelects["editStatus"].getValue();
@@ -300,14 +308,14 @@ document.getElementById("updateMemberForm").addEventListener("submit", async (e)
   status.innerHTML = "⏳ Menyimpan...";
 
   try {
-    const result = await callApi("updateMember", { id, angkatan, nama, jabatan, divisi, status: newStatus, ketSp });
+    const result = await callApi("updateMember", { id, angkatan, nama, role, jabatan, divisi, status: newStatus, ketSp });
 
     if (!result.success) {
       status.innerHTML = "❌ " + (result.message || "Gagal menyimpan perubahan");
       return;
     }
 
-    status.innerHTML = "✅ Perubahan berhasil disimpan";
+    status.innerHTML = result.warning ? "⚠️ " + result.warning : "✅ Perubahan berhasil disimpan";
     document.getElementById("editMemberWrap").classList.add("hidden");
     searchInput.value = "";
     relockEditableFields();
