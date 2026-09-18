@@ -151,6 +151,12 @@
   height: 14px;
 }
 
+#editRole:disabled {
+  opacity: 0.6;
+  background: rgba(var(--surface-rgb), 0.3);
+  cursor: not-allowed;
+}
+
 .tab-switch-3col {
   grid-template-columns: 1fr 1fr 1fr;
 }
