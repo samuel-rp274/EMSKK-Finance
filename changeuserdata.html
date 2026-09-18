@@ -134,6 +134,20 @@
             </div>
 
             <div class="form-group">
+              <div class="field-label-row">
+                <label>Role</label>
+                <button type="button" class="field-edit-btn" id="editRoleLock" title="Ubah Role" aria-label="Ubah Role">
+                  <i data-lucide="pencil"></i>
+                </button>
+              </div>
+              <select id="editRole" required disabled>
+                <option value="user">User</option>
+                <option value="admin">Admin</option>
+                <option value="superadmin">Superadmin</option>
+              </select>
+            </div>
+
+            <div class="form-group">
               <label>Divisi</label>
               <select id="editDivisi" required>
                 <option value="PETINGGI">PETINGGI</option>
