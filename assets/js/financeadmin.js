@@ -8,6 +8,13 @@ let allSalaryData = [];
 let weekSelectTS = null;
 let financeStaffList = [];
 const CACHE_KEY_SALARY = "salary_cache_v1";
+const FINANCE_STAFF_COLORS = ["amber", "purple", "emerald", "sky", "rose", "blue", "red", "slate"];
+
+function getStatusColorClass(status){
+  if(status === "UNPAID") return "status-unpaid";
+  const staff = financeStaffList.find(s => s.name === status);
+  return `status-color-${staff ? staff.color : "slate"}`;
+}
 
 function escapeHtml(str) {
   return String(str || "").replace(/[&<>"']/g, (m) => ({
@@ -194,7 +201,7 @@ async function renderTable(){
         <td>$KK ${invoice.toLocaleString("id-ID")}</td>
         <td><b style="color:#ef4444">$KK ${total.toLocaleString("id-ID")}</b></td>
         <td>
-          <select class="status-select status-${currentStatus.toLowerCase()}" data-prev-value="${currentStatus}" onchange="markPaid('${x.user_id}','${x.week}', this.value, this)">${optionsHtml}</select>
+          <select class="status-select ${getStatusColorClass(currentStatus)}" data-prev-value="${currentStatus}" onchange="markPaid('${x.user_id}','${x.week}', this.value, this)">${optionsHtml}</select>
         </td>
       </tr>
     `;
@@ -236,7 +243,7 @@ async function markPaid(userId, week, status, element){
       allSalaryData = parsed.data;
     }
     if(element){
-      element.className = `status-select status-${status.toLowerCase()}`;
+      element.className = `status-select ${getStatusColorClass(status)}`;
       element.dataset.prevValue = status;
       element.disabled = false;
     }
@@ -289,12 +296,15 @@ function openStaffModal(){
   document.getElementById("staffModal").classList.add("active");
   document.getElementById("staffFormStatus").innerText = "";
   document.getElementById("newStaffName").value = "";
+  openColorPopoverId = null;
   renderStaffList();
 }
 
 function closeStaffModal(){
   document.getElementById("staffModal").classList.remove("active");
 }
+
+let openColorPopoverId = null;
 
 function renderStaffList(){
   const container = document.getElementById("staffList");
@@ -304,10 +314,81 @@ function renderStaffList(){
   }
   container.innerHTML = financeStaffList.map(s => `
     <div class="staff-item">
-      <span>${escapeHtml(s.name.charAt(0) + s.name.slice(1).toLowerCase())}</span>
-      <button onclick="submitDeactivateFinanceStaff(${s.id}, this)">Nonaktifkan</button>
+      <div class="staff-item-top">
+        <span>${escapeHtml(s.name.charAt(0) + s.name.slice(1).toLowerCase())}</span>
+        <div class="staff-item-actions">
+          <div class="color-trigger-wrap">
+            <button type="button" class="color-trigger color-swatch-${s.color}" title="Ganti warna" aria-label="Ganti warna" onclick="toggleColorPopover(${s.id}, this)"></button>
+            <div class="color-popover" id="colorPopover-${s.id}">
+              ${FINANCE_STAFF_COLORS.map(c => `
+                <button type="button" class="color-swatch color-swatch-${c}${c === s.color ? " active" : ""}" title="${c}" aria-label="${c}" onclick="changeFinanceStaffColor(${s.id}, '${c}', this)"></button>
+              `).join("")}
+            </div>
+          </div>
+          <button onclick="submitDeactivateFinanceStaff(${s.id}, this)">Nonaktifkan</button>
+        </div>
+      </div>
     </div>
   `).join("");
+}
+
+function toggleColorPopover(id, triggerEl){
+  const popover = document.getElementById(`colorPopover-${id}`);
+  if(!popover) return;
+  const isOpen = popover.classList.contains("open");
+
+  document.querySelectorAll(".color-popover.open").forEach(p => p.classList.remove("open"));
+
+  if(!isOpen){
+    popover.classList.add("open");
+    openColorPopoverId = id;
+  } else {
+    openColorPopoverId = null;
+  }
+}
+
+document.addEventListener("click", (e) => {
+  if(openColorPopoverId === null) return;
+  const openPopover = document.getElementById(`colorPopover-${openColorPopoverId}`);
+  if(!openPopover) return;
+  const wrap = openPopover.closest(".color-trigger-wrap");
+  if(wrap && !wrap.contains(e.target)){
+    openPopover.classList.remove("open");
+    openColorPopoverId = null;
+  }
+});
+
+async function changeFinanceStaffColor(id, color, btnEl){
+  const popover = btnEl.closest(".color-popover");
+  const swatches = popover ? popover.querySelectorAll(".color-swatch") : [];
+  swatches.forEach(b => b.disabled = true);
+
+  try {
+    const res = await callApi("updateFinanceStaffColor", { id, color });
+    if(res && res.success){
+      const staff = financeStaffList.find(s => s.id === id);
+      if(staff) staff.color = color;
+      swatches.forEach(b => b.classList.remove("active"));
+      btnEl.classList.add("active");
+
+      const wrap = popover ? popover.closest(".color-trigger-wrap") : null;
+      const trigger = wrap ? wrap.querySelector(".color-trigger") : null;
+      if(trigger){
+        FINANCE_STAFF_COLORS.forEach(c => trigger.classList.remove(`color-swatch-${c}`));
+        trigger.classList.add(`color-swatch-${color}`);
+      }
+      if(popover) popover.classList.remove("open");
+      openColorPopoverId = null;
+
+      renderTable();
+    } else {
+      alert((res && res.message) || "Gagal mengubah warna staff.");
+    }
+  } catch(e){
+    alert("Koneksi bermasalah, coba lagi.");
+  } finally {
+    swatches.forEach(b => b.disabled = false);
+  }
 }
 
 async function submitAddFinanceStaff(){
