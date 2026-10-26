@@ -214,6 +214,8 @@ document.addEventListener("input", updateTotal);
 
 document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     e.preventDefault();
+    const submitBtn = document.querySelector('#invoiceForm button[type="submit"]');
+    if(submitBtn.disabled) return;
     if(!currentUser){ status.innerHTML = "⚠️ Data EMS tidak ditemukan, tidak bisa submit"; return; }
     const invoiceTypeValue = invoiceTypeTS ? invoiceTypeTS.getValue() : "";
     if(!invoiceTypeValue){ status.innerHTML = "⚠️ Pilih Jenis Invoice"; return; }
@@ -255,6 +257,7 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
         const yakin = confirm(`Nama: ${currentUser.nama}\nInvoice: ${invoiceTypeText}\nTotal: $KK ${hargaFinal*qtyFinal}\nLanjut simpan?`);
         if(!yakin) { status.innerHTML = ""; return; }
 
+        submitBtn.disabled = true;
         const result = await callApi("submitInvoice", payload);
 
         if (!result.success) {
@@ -297,6 +300,8 @@ document.getElementById("invoiceForm").addEventListener("submit", async (e)=>{
     } catch(err){
         console.error(err);
         status.innerHTML = "❌ Gagal mengirim invoice";
+    } finally {
+        submitBtn.disabled = false;
     }
 });
 

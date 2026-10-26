@@ -244,7 +244,7 @@ function injectPrice(data) {
   if(!invTypeTS){
     invTypeTS = new TomSelect("#invType", {
       create: false,
-      controlInput: null,
+      placeholder: "Pilih Invoice",
       onChange: (value) => { handleInvTypeChange(value); }
     });
   }
@@ -355,6 +355,8 @@ document.getElementById("attendanceManualForm").addEventListener("submit", async
 document.getElementById("invoiceManualForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   const status = document.getElementById("invStatus");
+  const submitBtn = document.querySelector('#invoiceManualForm button[type="submit"]');
+  if (submitBtn.disabled) return;
 
   const nama = invNamaTS ? invNamaTS.getValue() : "";
   if (!nama || !emsData[nama]) { status.innerHTML = "⚠️ Pilih nama terlebih dahulu"; return; }
@@ -406,6 +408,7 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
   const yakin = confirm(`Nama: ${nama}\nInvoice: ${invTypeText}\nTotal: $KK ${hargaFinal * qtyFinal}\nLanjut simpan?`);
   if (!yakin) return;
 
+  submitBtn.disabled = true;
   status.innerHTML = "⏳ Mengirim...";
 
   try {
@@ -441,5 +444,7 @@ document.getElementById("invoiceManualForm").addEventListener("submit", async (e
   } catch (err) {
     console.error(err);
     status.innerHTML = "❌ Gagal mengirim invoice";
+  } finally {
+    submitBtn.disabled = false;
   }
 });
