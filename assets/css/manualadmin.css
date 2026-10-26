@@ -109,7 +109,7 @@ label {
   letter-spacing: 0.5px;
 }
 
-input, select {
+input:not(.ts-wrapper input), select {
   width: 100%;
   padding: 14px 16px;
   border: 1px solid rgba(var(--white-rgb), 0.04);
@@ -121,12 +121,7 @@ input, select {
   color-scheme: dark;
 }
 
-select#invType + .ts-wrapper:not(.has-items) .ts-control::before {
-  content: "Pilih Invoice";
-  color: var(--muted-2);
-}
-
-input:focus, select:focus {
+input:focus:not(.ts-wrapper input), select:focus {
   outline: none;
   border-color: rgba(var(--purple-rgb), 0.4);
   box-shadow: 0 0 10px rgba(var(--purple-rgb), 0.1);
@@ -184,6 +179,13 @@ button[type="submit"]:active {
   transform: translateY(1px);
 }
 
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
 .status-msg {
   text-align: center;
   margin-top: 20px;
@@ -233,5 +235,5 @@ button[type="submit"]:active {
 @media (max-width: 640px) {
   .form-row { grid-template-columns: 1fr; gap: 0; }
   .tab-switch { grid-template-columns: 1fr; }
-  input, select { font-size: 16px; }
+  input:not(.ts-wrapper input), select { font-size: 16px; }
 }

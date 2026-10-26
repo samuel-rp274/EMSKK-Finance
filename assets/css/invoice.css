@@ -139,6 +139,13 @@ button:active {
     transform: translateY(1px);
 }
 
+button:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+}
+
 #status {
     text-align: center;
     margin-top: 20px;
